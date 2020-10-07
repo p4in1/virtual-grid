@@ -1,0 +1,9 @@
+.idea/.*
+node_modules/.*
+virtual-grid/.*
+index.js
+main.html
+rollup.config.js
+Test.iml
+tsconfig.json
+tslint.json

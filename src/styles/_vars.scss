@@ -1,0 +1,104 @@
+/* COLORS */
+
+//------------------------------------------------------------------------------ Theme relevant variables START
+//only change these vsriables and the client will lool completely dirfferent
+//----------------------------blue theme
+$color-background-panel: #f1f1f1;
+$color-accent: #0092e1;
+$color-nav-elements: #fff;
+$color-font-inverted: #fff;
+$color-font-main: #777;
+
+//navbackgrounds
+$color-background-navigation: rgba(lighten($color-accent, 20%), 0.72);
+$color-background-navigation-body: rgba($color-accent, 0.78);
+$color-background-navigation-underlay: #0c2a40;
+
+//scrollbarcolors
+$color-scrollbar-gray: darken($color-background-panel, 10%);
+
+//----------------------------black theme
+//$color-background-panel: #333;
+//$color-accent: #0092e1;
+//$color-nav-elements: #fff;
+//$color-font-inverted: #fff;
+//$color-font-main: #dadada;
+//
+////navbackgrounds
+//$color-background-navigation: rgba($color-accent, 0.6);
+//$color-background-navigation-body:  rgba($color-accent, 0.6);
+//$color-background-navigation-underlay: transparent;
+//
+////scrollbarcolors
+//$color-scrollbar-gray: lighten($color-background-panel, 30%);
+
+//------------------------------------------------------------------------------  Theme relevant variables END
+
+// backgrounds based on $color-background-panel
+$color-background-main-light: darken($color-background-panel, 8%);
+$color-background-inline-dialog: lighten($color-background-panel, 10%);
+$color-background-overlay: $color-background-panel;
+$color-background-dialog-header: $color-background-panel;
+$color-background-split-pane: darken($color-background-panel, 10%);
+$color-background-grid: lighten($color-background-panel, 5%);
+$color-background-nav: rgba($color-nav-elements, 0.32);
+
+//backgrounds special elements
+$color-background-secondary-button: #fff;
+
+//color for modal dialog overlays
+$color-overlay: rgba(0, 0, 0, 0.8);
+
+//color defs based on $color-accent
+$color-input-focus: $color-accent;
+$color-accent-light: lighten($color-accent, 10%);
+$color-rock-blue: desaturate($color-accent-light, 40%);
+$color-accent-desat: desaturate($color-accent-light, 80%);
+$form-button-color: rgba($color-accent-desat, .6);
+//selction color in client
+$color-accent-mediumlight:rgba($color-accent-light, .30);
+$color-accent-extralight: rgba($color-accent-light, .15);
+// ... some more color defs
+$color-accent-gray: darken($color-background-panel, 3%);
+
+$color-accent-red: #bd362f;
+$color-invalid: rgba(255, 0, 0, 0.08);
+$color-capslock: rgba(255, 165, 0, 0.08);
+$color-status-ok: #96be0a;
+$yellow: #ff0;
+
+// cleanup of generated colors from automated scss
+$white_20: rgba(255, 255, 255, 0.2);
+$white_5: hsla(0, 0%, 100%, .05);
+$black_10: rgba(0, 0, 0, 0.10);
+$black_16: rgba(0, 0, 0, 0.16);
+
+//colors font
+$color-font-nav: $color-font-inverted;
+$color-font-medium: rgba($color-font-main, .6); //for placeholder or disabled fields
+
+//colors font per context
+$color-font-button-primary: $color-font-inverted;
+$color-font-button-form: $color-font-inverted;
+$color-font-button-secondary: $color-font-main;
+
+//colors per elements
+$color-form-elements: lighten($color-background-panel, 40%);
+$color-form-element-disabled: lighten($color-background-panel, 5%);
+$color-form-inputs: lighten($color-background-panel, 20%);
+$background-disabled-field: repeating-linear-gradient(-40deg, $color-background-grid, $color-background-inline-dialog 3px, $color-background-panel 6px);
+$color-osloader-light: lighten($color-background-panel, 40%);
+
+// colors border
+$color-border-light: $color-background-panel;
+$color-border-medium: darken($color-background-panel, 5%);
+$color-border-dark: darken($color-background-panel, 10%);
+$color-border-nav: $color-nav-elements;
+
+/* FONT */
+// font sizes
+$font-medium: 14px;
+$font-big: 16px;
+
+//paddings
+$eob-pane-padding: 16px; // the main inner padding of ui components

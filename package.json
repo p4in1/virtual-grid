@@ -1,0 +1,43 @@
+{
+  "name": "@p4in1/virtual-grid",
+  "version": "0.0.39",
+  "description": "This is a grid component that is extremely fast and can manage up to 500k rows",
+  "main": "dist/virtual.grid.min.js",
+  "module": "dist/virtual.grid.min.js",
+  "types": "dist/virtual.grid.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "mkDir": "if exist dist rd /s /q dist && mkdir dist && if exist tmp rd /s /q tmp && mkdir tmp",
+    "transpile": "tsc",
+    "sass": "node-sass src/styles/ -o dist",
+    "combine": "rollup src/virtual.grid.service.js --file tmp/bundle.js --format umd --name 'VirtualGrid'",
+    "compress": "terser tmp/bundle.js --keep-classnames -c -m  -o dist/virtual.grid.min.js",
+    "clean": "if exist declarations rd /s /q declarations",
+    "assets": "mkdir \"dist/assets\" && copy \"src/styles/assets\" \"dist/assets\"",
+    "build": "npm run mkDir && rollup -c && npm run clean && npm run assets"
+  },
+  "keywords": [
+    "grid",
+    "fast",
+    "performance",
+    "free",
+    "virtual",
+    "infinite",
+    "scroll",
+    "definition",
+    "column",
+    "row"
+  ],
+  "author": "P4in1",
+  "license": "ISC",
+  "devDependencies": {
+    "rollup": "^2.28.1",
+    "rollup-plugin-scss": "^2.6.0",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-typescript2": "^0.27.2",
+    "typescript": "^4.0.3"
+  }
+}
