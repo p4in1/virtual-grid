@@ -120,7 +120,8 @@ export class VirtualGridFilterController {
                     continue
                 }
 
-                let isMatching = true;
+                let isColumnFilterMatching = true;
+                let isGlobalFilterMatching = this.filterValue.length === 0;
 
                 // now we apply the global filter text
                 for (const col of this.Grid.columns) {
@@ -132,24 +133,26 @@ export class VirtualGridFilterController {
                         continue;
                     }
 
-                    if (!isColumnFilter && !isColumnFilter) {
+                    if (!isColumnFilter && !isGlobalFilter) {
                         continue
                     }
 
                     let cellValue = this._getCellValue(row, col).toLowerCase()
 
-                    if (isColumnFilter && isMatching) {
-                        isMatching = this._isColumnFilterMatching(cellValue, col)
+                    if (isColumnFilter && isColumnFilterMatching) {
+                        isColumnFilterMatching = this._isColumnFilterMatching(cellValue, col)
                     }
 
-                    if (isGlobalFilter && isMatching) {
-                        isMatching = this._isGlobalFilterMatching(cellValue)
+                    if (isGlobalFilter && isColumnFilterMatching && !isGlobalFilterMatching) {
+                        isGlobalFilterMatching = isGlobalFilterMatching == false ? this._isGlobalFilterMatching(cellValue) : true;
                     }
 
-                    if (!isMatching) {
+                    if (!isColumnFilterMatching) {
                         break
                     }
                 }
+
+                let isMatching = isColumnFilterMatching && isGlobalFilterMatching;
 
                 row.isVisible = isMatching;
                 row.isVisibleAfterFilter = isMatching;

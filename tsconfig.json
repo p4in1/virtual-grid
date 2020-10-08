@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "watch": true,
+    "sourceMap": true,
     "declaration": true,
     "declarationDir": "./declarations",
     "module": "es6",
@@ -8,7 +10,7 @@
     "target": "es5"
   },
   "include": [
-    "src/**/*"
+    "my-grid/src/virtual-grid/**/*"
   ],
   "exclude": [
     "node_modules"

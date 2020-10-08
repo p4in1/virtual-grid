@@ -456,11 +456,11 @@ export class VirtualGridApi {
         }
 
         const scrollLeftPosition: number = this.Grid.rows[index].level * this.gPadding;
-        const scrollTopPosition: number = (visibleItemsBefore * this.Grid.RowController.rowHeight) - (this.Grid.UI.domController.dom.gridContainer.offsetHeight / 2);
+        const scrollTopPosition: number = (visibleItemsBefore * this.Grid.RowController.rowHeight) - (this.Grid.UI.domController.dom.virtualGrid.offsetHeight / 2);
 
         this.Grid.UI.domController.dom.bodyWrapper.scrollTop = scrollTopPosition;
 
-        if (scrollHorizontal && scrollLeftPosition > (this.Grid.UI.domController.dom.gridContainer.offsetWidth / 2)) {
+        if (scrollHorizontal && scrollLeftPosition > (this.Grid.UI.domController.dom.virtualGrid.offsetWidth / 2)) {
             this.Grid.UI.domController.dom.bodyWrapper.scrollLeft = scrollLeftPosition / 2;
         }
     };

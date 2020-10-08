@@ -55,6 +55,6 @@ export class VirtualGridUIController {
      * releases listeners and clears all array to prevent memory leaks
      */
     public destroy = (): void => {
-        this.domController.dom.gridContainer.remove();
+        this.domController.dom.virtualGrid.remove();
     }
 }

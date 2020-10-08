@@ -5,14 +5,14 @@ import scss from 'rollup-plugin-scss'
 import dts from "rollup-plugin-dts";
 
 export default [{
-    input: 'src/styles/virtual.grid.scss', // our source file
+    input: 'my-grid/src/virtual-grid/styles/virtual.grid.scss', // our source file
     plugins: [
         scss({
             output: './dist/virtual.grid.min.css'
         })
     ],
 }, {
-    input: 'src/virtual.grid.service.ts',
+    input: 'my-grid/src/virtual-grid/virtual.grid.service.ts',
     output: [
         {
             file: pkg.module,

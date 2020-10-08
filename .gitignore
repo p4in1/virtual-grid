@@ -2,3 +2,5 @@
 node_modules/
 declarations/
 dist/
+my-grid/src/assets/data.json
+test/data.json

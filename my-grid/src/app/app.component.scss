@@ -1,0 +1,34 @@
+@import "src/virtual-grid/styles/virtual.grid";
+
+html, body {
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
+
+:root {
+    --color-primary: #46A2BF;
+    --color-secondary: #9a1915;
+    --color-success: #00c853;
+    --color-grey: #aaa;
+    --color-light-grey: #dadada;
+}
+
+body {
+    font-family: "Roboto", sans-serif;
+}
+
+.grid-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    #grid-demo{
+        position: relative;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+}

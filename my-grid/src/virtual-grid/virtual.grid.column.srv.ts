@@ -383,7 +383,7 @@ export class VirtualGridColumnController {
         this.calculateMinWidth();
 
         // the grid now has a scrollbar, so we have to create some space
-        if ((this.Grid.rows.length - 1) * this.Grid.RowController.rowHeight > this.Grid.UI.domController.dom.gridContainer.offsetHeight) {
+        if ((this.Grid.rows.length - 1) * this.Grid.RowController.rowHeight > this.Grid.UI.domController.dom.virtualGrid.offsetHeight) {
             this.isVerticalScrolling = true;
         }
 
@@ -392,7 +392,7 @@ export class VirtualGridColumnController {
             return
         }
 
-        let availableWidth: number = this.Grid.UI.domController.dom.gridContainer.clientWidth;
+        let availableWidth: number = this.Grid.UI.domController.dom.virtualGrid.clientWidth;
         let unsizedColumns: number = 0; // we count the columns without a predefined width
 
         if (this.isVerticalScrolling) {

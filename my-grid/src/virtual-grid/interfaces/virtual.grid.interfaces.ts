@@ -223,6 +223,8 @@ export interface IRenderedRow {
 }
 
 export interface IVirtualGridDom {
+    virtualGrid:HTMLElement
+
     headerWrapper: HTMLElement
     headerCenterScrollPort: HTMLElement
 

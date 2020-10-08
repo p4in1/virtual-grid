@@ -51,7 +51,7 @@ export class VirtualGridDragAndDropController {
 
             if (this.isGhostAttached) {
                 this.isGhostAttached = false;
-                this.dom.gridContainer.classList.remove("moving")
+                this.dom.virtualGrid.classList.remove("moving")
                 this.dom.ghost.parentNode.removeChild(this.dom.ghost)
             }
         }
@@ -96,7 +96,7 @@ export class VirtualGridDragAndDropController {
     private onColDrag = (event, dragData: IVirtualDragData): void => {
         if (!this.isGhostAttached && (Math.abs(dragData.x - event.clientX) > 8 || Math.abs(dragData.y - event.clientY) > 8)) {
             this.isGhostAttached = true;
-            this.dom.gridContainer.classList.add("moving")
+            this.dom.virtualGrid.classList.add("moving")
             this.dom.ghostLabel.textContent = dragData.col.title
             this.ghostWidth = this.Grid.Utils.getTextWidthInPixel(dragData.col.title) + 20
 

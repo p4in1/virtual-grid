@@ -54,6 +54,9 @@ export class VirtualGridUIDomController {
         this.renderedColumnCount = config.columns.length;
 
         this.dom = {
+
+            virtualGrid:this.Utils.el("div", ['virtual-grid']),
+
             headerWrapper: this.Utils.el("div", ['virtual-grid-header-wrapper']),
             headerCenterScrollPort: this.Utils.el("div", ['virtual-grid-header-wrapper-scroll-port']),
 
@@ -84,14 +87,16 @@ export class VirtualGridUIDomController {
             ghostLabel: this.Utils.el("span", ["virtual-grid-ghost-label"])
         };
 
+        this.dom.gridContainer.appendChild(this.dom.virtualGrid)
+
         this.dom.headerLeft.appendChild(this.dom.headerLeftResizer)
         this.dom.headerRight.appendChild(this.dom.headerRightResizer)
 
-        this.dom.gridContainer.appendChild(this.dom.bodyWrapper);
+        this.dom.virtualGrid.appendChild(this.dom.bodyWrapper);
 
         this.dom.scrollYCenterScrollport.appendChild(this.dom.scrollYCenterSpacer)
 
-        this.dom.gridContainer.appendChild(this.dom.scrollYGuard)
+        this.dom.virtualGrid.appendChild(this.dom.scrollYGuard)
         this.dom.scrollYGuard.appendChild(this.dom.scrollYLeftSpacer)
         this.dom.scrollYGuard.appendChild(this.dom.scrollYCenterScrollport)
         this.dom.scrollYGuard.appendChild(this.dom.scrollYRightSpacer)
@@ -196,7 +201,7 @@ export class VirtualGridUIDomController {
         let bodyRightFragment = document.createDocumentFragment();
 
         if (this.showHeader) {
-            this.dom.gridContainer.prepend(this.dom.headerWrapper);
+            this.dom.virtualGrid.prepend(this.dom.headerWrapper);
 
             this.dom.headerLeft.style["height"] = `${this.headerRowHeight}px`;
             this.dom.headerCenter.style["height"] = `${this.headerRowHeight}px`;
@@ -270,15 +275,13 @@ export class VirtualGridUIDomController {
             this.dom.bodyRight.classList.add("hidden")
         }
 
-        this.dom.gridContainer.classList.add("virtual-grid");
-
         if (this.config.style) {
-            this.dom.gridContainer.classList.add(this.config.style);
+            this.dom.virtualGrid.classList.add(this.config.style);
         }
     }
 
     public calculateWrapper() {
-        this.gridHeight = this.dom.gridContainer.offsetHeight
+        this.gridHeight = this.dom.virtualGrid.offsetHeight
 
         this.bodyHeight = this.dom.bodyCenter.offsetHeight
 
