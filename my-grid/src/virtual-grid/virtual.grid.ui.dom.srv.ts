@@ -392,8 +392,8 @@ export class VirtualGridUIDomController {
         dom.cellText = this.Utils.el("span", ["header-cell-text"]);
         dom.cellText.textContent = column.title;
 
-        dom.cellSortArrow = this.Utils.el("i", ["header-sort-arrow", "material-icons"]);
-        dom.cellSortArrow.innerHTML = "arrow_right_alt"
+        dom.cellSortArrow = this.Utils.el("i", ["header-sort-arrow", "material-icons", "small"]);
+        dom.cellSortArrow.innerHTML = "trending_flat"
 
         dom.cellResizer = this.Utils.el("div", ["header-cell-resizer"]);
         dom.cellFilter = this.Utils.el("input", ["header-filter-input"]) as HTMLInputElement
