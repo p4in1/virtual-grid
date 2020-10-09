@@ -17,28 +17,23 @@ export class VirtualGridRow implements IVirtualGridRow {
     isSelected: boolean = false;
     isVisible: boolean = true;
     isVisibleAfterFilter: boolean = true;
-    isCollapsible: boolean = false;
 
     parent?: VirtualGridRow;
     isExpanded?: boolean = false;
 
     constructor(private Grid: IVirtualGrid, node: any, level: number = 0, parent?: VirtualGridRow) {
         this.level = level;
-        this.isSelectable = !Grid.RowController.readonly;
+        this.isSelectable = true;
         this.isSelected = !!node.isSelected;
-        this.isVisible = parent == void 0 || parent != void 0 && parent.isExpanded;//node.isCollapsible == void 0 ? true : node.isCollapsible;
+        this.isVisible = parent == void 0 || parent != void 0 && parent.isExpanded;
 
         if (parent != void 0) {
             this.parent = parent;
         }
 
-        if (Grid.RowController.isCollapsible) {
-            this.isCollapsible = node.isCollapsible == void 0 ? true : node.isCollapsible;
-        }
-
         if (node[Grid.childNodesKey]) {
             this.isExpanded = Grid.RowController.expandNodesByDefault || node.expanded;
-            this.isSelectable = Grid.RowController.readonly ? !Grid.RowController.readonly : Grid.RowController.useIntermediateNodes;
+            this.isSelectable = Grid.RowController.useIntermediateNodes;
         }
 
         // TODO observe changes on the rowData
@@ -64,37 +59,37 @@ export class VirtualGridRow implements IVirtualGridRow {
         }
     };
 
-    private renderRow() {
-        // TODO - when reordering rows the grid should attach the rendered row to the row model
-        // TODO - Attach the rendered Row to the row model and remove the row model once the row leaves the viewport and
-        // TODO - would be reused for another row model .. this avoids the use of a for..loop
-        // let renderedRows: RenderedRow[] = this.Grid.UI.domController.renderedRows;
-        //
-        // for (let renderedRow of renderedRows) {
-        //     const number: number = Number(renderedRow.element.getAttribute("number"));
-        //     if (number == this.index) {
-        //         this.Grid.RowController.renderRow(renderedRow);
-        //         break;
-        //     }
-        // }
-    };
+    // private renderRow() {
+    //     // TODO - when reordering rows the grid should attach the rendered row to the row model
+    //     // TODO - Attach the rendered Row to the row model and remove the row model once the row leaves the viewport and
+    //     // TODO - would be reused for another row model .. this avoids the use of a for..loop
+    //     // let renderedRows: RenderedRow[] = this.Grid.UI.domController.renderedRows;
+    //     //
+    //     // for (let renderedRow of renderedRows) {
+    //     //     const number: number = Number(renderedRow.element.getAttribute("number"));
+    //     //     if (number == this.index) {
+    //     //         this.Grid.RowController.renderRow(renderedRow);
+    //     //         break;
+    //     //     }
+    //     // }
+    // };
 
-    private addProxy(node: any): void {
-
-        let debounce: any = null;
-        let _this = this;
-        this.rowData = new Proxy(node, {
-            set: function (target, prop, value) {
-                console.log({type: 'set', target, prop, value});
-
-                clearTimeout(debounce);
-
-                debounce = setTimeout(() => {
-                    _this.renderRow()
-                }, 0);
-
-                return Reflect.set(target, prop, value);
-            }
-        });
-    }
+    // private addProxy(node: any): void {
+    //
+    //     let debounce: any = null;
+    //     let _this = this;
+    //     this.rowData = new Proxy(node, {
+    //         set: function (target, prop, value) {
+    //             console.log({type: 'set', target, prop, value});
+    //
+    //             clearTimeout(debounce);
+    //
+    //             debounce = setTimeout(() => {
+    //                 _this.renderRow()
+    //             }, 0);
+    //
+    //             return Reflect.set(target, prop, value);
+    //         }
+    //     });
+    // }
 }

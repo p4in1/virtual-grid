@@ -2,8 +2,7 @@
  * api controller
  * everything related to the api of a virtual grid instance goes here
  */
-import {IRenderedRow, IVirtualGrid, IVirtualGridRow} from "./interfaces/virtual.grid.interfaces";
-import {VirtualGridColumn} from "./virtual.grid.column.model";
+import {IRenderedRow, IVirtualGrid, IVirtualGridConfig, IVirtualGridRow} from "./interfaces/virtual.grid.interfaces";
 
 export class VirtualGridApi {
     private debounceTimeout: any = null;
@@ -12,7 +11,8 @@ export class VirtualGridApi {
 
     scrollPosTopBackup: number = 0;
 
-    constructor(protected Grid: IVirtualGrid, protected config: any) {
+    constructor(protected Grid: IVirtualGrid, protected config: IVirtualGridConfig) {
+        this.useMultiSelect = this.config.selectionMethod == "multi"
     }
 
     /**
@@ -73,8 +73,8 @@ export class VirtualGridApi {
      * updates the config properties
      * @param config
      */
-    public updateConfigProperties = (config: any): void => {
-        this.useMultiSelect = config.useMultiSelect;
+    public updateConfigProperties = (config: IVirtualGridConfig): void => {
+        this.useMultiSelect = config.selectionMethod === "multi";
     };
     /**
      * Updates the rows in the grid and refreshes the grid
@@ -159,7 +159,7 @@ export class VirtualGridApi {
     }
 
     /**
-     * returns alls rows
+     * returns all rows
      * @returns {Array}
      */
     public getRows = (): any[] => {
@@ -170,10 +170,10 @@ export class VirtualGridApi {
      *
      * @param {string} key   - the key to use
      * @param {string} value - the value to find
-     * @param {boolean} useRowdata - searches the given key/value pair inside the original data
+     * @param {boolean} useRowData - searches the given key/value pair inside the original data
      * @returns {VirtualGridRow|null}
      */
-    public getRowByKey = (key: string, value: string | number, useRowdata: boolean = false): IVirtualGridRow => {
+    public getRowByKey = (key: string, value: string | number, useRowData: boolean = false): IVirtualGridRow => {
 
         if (this.Grid == void 0) {
             return;
@@ -181,7 +181,7 @@ export class VirtualGridApi {
 
         for (const i in this.Grid.rows) {
 
-            let searchObject = useRowdata ? this.Grid.rows[i].rowData : this.Grid.rows[i];
+            let searchObject = useRowData ? this.Grid.rows[i].rowData : this.Grid.rows[i];
             if (searchObject[key] == value) {
                 return this.Grid.rows[i];
             }
@@ -441,7 +441,7 @@ export class VirtualGridApi {
      * @param {Boolean} scrollHorizontal - Whether to scroll horizontally or not
      */
     public scrollToIndex = (index: number, scrollHorizontal: boolean = true): void => {
-
+        let dom = this.Grid.UI.domController.dom
         let visibleItemsBefore: number = 0;
 
         for (const row of this.Grid.rows) {
@@ -456,12 +456,12 @@ export class VirtualGridApi {
         }
 
         const scrollLeftPosition: number = this.Grid.rows[index].level * this.gPadding;
-        const scrollTopPosition: number = (visibleItemsBefore * this.Grid.RowController.rowHeight) - (this.Grid.UI.domController.dom.virtualGrid.offsetHeight / 2);
+        const scrollTopPosition: number = (visibleItemsBefore * this.Grid.RowController.rowHeight) - (dom.virtualGrid.offsetHeight / 2);
 
-        this.Grid.UI.domController.dom.bodyWrapper.scrollTop = scrollTopPosition;
+        dom.bodyWrapper.scrollTop = scrollTopPosition;
 
-        if (scrollHorizontal && scrollLeftPosition > (this.Grid.UI.domController.dom.virtualGrid.offsetWidth / 2)) {
-            this.Grid.UI.domController.dom.bodyWrapper.scrollLeft = scrollLeftPosition / 2;
+        if (scrollHorizontal && scrollLeftPosition > (dom.virtualGrid.offsetWidth / 2)) {
+            dom.bodyWrapper.scrollLeft = scrollLeftPosition / 2;
         }
     };
 
@@ -533,10 +533,10 @@ export class VirtualGridApi {
      *
      * @param {number} rowIndexToInsert
      * @param {Array} rowsToInsert
-     * @param {boolean} insertAsChilds
+     * @param {boolean} insertAsChildren
      */
-    public insertRows = (rowIndexToInsert: number, rowsToInsert: any[], insertAsChilds: boolean): void => {
-        this.Grid.RowController.insertRows(rowIndexToInsert, rowsToInsert, insertAsChilds);
+    public insertRows = (rowIndexToInsert: number, rowsToInsert: any[], insertAsChildren: boolean): void => {
+        this.Grid.RowController.insertRows(rowIndexToInsert, rowsToInsert, insertAsChildren);
     };
 
     /**
@@ -549,7 +549,7 @@ export class VirtualGridApi {
     };
 
     /**
-     * refreshes the column headers and executes the headervaluegetter
+     * refreshes the column headers and executes the headerValueGetter
      */
     public refreshHeader = (): void => {
         this.Grid.ColumnController.refreshColumns();

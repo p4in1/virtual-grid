@@ -1,4 +1,9 @@
-import {IVirtualGrid, IVirtualGridColumn, IVirtualGridRow} from "./interfaces/virtual.grid.interfaces";
+import {
+    IVirtualGrid,
+    IVirtualGridColumn,
+    IVirtualGridConfig,
+    IVirtualGridRow
+} from "./interfaces/virtual.grid.interfaces";
 import {VirtualGridColumn} from "./virtual.grid.column.model";
 
 /**
@@ -15,31 +20,17 @@ export class VirtualGridColumnController {
 
     private headerValueGetter: any;
     private autoSizeColumns: boolean;
-    private isGridHierarchy: boolean = false;
-    private truncateCellContent: boolean = true;
-    private minWidth: any = 0;
-    private width: any = 0;
 
     public sortedColumns: IVirtualGridColumn[];
-    public minimumColumnWidth: number = 60;
 
-    constructor(protected Grid: IVirtualGrid, config: any) {
+    constructor(protected Grid: IVirtualGrid, config: IVirtualGridConfig) {
 
         this.colDefs = config.columns.slice();
         this.headerValueGetter = config.headerValueGetter;
         this.autoSizeColumns = config.autoSizeColumns;
-        this.minWidth = config.minWidth;
-        this.width = config.width;
         this.sortedColumns = [];
-        this.truncateCellContent = config.truncateCellContent != void 0 ? config.truncateCellContent : true;
 
         this.scrollbarWidth = this.getScrollbarWidth()
-
-        for (let col of config.columns) {
-            if (col.showAsTree) {
-                this.isGridHierarchy = true;
-            }
-        }
     }
 
     setCurrentColumnIndex() {
@@ -57,14 +48,11 @@ export class VirtualGridColumnController {
         this.colDefs = config.columns;
         this.headerValueGetter = config.headerValueGetter;
         this.autoSizeColumns = config.autoSizeColumns;
-        this.minWidth = config.minWidth;
-        this.width = config.width;
-        this.truncateCellContent = config.truncateCellContent != void 0 ? config.truncateCellContent : true
     };
 
     /**
-     * refreshes the header and each headercell
-     * replaces the headervalue or calls the headerValueGetter
+     * refreshes the header and each header cell
+     * replaces the header value or calls the headerValueGetter
      */
     public refreshColumns = (): void => {
         for (let column of this.Grid.originalColumns) {
@@ -115,7 +103,7 @@ export class VirtualGridColumnController {
         /**
          * Sorts array of objects on keys as provided
          * @param array array of objects
-         * @param sortObject object specifying keys, {KEY1:"asc", "KEY2:"desc", KEY3:"desc"}, also {KEYX:"skip"} for fun
+         * @param sortObject object specifying keys, {KEY1:"asc", "KEY2:"desc", KEY3:"desc"}
          * @returns array of objects, sorted
          */
         multiSort: (array: any[], sortObject: any = {}): any[] => {
@@ -170,12 +158,12 @@ export class VirtualGridColumnController {
      * sorts the column ascending or descending
      * if the user holds the shift key the grid starts to sort multidimensional
      *
-     * @param col - the column definiton of the column to sort
+     * @param col - the column definition of the column to sort
      * @param {boolean} isMultiSelect
      * @param {string} dir - asc, desc, none
      */
     public sortColumn(col: IVirtualGridColumn, isMultiSelect: boolean, dir?: string): void {
-        // reset all columns --> there was a multisort present but now its not
+        // reset all columns --> there was a multi sort present but now its not
         if (!isMultiSelect) {
 
             // find the column that has just been clicked. If the column is found, that means the user clicked the
@@ -183,7 +171,7 @@ export class VirtualGridColumnController {
             // which results in a reset and a new sort with that column
             let sortedCol = this.sortedColumns.find(_col => _col.field === col.field)
 
-            // multisort is present but this click is not with shift --> reset
+            // multi sort is present but this click is not with shift --> reset
             if (Object.keys(this.sortConfig).length > 1 || !sortedCol) {
                 this.resetColumnSort()
             }
@@ -223,8 +211,8 @@ export class VirtualGridColumnController {
      * apply the current sorting to each row set
      */
     public applySorting(): void {
-        // let start = +new Date();
-        if (this.isGridHierarchy) {
+        let isHierarchy = this.Grid.columns.filter(x => x.isHierarchyColumn).length > 0
+        if (isHierarchy) {
             let roots: IVirtualGridRow[] = [];
 
             for (let row of this.Grid.rows) {
@@ -233,19 +221,14 @@ export class VirtualGridColumnController {
                 }
             }
 
-            // let _s = +new Date();
             this.sortAsTree(roots, this.sortConfig);
 
             this.Grid.rows = this.Grid.Utils.flatten(roots);
-            // console.log("recursive tree sort took -->", +new Date() - _s)
         } else {
-            let _s = +new Date();
             this.sortHelper.multiSort(this.Grid.rows, this.sortConfig);
-            console.log("sort took -->", +new Date() - _s)
         }
 
         this.Grid.api.refreshGrid(false, true);
-        // console.log("sort finished after -->", +new Date() - start)
     }
 
     /**
@@ -314,7 +297,7 @@ export class VirtualGridColumnController {
 
     /**
      * helper function to sort the grid elements as a tree
-     * it sorts each subsequent childset of a row recursively
+     * it sorts each subsequent child set of a row recursively
      * @param rows
      * @param sortObject
      */
@@ -372,15 +355,12 @@ export class VirtualGridColumnController {
     }
 
     /**
-     * this only calculates the width of each column but does not alter the css value of the headercell
+     * this only calculates the width of each column but does not alter the css value of the header cell
      *
-     * if the columns shall be autosized we calculate the approx. width by the width of the content using the FormlayoutService
+     * if the columns shall be auto sized we calculate the approx. width by the width of the content using the Form layout Service
      * otherwise we divide the available width by the columns given
      */
     public calculateColumnWidth(): void {
-
-        // let s = +new Date();
-        this.calculateMinWidth();
 
         // the grid now has a scrollbar, so we have to create some space
         if ((this.Grid.rows.length - 1) * this.Grid.RowController.rowHeight > this.Grid.UI.domController.dom.virtualGrid.offsetHeight) {
@@ -393,7 +373,7 @@ export class VirtualGridColumnController {
         }
 
         let availableWidth: number = this.Grid.UI.domController.dom.virtualGrid.clientWidth;
-        let unsizedColumns: number = 0; // we count the columns without a predefined width
+        let upsizedColumns: number = 0; // we count the columns without a predefined width
 
         if (this.isVerticalScrolling) {
             availableWidth -= this.scrollbarWidth
@@ -406,18 +386,18 @@ export class VirtualGridColumnController {
             if (col.width !== void 0) {
                 availableWidth -= col.width
             } else {
-                unsizedColumns++;
+                upsizedColumns++;
             }
         }
 
-        if (unsizedColumns > 0) {
+        if (upsizedColumns > 0) {
             // there are columns without a defined width so we even the available space out down to the minimum of 40px
             for (let i = 0; i < this.Grid.originalColumns.length; i++) {
                 let col = this.Grid.originalColumns[i];
                 if (col.width === void 0) {
-                    const width: number = Math.floor((availableWidth) / unsizedColumns);
+                    const width: number = Math.floor((availableWidth) / upsizedColumns);
 
-                    col.width = width < this.minimumColumnWidth ? this.minimumColumnWidth : width;
+                    col.width = width < col.minWidth ? col.minWidth : width;
                     col.width = Math.round(col.width)
                 }
             }
@@ -437,35 +417,6 @@ export class VirtualGridColumnController {
         cellWidth += this.gPadding;
 
         return cellWidth;
-    }
-
-    /**
-     * calculates the minimum width of a cell
-     */
-    private calculateMinWidth(): void {
-        for (const row of this.Grid.rows) {
-
-            for (const col of this.Grid.originalColumns) {
-
-                if (this.truncateCellContent) {
-                    col.minWidth = this.minimumColumnWidth;
-                    continue;
-                }
-
-                // calculate the width of the cell to apply the minimum column width
-                let cellWidth: number = 0;
-
-                if (col.minWidth == void 0) {
-                    col.minWidth = 0;
-                }
-
-                cellWidth = this.getCellContentWidth(col, row);
-
-                if (cellWidth > col.minWidth) {
-                    col.minWidth = cellWidth;
-                }
-            }
-        }
     }
 
     /**

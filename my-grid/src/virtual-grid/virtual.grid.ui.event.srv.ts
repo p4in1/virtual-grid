@@ -1,4 +1,10 @@
-import {IVirtualGrid, IVirtualGridColumn, IVirtualGridDom, IVirtualGridRow} from "./interfaces/virtual.grid.interfaces";
+import {
+    IVirtualGrid,
+    IVirtualGridColumn,
+    IVirtualGridConfig,
+    IVirtualGridDom,
+    IVirtualGridRow
+} from "./interfaces/virtual.grid.interfaces";
 import {VirtualGridUIDomController} from "./virtual.grid.ui.dom.srv";
 
 export class VirtualGridUIEventController {
@@ -17,7 +23,7 @@ export class VirtualGridUIEventController {
 
     scrollLeft: number = 0
 
-    constructor(private Grid: IVirtualGrid, private config: any, private domController: VirtualGridUIDomController) {
+    constructor(private Grid: IVirtualGrid, private config: IVirtualGridConfig, private domController: VirtualGridUIDomController) {
         this.dom = domController.dom;
         // callbacks
         this.onRowRightClick = this.config.onRowRightClick;
@@ -107,7 +113,7 @@ export class VirtualGridUIEventController {
      * catch the scroll event of the scroll guard and apply it to the body and the header
      */
     private onBodyScrollX = (): void => {
-        this.scrollLeft = this.dom.scrollYCenterScrollport.scrollLeft
+        this.scrollLeft = this.dom.scrollYCenterScrollPort.scrollLeft
 
         this.dom.bodyCenterScrollPort.scrollLeft = this.scrollLeft
         this.dom.headerCenterScrollPort.scrollLeft = this.scrollLeft
@@ -185,7 +191,7 @@ export class VirtualGridUIEventController {
     }
 
     /**
-     * calculates and updates the columnwidths of all columns starting from the startindex
+     * calculates and updates the column widths of all columns starting from the startIndex
      * at this point we calculate the relative width of a column once something changed according to the configuration
      * off all columns whether they can grow or shrink
      * the calculation starts periodically every 16ms caused by the use of a requestAnimationFrame
@@ -228,8 +234,8 @@ export class VirtualGridUIEventController {
             }
 
         } else {
-            let isVertivalScrolling: boolean = this.Grid.ColumnController.isVerticalScrolling;
-            let scrollbarWidth = isVertivalScrolling ? this.Grid.ColumnController.scrollbarWidth : 0;
+            let isVerticalScrolling: boolean = this.Grid.ColumnController.isVerticalScrolling;
+            let scrollbarWidth = isVerticalScrolling ? this.Grid.ColumnController.scrollbarWidth : 0;
             let width = this.domController.calculatePartialWidths()
             let remaining = this.domController.bodyWrapperWidth - width.bodyLeftWidth - width.bodyRightWidth - scrollbarWidth
 
@@ -243,8 +249,8 @@ export class VirtualGridUIEventController {
 
     public updateGridWidth() {
         let centerColumns = this.Grid.columns.filter(x => x.pinned == "center")
-        let isVertivalScrolling: boolean = this.Grid.ColumnController.isVerticalScrolling;
-        let scrollbarWidth = isVertivalScrolling ? this.Grid.ColumnController.scrollbarWidth : 0;
+        let isVerticalScrolling: boolean = this.Grid.ColumnController.isVerticalScrolling;
+        let scrollbarWidth = isVerticalScrolling ? this.Grid.ColumnController.scrollbarWidth : 0;
         let gridWidth: number = this.domController.bodyWrapperWidth - scrollbarWidth
         let widths = this.domController.calculatePartialWidths()
 
@@ -268,7 +274,7 @@ export class VirtualGridUIEventController {
     }
 
     /**
-     * adjusts the cellwidth of each cell (including header cells) to the width of the header cell + the calculated difference per column
+     * adjusts the cell width of each cell (including header cells) to the width of the header cell + the calculated difference per column
      * @param {IVirtualGridColumn[]} columns
      * @param {number} diffPerColumn
      */
@@ -309,7 +315,7 @@ export class VirtualGridUIEventController {
                 let cell = row.cells[currentColumn.currentIndex].cellNode
                 styles["width"] = `${Math.floor(currentColumn.width)}px`
 
-                if (currentColumn.isShowAsTree) {
+                if (currentColumn.isHierarchyColumn) {
                     styles["padding-left"] = `${this.Grid.rows[row.index].level * this.gPadding}px`
                 }
 
@@ -573,7 +579,7 @@ export class VirtualGridUIEventController {
             this.dom.bodyWrapper.addEventListener("scroll", this.onScroll);
         }
 
-        this.dom.scrollYCenterScrollport.addEventListener("scroll", this.onBodyScrollX)
+        this.dom.scrollYCenterScrollPort.addEventListener("scroll", this.onBodyScrollX)
 
         this.bindRowEvents()
         this.bindColumnEvents()
@@ -600,7 +606,7 @@ export class VirtualGridUIEventController {
 
     /**
      * returns an array of columns that are able to autosize their width
-     * when the grid shrinks the columns can only shrink to the minimum columnwidth
+     * when the grid shrinks the columns can only shrink to the minimum column width
      * @param {Array} colsToBeResized - the cols that are being resized
      * @param {boolean} isGrowing - the indicator whether the grid is growing or not
      * @returns {Array} - an array
@@ -613,7 +619,7 @@ export class VirtualGridUIEventController {
      * adds swipe actions to the action container
      * @param actionElement - the action element where the swipe actions are stored and shown
      * @param actions - the action models
-     * @param rowIndex - the rowIndex where the actionelement should show up
+     * @param rowIndex - the rowIndex where the action element should show up
      */
     // private addSwipeActions(actionElement, actions, rowIndex) {
     //     for (const action of actions) {

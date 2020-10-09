@@ -1,4 +1,4 @@
-import {IVirtualColDefConfig, IVirtualGrid} from "./interfaces/virtual.grid.interfaces";
+import {IVirtualColDefConfig, IVirtualGrid, IVirtualGridConfig} from "./interfaces/virtual.grid.interfaces";
 
 /**
  * api controller
@@ -14,7 +14,7 @@ export class VirtualGridConfigController {
 
     headerRowHeight: number = 40;
 
-    constructor(private Grid: IVirtualGrid, private config: any) {
+    constructor(private Grid: IVirtualGrid, private config: IVirtualGridConfig) {
 
         for (let col of this.config.columns) {
 
@@ -23,7 +23,7 @@ export class VirtualGridConfigController {
                 lineCount: 1,
                 field: col.field,
                 fieldPath: col.field ? col.field.indexOf(".") != -1 ? col.field.split(".") : [col.field] : [],
-                type: col.type,
+                type: col.type == void 0 ? "text" : col.type,
 
                 isShowFilter: this.config.showColumnFilter || col.showFilter,
 
@@ -109,9 +109,7 @@ export class VirtualGridConfigController {
             this.rowHeight = rowHeight > this.rowHeight ? rowHeight : this.rowHeight
         }
 
-        if (this.config.style == "virtual-material") {
-            this.rowHeight += 12 // this works like a padding
-        }
+        this.rowHeight += 12 // this works like a padding
     }
 
     getValue(col, row) {

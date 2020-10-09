@@ -5,7 +5,12 @@ import {VirtualGridUtils} from './virtual.grid.utils';
 import {VirtualGridUIController} from './virtual.grid.ui.srv';
 import {VirtualGridConfigController} from "./virtual.grid.config.srv";
 import {VirtualGridFilterController} from "./virtual.grid.filter.srv";
-import {IVirtualGrid, IVirtualGridColumn, IVirtualGridRow} from "./interfaces/virtual.grid.interfaces";
+import {
+    IVirtualGrid,
+    IVirtualGridColumn,
+    IVirtualGridConfig,
+    IVirtualGridRow
+} from "./interfaces/virtual.grid.interfaces";
 import {VirtualGridDragAndDropController} from "./virtual.grid.drag.srv";
 
 export class VirtualGrid implements IVirtualGrid {
@@ -31,11 +36,9 @@ export class VirtualGrid implements IVirtualGrid {
 
     childNodesKey: string;
 
-    private externalFilter: any;
-
     enableLogging: boolean = false
 
-    constructor(readonly config: any) {
+    constructor(readonly config: IVirtualGridConfig) {
 
         let gStart = +new Date();
         this.initDone = false;
@@ -43,8 +46,6 @@ export class VirtualGrid implements IVirtualGrid {
         this.childNodesKey = this.config.childNodesKey != void 0 && this.config.childNodesKey !== '' ? this.config.childNodesKey : 'children';
 
         this.config = config;
-
-        this.externalFilter = this.config.externalFilter;
 
         this.logTime("create api and utils -->", () => {
             this.api = new VirtualGridApi(this, this.config);
@@ -104,7 +105,7 @@ export class VirtualGrid implements IVirtualGrid {
     }
 
     /**
-     * update the configuration of the grid once a new gridconfig is set
+     * update the configuration of the grid once a new grid config is set
      */
     public updateConfigProperties = (): void => {
 

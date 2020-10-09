@@ -1,4 +1,10 @@
-import {IRenderedCell, IRenderedRow, IVirtualGrid, IVirtualGridRow} from "./interfaces/virtual.grid.interfaces";
+import {
+    IRenderedCell,
+    IRenderedRow,
+    IVirtualGrid,
+    IVirtualGridConfig,
+    IVirtualGridRow
+} from "./interfaces/virtual.grid.interfaces";
 import {VirtualGridRow} from "./virtual.grid.row.model";
 
 /**
@@ -7,29 +13,22 @@ import {VirtualGridRow} from "./virtual.grid.row.model";
  */
 export class VirtualGridRowController {
 
-    isCollapsible: boolean;
     expandNodesByDefault: boolean;
-    readonly: boolean;
     deselectWhenCollapse: boolean;
     useIntermediateNodes: boolean;
     useCheckboxSelection: boolean;
-    useSwipeGesture: boolean;
     selectedRows: IVirtualGridRow[] = [];
     rowHeight: number = 40;
-
 
     private gPadding: number = 16;
     private onNodeExpandAsync: any;
 
-    constructor(protected Grid: IVirtualGrid, config: any) {
+    constructor(protected Grid: IVirtualGrid, private config: IVirtualGridConfig) {
         this.onNodeExpandAsync = config.onNodeExpandAsync;
         this.expandNodesByDefault = config.expandNodesByDefault == void 0 ? true : config.expandNodesByDefault;
-        this.isCollapsible = config.isCollapsible == void 0 ? true : config.isCollapsible;
-        this.useCheckboxSelection = config.useCheckboxSelection;
+        this.useCheckboxSelection = config.selectionMethod == "checkbox";
         this.useIntermediateNodes = config.useIntermediateNodes;
         this.deselectWhenCollapse = config.deselectWhenCollapse;
-        this.useSwipeGesture = config.useSwipeGesture;
-        this.readonly = config.readonly;
         this.rowHeight = this.Grid.ConfigController.rowHeight;
     }
 
@@ -37,37 +36,23 @@ export class VirtualGridRowController {
      * updates the config properties
      * @param config
      */
-    public updateConfigProperties = (config: any): void => {
+    public updateConfigProperties = (config: IVirtualGridConfig): void => {
         this.onNodeExpandAsync = config.onNodeExpandAsync;
         this.expandNodesByDefault = config.expandNodesByDefault == void 0 ? true : config.expandNodesByDefault;
-        this.isCollapsible = config.isCollapsible == void 0 ? true : config.isCollapsible;
-        this.useCheckboxSelection = config.useCheckboxSelection;
+        this.useCheckboxSelection = config.selectionMethod == "checkbox";
         this.useIntermediateNodes = config.useIntermediateNodes;
-        this.useSwipeGesture = config.useSwipeGesture;
         this.deselectWhenCollapse = config.deselectWhenCollapse;
-        this.readonly = config.readonly;
     };
     /**
      * processes the grid data and creates the grid rows from scratch
      */
     public buildRows = (): void => {
-        // let start = +new Date();
         this.selectedRows = [];
-        // console.log("create rows -->", +new Date() - start);
-        // start = +new Date();
         // flatten the recursive structure
         this.Grid.rows = this.Grid.Utils.flatten(this.Grid.rows);
-        // console.log("flatten rows -->", +new Date() - start);
-        // start = +new Date();
-        // this.Grid.ColumnController.getMaxRecursionDepth(this.Grid.rows);
-        // console.log("get max depth -->", +new Date() - start);
-        // start = +new Date();
-        // setting childcount for later usage
         this.setRowIndexes();
-        // console.log("set row indexes -->", +new Date() - start);
-        // start = +new Date();
+        // setting childCount for later usage
         this.setTotalChildCounts(this.Grid.rows);
-        // console.log("set childcount -->", +new Date() - start);
     };
     /**
      * set the row indexes for each row
@@ -81,7 +66,7 @@ export class VirtualGridRowController {
         }
     };
     /**
-     * sets the cummulative count of children per node
+     * sets the cumulative count of children per node
      * @param {Array<IVirtualGridRow>} rows
      */
     public setTotalChildCounts = (rows: IVirtualGridRow[]): void => {
@@ -94,7 +79,7 @@ export class VirtualGridRowController {
         }
     };
     /**
-     * Return the complete child count, not just one node level but the whole recursive structurefolder.dir
+     * Return the complete child count, not just one node level but the whole recursive structure
      *
      * @param {VirtualGridRow} row - the row to get the child count from
      * @returns {number}
@@ -103,7 +88,7 @@ export class VirtualGridRowController {
         return this.getChildCount(row);
     };
     /**
-     * creates an array with all rowindexes that are currently displayable
+     * creates an array with all row indexes that are currently displayable
      * this does not mean that every row is visible on the screen but these rows can be reached by scrolling
      */
     public rebuildVisibleRowMap = (): void => {
@@ -520,13 +505,13 @@ export class VirtualGridRowController {
     }
 
     private _renderTreeNode(cell: IRenderedCell) {
-        if (cell.colModel.isShowAsTree) {
+        if (cell.colModel.isHierarchyColumn) {
             cell.cellNode.style["padding-left"] = `${this.gPadding * cell.rowModel.level}px`;
 
             if (cell.treeNode != void 0) {
                 const children: IVirtualGridRow[] = cell.rowModel.children;
 
-                if (children != void 0 && children.length > 0 && cell.rowModel.isCollapsible) {
+                if (children != void 0 && children.length > 0) {
 
                     cell.treeNode.classList.remove("tree-empty");
 
@@ -601,7 +586,7 @@ export class VirtualGridRowController {
      * @param nodes - the raw nodes to iterate
      * @param nodeLevel - the current level
      * @param parent - the nodes parent
-     * @param isRecursive - boolean wheter this is a recursive call or not
+     * @param isRecursive - boolean whether this is a recursive call or not
      */
     public createRowModels(nodes: any[], nodeLevel: number = 0, parent?: any, isRecursive?: boolean): IVirtualGridRow[] {
         let rows: IVirtualGridRow[] = [];
@@ -624,7 +609,7 @@ export class VirtualGridRowController {
     }
 
     /**
-     * returns the childcount of a node and adds che childrens child count recursively
+     * returns the childCount of a node and adds che children child count recursively
      * @param {VirtualGridRow} row
      * @return number
      */
@@ -666,7 +651,7 @@ export class VirtualGridRowController {
     }
 
     /**
-     * rebases the level of a row and all its children in the case they were moved to another level
+     * rebase the level of a row and all its children in the case they were moved to another level
      *
      * @param row - the row to start rebasing
      * @param {number} baseLevel - the new base level

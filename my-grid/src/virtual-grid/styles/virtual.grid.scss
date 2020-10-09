@@ -30,7 +30,7 @@
             transition: transform 150ms;
         }
 
-        .virtual-grid-row:hover{
+        .virtual-grid-row:hover {
             background-color: transparent !important;
         }
     }
@@ -43,7 +43,7 @@
         overflow: hidden;
     }
 
-    .virtual-grid-scroll-y-center-scrollport {
+    .virtual-grid-scroll-y-center-scroll-port {
         overflow: hidden;
         overflow-x: scroll;
 
@@ -105,6 +105,8 @@
                     right: 0;
                     white-space: nowrap;
                     display: flex;
+                    border-bottom: 1px solid rgba(0, 0, 0, .1);
+                    cursor: pointer;
 
                     .virtual-grid-cell {
                         position: absolute;
@@ -192,7 +194,7 @@
                     }
 
                     &.selectable.selected {
-                        background-color: $color-accent-extralight !important;
+                        background-color: $color-accent-extra-light !important;
 
                         .tree-checkbox-icon {
                             background-size: $eob-pane-padding*2 $eob-pane-padding*2;
@@ -306,11 +308,11 @@
                             cursor: pointer;
 
                             &:hover {
-                                background-color: $color-accent-extralight;
+                                background-color: $color-accent-extra-light;
                             }
 
                             &.active {
-                                background-color: $color-accent-mediumlight;
+                                background-color: $color-accent-medium-light;
                             }
                         }
                     }
@@ -337,14 +339,6 @@
     .tree-node-icon {
         height: 26px;
         width: 26px;
-    }
-
-    img.tree-node-icon {
-        display: none;
-
-        &[src] {
-            display: block;
-        }
     }
 
     .tree-node-marker {
@@ -413,16 +407,9 @@
         /* Support for IE. */
         font-feature-settings: 'liga';
 
-        &.small{
-            font-size: 16px;
+        &.small {
+            font-size: $font-big;
         }
-    }
-}
-
-.virtual-material {
-    .virtual-grid-row {
-        border-bottom: 1px solid rgba(0, 0, 0, .1);
-        cursor: pointer;
     }
 
     //scrollbar

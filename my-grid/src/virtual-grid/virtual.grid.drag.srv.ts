@@ -1,4 +1,8 @@
-import {IVirtualGrid, IVirtualGridColumn, IVirtualGridDom} from "./interfaces/virtual.grid.interfaces";
+import {
+    IVirtualGrid,
+    IVirtualGridColumn,
+    IVirtualGridDom
+} from "./interfaces/virtual.grid.interfaces";
 import {VirtualGridUIDomController} from "./virtual.grid.ui.dom.srv";
 
 interface IVirtualDragData {
@@ -18,7 +22,7 @@ export class VirtualGridDragAndDropController {
     ghostHeight: number = 40;
     ghostWidth: number = 0;
 
-    constructor(private Grid: IVirtualGrid, private config: any) {
+    constructor(private Grid: IVirtualGrid) {
         this.domController = this.Grid.UI.domController
         this.dom = this.domController.dom
     }
@@ -181,8 +185,10 @@ export class VirtualGridDragAndDropController {
         column.isPinned = ["left", "right"].includes(column.pinned)
 
         this.Grid.ColumnController.setCurrentColumnIndex()
-        this.Grid.UI.eventController.updateGridWidth()
+
         this.Grid.UI.eventController.adjustCell(this.Grid.columns, 0)
+        this.Grid.UI.eventController.updateGridWidth()
+        this.domController.calculateScrollGuard()
 
     }
     /**

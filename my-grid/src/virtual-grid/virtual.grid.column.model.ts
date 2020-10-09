@@ -1,11 +1,14 @@
 import {
     IVirtualAvatar,
-    IVirtualCellDom, IVirtualColumAction,
-    IVirtualColumFilter,
+    IVirtualCellDom,
+    IVirtualColumnAction,
+    IVirtualColumnFilter,
     IVirtualGrid,
-    IVirtualGridColumn
+    IVirtualGridColumn,
+    IVirtualGridColumnApi
 } from "./interfaces/virtual.grid.interfaces";
-import {IVirtualGridColumnApi, VirtualGridColumnApi} from "./virtual.grid.column.api";
+
+import {VirtualGridColumnApi} from "./virtual.grid.column.api";
 
 export class VirtualGridColumn implements IVirtualGridColumn {
 
@@ -26,7 +29,8 @@ export class VirtualGridColumn implements IVirtualGridColumn {
     isShowFilter: boolean = false;
     isAutoResize: boolean = false;
     isVisible: boolean = true;
-    isShowAsTree: boolean = false;
+
+    isHierarchyColumn: boolean = false;
     isIconColumn: boolean = false;
     isCheckboxColumn: boolean = false;
     isActionColumn: boolean = false;
@@ -72,10 +76,10 @@ export class VirtualGridColumn implements IVirtualGridColumn {
         cellFilterContainer: null
     };
 
-    filter: IVirtualColumFilter
+    filter: IVirtualColumnFilter
 
     lineCount = 1
-    actions: IVirtualColumAction[] = []
+    actions: IVirtualColumnAction[] = []
     avatarConfig: IVirtualAvatar;
 
     constructor(private Grid: IVirtualGrid, colDef: any, index: number) {
@@ -102,18 +106,16 @@ export class VirtualGridColumn implements IVirtualGridColumn {
         this.cellValueGetter = colDef.cellValueGetter;
         this.colDef = colDef;
 
-        this.isShowAsTree = colDef.showAsTree;
-
         // new variables
 
 
         this.width = configColDef.width;
-        this.minWidth = configColDef.minWidth;
+        this.minWidth = configColDef.minWidth == void 0 ? 80 : configColDef.minWidth;
         this.isAvatarColumn = configColDef.isAvatarColumn;
         this.isActionColumn = configColDef.isActionColumn;
         this.isIconColumn = configColDef.isIconColumn;
         this.isCheckboxColumn = configColDef.isCheckboxColumn;
-
+        this.isHierarchyColumn = configColDef.isHierarchyColumn;
         this.colType = configColDef.type;
 
         this.field = configColDef.field;

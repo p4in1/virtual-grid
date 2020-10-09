@@ -1,6 +1,6 @@
 import {
     IVirtualGrid,
-    IVirtualGridColumn,
+    IVirtualGridColumn, IVirtualGridConfig,
     IVirtualGridRow,
     VirtualGridCurrentFilter
 } from "./interfaces/virtual.grid.interfaces";
@@ -11,12 +11,12 @@ import {
  */
 export class VirtualGridFilterController {
 
-    private externalFilter: any;
+    private readonly externalFilter: any;
     private filterValue = "";
 
     currentFilter: VirtualGridCurrentFilter = {text: "", columns: {}}
 
-    constructor(protected Grid: IVirtualGrid, private config: any) {
+    constructor(protected Grid: IVirtualGrid, private config: IVirtualGridConfig) {
         this.externalFilter = this.config.externalFilter;
 
         this.resetFilter()
@@ -227,8 +227,8 @@ export class VirtualGridFilterController {
     }
 
     /**
-     * pretty redundand but necessary
-     * check if the filter cahnged at all, or the function got called by a refresh cycle
+     * pretty redundant but necessary
+     * check if the filter changed at all, or the function got called by a refresh cycle
      */
     private _isFilterChanged() {
         if (this.filterValue.length !== this.currentFilter.text.length) {
@@ -270,11 +270,11 @@ export class VirtualGridFilterController {
     /**
      * returns the cell value of a given row and column
      *
-     * filter priorization
+     * filter prioritization
      * 1. cellRenderer              -> this might not have the highest value, but if there is a cellRenderer, the content of the cell is all we have
      * 2. cellValueGetter           -> this should return the value of the cell
      * 3. data type as Array        -> there is a special need in case the cellContent is an array .. we have to join the array
-     * 4. data type of the column   -> this is the lowest prio but the highest probability and we interprete the datatype which should not be problematic
+     * 4. data type of the column   -> this is the lowest priority but the highest probability and we interpret the datatype which should not be problematic
      *
      * @param row
      * @param col

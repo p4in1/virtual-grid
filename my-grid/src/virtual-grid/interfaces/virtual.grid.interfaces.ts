@@ -7,6 +7,197 @@ import {VirtualGridUtils} from "../virtual.grid.utils";
 import {VirtualGridUIController} from "../virtual.grid.ui.srv";
 import {VirtualGridDragAndDropController} from "../virtual.grid.drag.srv";
 
+export interface IVirtualGridConfig {
+
+    /**
+     * the dom element to attach to
+     */
+    element: HTMLElement
+    /**
+     * the column definition
+     */
+    columns: IVirtualGridColumnConfig[]
+    /**
+     * rows to display
+     */
+    rows: any[]
+
+    /**
+     * whether the header is visible or not
+     * @default true
+     */
+    showHeader?: boolean
+    /**
+     * whether to show the column filter or not
+     * @default false
+     */
+    showColumnFilter?: boolean
+
+    /**
+     * the child nodes key is only necessary when you are dealing with tree structures
+     * using this key the grid knows how to display the tree nodes
+     * @default 'children'
+     */
+    childNodesKey?: string
+
+    /**
+     * @property {string} single "single"
+     * @property {string} multi "multi"
+     * @property {string} range "range"
+     * @property {string} checkbox "checkbox"
+     * @default {string} single "single"
+     */
+    selectionMethod?: string
+
+    /**
+     * defines if the column shrinks or grows automatically
+     * @default false
+     */
+    autoSizeColumns?: boolean
+
+    /**
+     * deselects nodes when the parent has been collapsed
+     * @default false
+     */
+    deselectWhenCollapse?: boolean
+
+    /**
+     * use this if you do not want to make expandable tree nodes selectable
+     * in this case only leaves can be selected
+     * @default false
+     */
+    useIntermediateNodes?: boolean
+
+    /**
+     * determines whether to expand nodes by default or not
+     * @default false
+     */
+    expandNodesByDefault?: boolean
+
+    /**
+     * suppresses sorting on all columns
+     * @default false
+     */
+    suppressSorting?: boolean
+
+    /**
+     * suppresses resizing on all columns
+     * @default false
+     */
+    suppressResize?: boolean
+
+    /**
+     * suppresses auto sizing on all columns
+     * @default false
+     */
+    suppressAutoSize?: boolean
+
+    /**
+     * suppresses dragging on all columns
+     * @default false
+     */
+    suppressDragging?: boolean
+
+    /**
+     * suppresses pinning on all columns
+     * @default false
+     */
+    suppressPinning?: boolean
+
+    /**
+     * callback before a node is expanded
+     * this gives you the opportunity to load the children async and attach them to the grid using the api
+     * @param row - the row to expand
+     * @param api - the virtual grid api
+     * @param done - a done callback you must call in order to tell the grid that the data is ready
+     */
+    onNodeExpandAsync?(row: IVirtualGridRow, api: VirtualGridApi, done: Function): void
+
+    /**
+     * external filter callback
+     * return true - the row stays visible
+     * return false - the row is invisible
+     *
+     * @param row - the row that might be filtered
+     * @param filterValue - the current filter value
+     */
+    externalFilter?(row: IVirtualGridRow, filterValue: string): boolean
+
+    /**
+     * callback that returns the value of the header cell
+     * @param column - the given column
+     * @param api - the virtual grid api
+     */
+    headerValueGetter?(column: IVirtualGridColumn, api: VirtualGridApi): void
+
+    /**
+     * right click callback
+     * @param row - the VirtualGridRow the event was executed on
+     * @param event - the original event
+     * @param api - grid api
+     */
+    onRowRightClick?(row: IVirtualGridRow, event: any, api: VirtualGridApi): void
+
+    /**
+     * double click callback
+     * @param row - the VirtualGridRow the event was executed on
+     * @param event - the original event
+     * @param api - grid api
+     */
+    onRowDoubleClick?(row: IVirtualGridRow, event: any, api: VirtualGridApi): void
+
+    /**
+     * row mouse enter callback
+     * @param row - the VirtualGridRow the event was executed on
+     * @param event - the original event
+     * @param api - grid api
+     */
+    onRowMouseEnter?(row: IVirtualGridRow, event: any, api: VirtualGridApi): void
+
+    /**
+     * row click callback
+     * @param row - the VirtualGridRow the event was executed on
+     * @param event - the original event
+     * @param api - grid api
+     */
+    onRowClick?(row: IVirtualGridRow, event: any, api: VirtualGridApi): void
+
+    /**
+     * swipe start callback
+     * @param row - the VirtualGridRow the event was executed on
+     * @param event - the original event
+     * @param api - grid api
+     */
+    onSwipeStart?(row: IVirtualGridRow, event: any, api: VirtualGridApi): void
+
+    /**
+     * grid ready callback
+     * @param Grid - returns the grid as parameter
+     */
+    onGridReady?(Grid: IVirtualGrid): void
+}
+
+export interface IVirtualGridColumnConfig {
+
+    field: string
+
+    title?: string
+    type?: string
+    showFilter?: boolean
+    suppressResize?: boolean
+    suppressSorting?: boolean
+    suppressAutoSize?: boolean
+    suppressDragging?: boolean
+    suppressPinning?: boolean
+
+    pinned?: string
+    avatarConfig?: IVirtualAvatar
+    actions?: IVirtualColumnAction[]
+    width?: number
+    minWidth?: number
+    valueFormat?: string
+}
+
 export interface IVirtualGrid {
     api: VirtualGridApi
     DnDController: VirtualGridDragAndDropController
@@ -60,21 +251,17 @@ export interface IVirtualGridRow {
     isSelected: boolean
     /**
      * Determines if the Row can be found whilst scrolling
-     * a row that is not visible might be the child of a collaped parent or be filtered from the rows array
+     * a row that is not visible might be the child of a collapsed parent or be filtered from the rows array
      */
     isVisible: boolean
     isVisibleAfterFilter: boolean
-    /**
-     * Determines whether the row has children and can be collapsed
-     */
-    isCollapsible: boolean
     /**
      * Determines whether the row has children and the children are shown
      */
     isExpanded?: boolean
     /**
      * Determines whether the content of the row is still loading
-     * This is useful in case the user / scripter / whatever uses the "onNodeExpandAsync" callback to show an indicator
+     * This is useful in case the user / developer / whatever uses the "onNodeExpandAsync" callback to show an indicator
      * if the content is still being loaded
      */
     isLoading?: boolean
@@ -118,6 +305,32 @@ export interface IVirtualGridRow {
     updateRowData(rowData: any): void
 }
 
+export interface IVirtualGridColumnApi {
+    /**
+     * pins the column to the given area
+     * areas are left, right and center whereas center is the same as the unpin function
+     *
+     * the column will be the last if pinned left or the first if pinned right
+     * @param area - the area where to pin the column
+     */
+    pin(area: string): void
+
+    /**
+     * unpins the column where ever it is
+     * this shifts the column to the center viewport at the last index
+     */
+    unpin(): void
+
+    /**
+     * moves the column to the given index
+     * if the index is part of the pinned columns, the column will be pinned to the left or
+     * right pin area
+     *
+     * @param index
+     */
+    move(index: number): void
+}
+
 export interface IVirtualGridColumn {
     index: number
     currentIndex: number
@@ -137,6 +350,8 @@ export interface IVirtualGridColumn {
         cellTextContainer: HTMLElement
         cellFilterContainer: HTMLElement
     }
+
+    api: IVirtualGridColumnApi
 
     colDef: any
     title: string
@@ -159,7 +374,7 @@ export interface IVirtualGridColumn {
     isAvatarColumn?: boolean
     isActionColumn?: boolean
     isCheckboxColumn?: boolean
-    isShowAsTree?: boolean
+    isHierarchyColumn?: boolean
 
     canShrink?: boolean
 
@@ -180,10 +395,10 @@ export interface IVirtualGridColumn {
     left: number
 
     lineCount: number
-    actions?: IVirtualColumAction[]
+    actions?: IVirtualColumnAction[]
     avatarConfig?: IVirtualAvatar
 
-    filter: IVirtualColumFilter
+    filter: IVirtualColumnFilter
 }
 
 export interface IRenderedCell {
@@ -223,7 +438,7 @@ export interface IRenderedRow {
 }
 
 export interface IVirtualGridDom {
-    virtualGrid:HTMLElement
+    virtualGrid: HTMLElement
 
     headerWrapper: HTMLElement
     headerCenterScrollPort: HTMLElement
@@ -248,7 +463,7 @@ export interface IVirtualGridDom {
     scrollYLeftSpacer: HTMLElement
     scrollYRightSpacer: HTMLElement
     scrollYCenterSpacer: HTMLElement
-    scrollYCenterScrollport: HTMLElement
+    scrollYCenterScrollPort: HTMLElement
 
     ghost: HTMLElement
     ghostLabel: HTMLElement
@@ -267,20 +482,29 @@ export interface IVirtualCellDom {
     cellFilterContainer: HTMLElement
 }
 
-export interface IVirtualColumFilter {
+export interface IVirtualColumnFilter {
     value: string | boolean | number
     content: string[]
 }
 
-export interface IVirtualColumAction {
+export interface IVirtualColumnAction {
     color: string
     icon: string
     callback: Function
 }
 
 export interface IVirtualAvatar {
+    /**
+     * the image url
+     */
     url: string
+    /**
+     * the aggregation for the placeholder
+     */
     placeholderAgg: string[]
+    /**
+     * the background-color
+     */
     placeholderBgColor: string
 }
 
@@ -298,6 +522,7 @@ export interface IVirtualColDefConfig {
     isActionColumn: boolean
     isIconColumn: boolean
     isCheckboxColumn: boolean
+    isHierarchyColumn: boolean
 
     isAutosize: boolean
     isShowFilter: boolean
@@ -312,7 +537,7 @@ export interface IVirtualColDefConfig {
     isSuppressSort: boolean
     isSuppressFilter: boolean
 
-    actions: IVirtualColumAction[]
+    actions: IVirtualColumnAction[]
     avatarConfig?: IVirtualAvatar
 
     width: number

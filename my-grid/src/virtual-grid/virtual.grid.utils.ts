@@ -80,11 +80,11 @@ export class VirtualGridUtils {
      * @return {boolean} - true if true we run on a phone device otherwise false
      */
     public checkIsPhone(): boolean {
-        const isPhonewidth: boolean = (
+        const isPhoneWidth: boolean = (
             (window.matchMedia('(min-width:320px) and (max-width: 420px) and (orientation: portrait)')).matches ||
             (window.matchMedia('(min-height:320px) and (max-height: 420px) and (orientation: landscape)')).matches
         );
-        return this.isTouchDevice() && isPhonewidth;
+        return this.isTouchDevice() && isPhoneWidth;
     }
 
     /**
@@ -188,7 +188,7 @@ export class VirtualGridUtils {
     };
 
     /**
-     * pads numbers with one leeding zero ( date formats etc.)
+     * pads numbers with one leading zero ( date formats etc.)
      * @param n
      */
     to2digit = (n: number): string => {

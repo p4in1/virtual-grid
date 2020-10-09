@@ -23,12 +23,13 @@ body {
 .grid-container {
     display: flex;
     flex-direction: column;
-    height: 100%;
 
-    #grid-demo{
+    .grid-demo{
+        width: 500px;
+        height: 500px;
         position: relative;
-        height: 100%;
         display: flex;
         flex-direction: column;
     }
+
 }

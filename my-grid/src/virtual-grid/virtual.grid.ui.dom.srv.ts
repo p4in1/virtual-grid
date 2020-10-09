@@ -4,7 +4,7 @@ import {
     IRenderedRow,
     IRenderedRowPartial,
     IVirtualGrid,
-    IVirtualGridColumn,
+    IVirtualGridColumn, IVirtualGridConfig,
     IVirtualGridDom,
 } from "./interfaces/virtual.grid.interfaces";
 
@@ -43,15 +43,15 @@ export class VirtualGridUIDomController {
 
     styleCommands = [];
 
-    constructor(private Grid: IVirtualGrid, private config: any) {
+    constructor(private Grid: IVirtualGrid, private config: IVirtualGridConfig) {
 
         this.lastTop = 0;
         this.Utils = this.Grid.Utils
-        this.showHeader = config.showHeader;
+        this.showHeader = this.config.showHeader;
         this.headerRowHeight = this.Grid.ConfigController.headerRowHeight;
         this.Grid.RowController.rowHeight = this.Grid.ConfigController.rowHeight;
 
-        this.renderedColumnCount = config.columns.length;
+        this.renderedColumnCount = this.config.columns.length;
 
         this.dom = {
 
@@ -81,7 +81,7 @@ export class VirtualGridUIDomController {
             scrollYLeftSpacer: this.Utils.el("div", ['virtual-grid-scroll-y-left-spacer']),
             scrollYRightSpacer: this.Utils.el("div", ['virtual-grid-scroll-y-right-spacer']),
             scrollYCenterSpacer: this.Utils.el("div", ['virtual-grid-scroll-y-center-spacer']),
-            scrollYCenterScrollport: this.Utils.el("div", ['virtual-grid-scroll-y-center-scrollport']),
+            scrollYCenterScrollPort: this.Utils.el("div", ['virtual-grid-scroll-y-center-scroll-port']),
 
             ghost: this.Utils.el("div", ["virtual-grid-ghost"]),
             ghostLabel: this.Utils.el("span", ["virtual-grid-ghost-label"])
@@ -94,11 +94,11 @@ export class VirtualGridUIDomController {
 
         this.dom.virtualGrid.appendChild(this.dom.bodyWrapper);
 
-        this.dom.scrollYCenterScrollport.appendChild(this.dom.scrollYCenterSpacer)
+        this.dom.scrollYCenterScrollPort.appendChild(this.dom.scrollYCenterSpacer)
 
         this.dom.virtualGrid.appendChild(this.dom.scrollYGuard)
         this.dom.scrollYGuard.appendChild(this.dom.scrollYLeftSpacer)
-        this.dom.scrollYGuard.appendChild(this.dom.scrollYCenterScrollport)
+        this.dom.scrollYGuard.appendChild(this.dom.scrollYCenterScrollPort)
         this.dom.scrollYGuard.appendChild(this.dom.scrollYRightSpacer)
 
         this.dom.headerCenterScrollPort.appendChild(this.dom.headerCenter)
@@ -274,10 +274,6 @@ export class VirtualGridUIDomController {
             this.dom.headerRight.classList.add("hidden")
             this.dom.bodyRight.classList.add("hidden")
         }
-
-        if (this.config.style) {
-            this.dom.virtualGrid.classList.add(this.config.style);
-        }
     }
 
     public calculateWrapper() {
@@ -292,13 +288,13 @@ export class VirtualGridUIDomController {
     public calculateScrollGuard() {
         let widths = this.calculatePartialWidths()
 
-        let isVertivalScrolling: boolean = this.Grid.ColumnController.isVerticalScrolling;
-        let scrollbarWidth = isVertivalScrolling ? this.Grid.ColumnController.scrollbarWidth : 0;
+        let isVerticalScrolling: boolean = this.Grid.ColumnController.isVerticalScrolling;
+        let scrollbarWidth = isVerticalScrolling ? this.Grid.ColumnController.scrollbarWidth : 0;
         let scrollPortWidth = this.bodyWrapperWidth - (widths.bodyRightWidth + widths.bodyLeftWidth + scrollbarWidth)
         let scrollPortTolerance = 8;
 
         this.Utils.setStyles(this.dom.scrollYLeftSpacer, {"width": widths.bodyLeftWidth});
-        this.Utils.setStyles(this.dom.scrollYCenterScrollport, {"width": scrollPortWidth});
+        this.Utils.setStyles(this.dom.scrollYCenterScrollPort, {"width": scrollPortWidth});
         this.Utils.setStyles(this.dom.scrollYRightSpacer, {"width": widths.bodyRightWidth});
 
         this.Utils.setStyles(this.dom.scrollYCenterSpacer, {"width": widths.bodyCenterWidth})
@@ -324,14 +320,14 @@ export class VirtualGridUIDomController {
         let scrollLeft = this.Grid.UI.eventController.scrollLeft
         let scrollPortWidth = this.scrollPortWidth
         let width = this.calculatePartialWidths()
-        let isScrolledTotheRight = scrollLeft + scrollPortWidth == Math.round(width.bodyCenterWidth)
+        let isScrolledToTheRight = scrollLeft + scrollPortWidth == Math.round(width.bodyCenterWidth)
         let bodyLeft = this.dom.bodyLeft
         let bodyRight = this.dom.bodyRight
         let headerLeft = this.dom.headerLeft
         let headerRight = this.dom.headerRight
 
         if (this.isHorizontalScrolling) {
-            if (!isScrolledTotheRight) {
+            if (!isScrolledToTheRight) {
                 bodyRight.classList.add("shadow")
                 headerRight.classList.add("shadow")
             } else {
@@ -438,7 +434,7 @@ export class VirtualGridUIDomController {
             dom.cell.appendChild(column.dom.cellResizer);
         }
 
-        if (column.width > this.Grid.ColumnController.minimumColumnWidth) {
+        if (column.width > column.minWidth) {
             column.canShrink = true;
         }
 
@@ -509,7 +505,7 @@ export class VirtualGridUIDomController {
 
             } else {
 
-                if (col.isShowAsTree && this.Grid.RowController.isCollapsible) {
+                if (col.isHierarchyColumn) {
                     cell.treeNode = this.Utils.el("i", ["tree-node-icon", "tree-expanded"]);
                     cell.treeNode.addEventListener("click", this.Grid.RowController.toggleNodeListener);
                     cellNode.appendChild(cell.treeNode)
@@ -532,7 +528,7 @@ export class VirtualGridUIDomController {
 
     public recalculateRowOrder(scrollTopOverride?: number): void {
         requestAnimationFrame(() => {
-            this.rearrangeListnodes(scrollTopOverride);
+            this.rearrangeListNodes(scrollTopOverride);
         })
     }
 
@@ -544,24 +540,24 @@ export class VirtualGridUIDomController {
      * at this point once the user scrolls, some rows will be scrolled outside the visible area,
      * we use these containers and adjust their top position and shift them through the rendered row array
      */
-    private rearrangeListnodes(scrollTopOverride?: number): void {
+    private rearrangeListNodes(scrollTopOverride?: number): void {
         const gridHeight = this.visibleRowIndices.length * this.Grid.RowController.rowHeight
-        // the current top and bottom position of the viewport relatively to the scrollposition
+        // the current top and bottom position of the viewport relatively to the scroll position
         const scrollTop: number = scrollTopOverride == void 0 ? this.dom.bodyWrapper.scrollTop : scrollTopOverride;
         const scrollBottom: number = scrollTop + this.bodyWrapperHeight;
 
-        const allRowsheight = this.renderedRows.length * this.Grid.RowController.rowHeight
+        const allRowsHeight = this.renderedRows.length * this.Grid.RowController.rowHeight
         // the offset to the top
-        // eg. the scrollTop is 100px and the rowheight is 48px
+        // eg. the scrollTop is 100px and the row height is 48px
         // the offset would be 4 px (100 mod 48 = 4)
         let offset = scrollTop % this.Grid.RowController.rowHeight;
 
         // how many rows fit into the viewport
         let visibleViewportRowCount = Math.ceil((scrollBottom - scrollTop) / this.Grid.RowController.rowHeight)
 
-        // the row threshhold to the top
-        let threshhold = Math.floor((this.renderedRows.length - visibleViewportRowCount) / 2)
-        let threshHoldInPixel = threshhold * this.Grid.RowController.rowHeight
+        // the row threshold to the top
+        let threshold = Math.floor((this.renderedRows.length - visibleViewportRowCount) / 2)
+        let threshHoldInPixel = threshold * this.Grid.RowController.rowHeight
 
         // do we need to render yet?
         if (scrollTopOverride == void 0 && Math.abs(this.lastTop - scrollTop) < threshHoldInPixel / 2) {
@@ -580,7 +576,7 @@ export class VirtualGridUIDomController {
             visibleRowIndexesStart = 0;
         } else if (scrollBottom + threshHoldInPixel > gridHeight) {
             // starting at the bottom
-            start = gridHeight - allRowsheight
+            start = gridHeight - allRowsHeight
             visibleRowIndexesStart = Math.floor(start / this.Grid.RowController.rowHeight)
 
         } else {

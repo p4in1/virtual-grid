@@ -9,12 +9,12 @@ $color-nav-elements: #fff;
 $color-font-inverted: #fff;
 $color-font-main: #777;
 
-//navbackgrounds
+//nav backgrounds
 $color-background-navigation: rgba(lighten($color-accent, 20%), 0.72);
 $color-background-navigation-body: rgba($color-accent, 0.78);
 $color-background-navigation-underlay: #0c2a40;
 
-//scrollbarcolors
+//scrollbar colors
 $color-scrollbar-gray: darken($color-background-panel, 10%);
 
 //----------------------------black theme
@@ -24,12 +24,12 @@ $color-scrollbar-gray: darken($color-background-panel, 10%);
 //$color-font-inverted: #fff;
 //$color-font-main: #dadada;
 //
-////navbackgrounds
+////nav backgrounds
 //$color-background-navigation: rgba($color-accent, 0.6);
 //$color-background-navigation-body:  rgba($color-accent, 0.6);
 //$color-background-navigation-underlay: transparent;
 //
-////scrollbarcolors
+////scrollbar colors
 //$color-scrollbar-gray: lighten($color-background-panel, 30%);
 
 //------------------------------------------------------------------------------  Theme relevant variables END
@@ -53,11 +53,11 @@ $color-overlay: rgba(0, 0, 0, 0.8);
 $color-input-focus: $color-accent;
 $color-accent-light: lighten($color-accent, 10%);
 $color-rock-blue: desaturate($color-accent-light, 40%);
-$color-accent-desat: desaturate($color-accent-light, 80%);
-$form-button-color: rgba($color-accent-desat, .6);
-//selction color in client
-$color-accent-mediumlight:rgba($color-accent-light, .30);
-$color-accent-extralight: rgba($color-accent-light, .15);
+$color-accent-desaturate: desaturate($color-accent-light, 80%);
+$form-button-color: rgba($color-accent-desaturate, .6);
+//selection color in client
+$color-accent-medium-light:rgba($color-accent-light, .30);
+$color-accent-extra-light: rgba($color-accent-light, .15);
 // ... some more color defs
 $color-accent-gray: darken($color-background-panel, 3%);
 
@@ -87,7 +87,6 @@ $color-form-elements: lighten($color-background-panel, 40%);
 $color-form-element-disabled: lighten($color-background-panel, 5%);
 $color-form-inputs: lighten($color-background-panel, 20%);
 $background-disabled-field: repeating-linear-gradient(-40deg, $color-background-grid, $color-background-inline-dialog 3px, $color-background-panel 6px);
-$color-osloader-light: lighten($color-background-panel, 40%);
 
 // colors border
 $color-border-light: $color-background-panel;

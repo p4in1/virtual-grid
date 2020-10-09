@@ -1,19 +1,19 @@
 import {VirtualGridUIDomController} from "./virtual.grid.ui.dom.srv";
 import {VirtualGridUIEventController} from "./virtual.grid.ui.event.srv";
-import {IVirtualGrid} from "./interfaces/virtual.grid.interfaces";
+import {IVirtualGrid, IVirtualGridConfig} from "./interfaces/virtual.grid.interfaces";
 
 export class VirtualGridUIController {
 
     domController: VirtualGridUIDomController;
     eventController: VirtualGridUIEventController;
 
-    constructor(private Grid: IVirtualGrid, private config: any) {
+    constructor(private Grid: IVirtualGrid, private config: IVirtualGridConfig) {
         this.domController = new VirtualGridUIDomController(this.Grid, this.config);
         this.eventController = new VirtualGridUIEventController(this.Grid, this.config, this.domController);
     }
 
     /**
-     * initilize the grid instance
+     * initialize the grid instance
      * create the rows
      * bind click handler
      */
@@ -51,7 +51,7 @@ export class VirtualGridUIController {
     }
 
     /**
-     * destroyes the grid and it's content
+     * destroys the grid and it's content
      * releases listeners and clears all array to prevent memory leaks
      */
     public destroy = (): void => {
