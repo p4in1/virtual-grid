@@ -109,7 +109,8 @@ export class VirtualGridDragAndDropController {
             let left = event.clientX - (this.ghostWidth / 2)
 
             this.domController.setStyles(this.dom.ghost, {
-                transform: `translateX(${left}px) translateY(${top}px)`,
+                top: `${top}px`,
+                left: `${left}px`,
                 width: `${this.ghostWidth}px`,
                 height: `${this.ghostHeight}px`
             })

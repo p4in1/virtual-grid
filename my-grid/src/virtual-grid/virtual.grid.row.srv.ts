@@ -480,7 +480,7 @@ export class VirtualGridRowController {
 
 
         if (colType == "boolean") {
-            let cellNode = this.Grid.Utils.el("i", ["tree-action-icon", "material-icons"])
+            let cellNode = this.Grid.Utils.el("i", ["tree-action-icon", "virtual-material-icons"])
 
             cell.textNodes[0].innerHTML = ""
             cell.textNodes[0].classList.add("boolean-node");

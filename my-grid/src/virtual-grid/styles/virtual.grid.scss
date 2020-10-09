@@ -389,8 +389,8 @@
         flex-shrink: 0;
     }
 
-    .material-icons {
-        font-family: 'Material Icons', sans-serif;
+    .virtual-material-icons {
+        font-family: 'Virtual Material Icons', sans-serif;
         font-weight: normal;
         font-style: normal;
         font-size: 24px; /* Preferred icon size */
@@ -417,15 +417,6 @@
             font-size: 16px;
         }
     }
-}
-
-@font-face {
-    font-family: 'Material Icons';
-    font-style: normal;
-    font-weight: 400;
-    src: local('Material Icons'),
-    local('MaterialIcons-Regular'),
-    url(assets/icons.woff2) format('woff2')
 }
 
 .virtual-material {

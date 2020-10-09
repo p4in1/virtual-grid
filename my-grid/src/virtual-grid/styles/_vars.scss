@@ -1,7 +1,7 @@
 /* COLORS */
 
 //------------------------------------------------------------------------------ Theme relevant variables START
-//only change these vsriables and the client will lool completely dirfferent
+//only change these variables and the client will lock completely different
 //----------------------------blue theme
 $color-background-panel: #f1f1f1;
 $color-accent: #0092e1;
@@ -102,3 +102,10 @@ $font-big: 16px;
 
 //paddings
 $eob-pane-padding: 16px; // the main inner padding of ui components
+
+@font-face {
+    font-family: 'Virtual Material Icons';
+    font-style: normal;
+    font-weight: 400;
+    src: url(assets/icons.woff2) format('woff2')
+}

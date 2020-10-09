@@ -392,7 +392,7 @@ export class VirtualGridUIDomController {
         dom.cellText = this.Utils.el("span", ["header-cell-text"]);
         dom.cellText.textContent = column.title;
 
-        dom.cellSortArrow = this.Utils.el("i", ["header-sort-arrow", "material-icons", "small"]);
+        dom.cellSortArrow = this.Utils.el("i", ["header-sort-arrow", "virtual-material-icons", "small"]);
         dom.cellSortArrow.innerHTML = "trending_flat"
 
         dom.cellResizer = this.Utils.el("div", ["header-cell-resizer"]);
@@ -408,8 +408,8 @@ export class VirtualGridUIDomController {
         dom.cellTextContainer.appendChild(dom.cellText);
         dom.cellTextContainer.appendChild(dom.cellSortArrow);
 
-        let trueFilterIcon = this.Utils.el("i", ["filter-button", "material-icons"])
-        let falseFilterIcon = this.Utils.el("i", ["filter-button", "material-icons"])
+        let trueFilterIcon = this.Utils.el("i", ["filter-button", "virtual-material-icons"])
+        let falseFilterIcon = this.Utils.el("i", ["filter-button", "virtual-material-icons"])
 
         trueFilterIcon.innerHTML = "done"
         falseFilterIcon.innerHTML = "clear"
@@ -496,7 +496,7 @@ export class VirtualGridUIDomController {
                 cellNode.classList.add("action-node")
 
                 for (let action of col.actions) {
-                    let actionTag = this.Utils.el("i", ["tree-action-icon", "material-icons"]);
+                    let actionTag = this.Utils.el("i", ["tree-action-icon", "virtual-material-icons"]);
                     actionTag.innerHTML = action.icon
                     actionTag.style.color = action.color
 
