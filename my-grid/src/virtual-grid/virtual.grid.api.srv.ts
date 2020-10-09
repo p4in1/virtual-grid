@@ -2,17 +2,15 @@
  * api controller
  * everything related to the api of a virtual grid instance goes here
  */
-import {IRenderedRow, IVirtualGrid, IVirtualGridConfig, IVirtualGridRow} from "./interfaces/virtual.grid.interfaces";
+import {IRenderedRow, IVirtualGrid, IVirtualGridRow} from "./interfaces/virtual.grid.interfaces";
+import {VirtualGridConfigController} from "./virtual.grid.config.srv";
 
 export class VirtualGridApi {
     private debounceTimeout: any = null;
-    private gPadding: number = 16;
-    private useMultiSelect: boolean = false;
 
     scrollPosTopBackup: number = 0;
 
-    constructor(protected Grid: IVirtualGrid, protected config: IVirtualGridConfig) {
-        this.useMultiSelect = this.config.selectionMethod == "multi"
+    constructor(protected Grid: IVirtualGrid, private config: VirtualGridConfigController) {
     }
 
     /**
@@ -27,7 +25,7 @@ export class VirtualGridApi {
             return;
         }
 
-        if (this.Grid.UI.domController.renderedRows.length > this.Grid.UI.domController.renderedRowCount) {
+        if (this.Grid.domController.renderedRows.length > this.Grid.domController.renderedRowCount) {
             console.error('Rendered row count exceeded the configured maximum!!!');
         }
 
@@ -53,7 +51,7 @@ export class VirtualGridApi {
         this.Grid.FilterController.applyFilter()
 
         this.Grid.RowController.rebuildVisibleRowMap();
-        this.Grid.UI.domController.calculateGridHeight();
+        this.Grid.domController.calculateGridHeight();
 
         this.Grid.RowController.calculateRowPosition(completeRefresh);
 
@@ -63,19 +61,12 @@ export class VirtualGridApi {
         this.Grid.ColumnController.refreshColumns();
 
         if (this.scrollPosTopBackup > 0) {
-            this.Grid.UI.domController.recalculateRowOrder(this.scrollPosTopBackup)
-            this.Grid.UI.domController.dom.bodyWrapper.scrollTop = this.scrollPosTopBackup
+            this.Grid.domController.recalculateRowOrder(this.scrollPosTopBackup)
+            this.Grid.domController.dom.bodyWrapper.scrollTop = this.scrollPosTopBackup
             this.scrollPosTopBackup = 0;
         }
     }
 
-    /**
-     * updates the config properties
-     * @param config
-     */
-    public updateConfigProperties = (config: IVirtualGridConfig): void => {
-        this.useMultiSelect = config.selectionMethod === "multi";
-    };
     /**
      * Updates the rows in the grid and refreshes the grid
      *
@@ -84,12 +75,11 @@ export class VirtualGridApi {
      */
     public updateGridRows = (rows: any[], resetRowConfig: boolean): void => {
         // resetting and setting general properties
-        this.Grid.updateConfigProperties();
 
-        this.scrollPosTopBackup = this.Grid.UI.domController.dom.bodyWrapper.scrollTop
+        this.scrollPosTopBackup = this.Grid.domController.dom.bodyWrapper.scrollTop
 
         if (resetRowConfig) {
-            this.Grid.UI.domController.resetRenderedRows();
+            this.Grid.domController.resetRenderedRows();
         }
 
         this.Grid.rows = this.Grid.RowController.createRowModels(rows);
@@ -99,7 +89,6 @@ export class VirtualGridApi {
         this.Grid.FilterController.resetFilter()
         // refreshing the visual projection
         this.Grid.api.refreshGrid(true, true);
-
 
     };
 
@@ -125,12 +114,12 @@ export class VirtualGridApi {
         this.refreshGrid(true, true)
 
         if (config.scrollTop !== 0) {
-            this.Grid.UI.domController.dom.bodyWrapper.scrollTop = config.scrollTop
+            this.Grid.domController.dom.bodyWrapper.scrollTop = config.scrollTop
         }
     }
 
     getConfig = (): any => {
-        let scrollTop = this.Grid.UI.domController.dom.bodyWrapper.scrollTop;
+        let scrollTop = this.Grid.domController.dom.bodyWrapper.scrollTop;
         let columns = this.Grid.originalColumns.sort((a, b) => {
             return a.index - b.index
         })
@@ -265,7 +254,7 @@ export class VirtualGridApi {
         }
 
         // in this case we deselect all other selected rows
-        if (((!useCtrl && !useShift) || !this.useMultiSelect) && !isCheckboxSelect) {
+        if (((!useCtrl && !useShift) || this.config.selectionMethod !== "multi") && !isCheckboxSelect) {
             this.deselectAll();
         }
 
@@ -321,7 +310,7 @@ export class VirtualGridApi {
             values = [values];
         }
 
-        if (!this.useMultiSelect) {
+        if (this.config.selectionMethod !== "multi") {
             values = [values[0]];
         }
 
@@ -419,7 +408,7 @@ export class VirtualGridApi {
      */
     public deselectAll = (): void => {
 
-        for (const renderedRow of this.Grid.UI.domController.renderedRows) {
+        for (const renderedRow of this.Grid.domController.renderedRows) {
 
             [renderedRow.left, renderedRow.center, renderedRow.right].forEach((rowPartial) => {
                 rowPartial.element.classList.remove('selected');
@@ -441,7 +430,7 @@ export class VirtualGridApi {
      * @param {Boolean} scrollHorizontal - Whether to scroll horizontally or not
      */
     public scrollToIndex = (index: number, scrollHorizontal: boolean = true): void => {
-        let dom = this.Grid.UI.domController.dom
+        let dom = this.Grid.domController.dom
         let visibleItemsBefore: number = 0;
 
         for (const row of this.Grid.rows) {
@@ -455,8 +444,8 @@ export class VirtualGridApi {
             }
         }
 
-        const scrollLeftPosition: number = this.Grid.rows[index].level * this.gPadding;
-        const scrollTopPosition: number = (visibleItemsBefore * this.Grid.RowController.rowHeight) - (dom.virtualGrid.offsetHeight / 2);
+        const scrollLeftPosition: number = this.Grid.rows[index].level * 16; // padding
+        const scrollTopPosition: number = (visibleItemsBefore * this.config.rowHeight) - (dom.virtualGrid.offsetHeight / 2);
 
         dom.bodyWrapper.scrollTop = scrollTopPosition;
 
@@ -562,25 +551,11 @@ export class VirtualGridApi {
         this.Grid.rows = [];
 
         this.Grid.ColumnController.destroy();
-        this.Grid.UI.destroy();
     };
 
     public setGridContent() {
-        // let start = +new Date();
-
-        this.Grid.updateConfigProperties();
-        // console.log("--> update properties -->", +new Date() - start);
-        // start = +new Date();
-
-        this.Grid.UI.domController.resetRenderedRows();
-        // console.log("--> reset rows -->", +new Date() - start);
-        // start = +new Date();
-
-        // processing row data and convert into a more suitable structure
+        this.Grid.domController.resetRenderedRows();
         this.Grid.RowController.buildRows();
-        // console.log("--> build rows -->", +new Date() - start);
-
-        // refreshing the visual projection
         this.refreshGrid(true);
     }
 
@@ -599,7 +574,7 @@ export class VirtualGridApi {
             }
         }
 
-        for (const renderedRow of this.Grid.UI.domController.renderedRows) {
+        for (const renderedRow of this.Grid.domController.renderedRows) {
             if (renderedRow.index == row.index) {
 
                 [renderedRow.left, renderedRow.center, renderedRow.right].forEach((rowPartial) => {
@@ -625,7 +600,7 @@ export class VirtualGridApi {
 
         this.Grid.RowController.selectedRows.push(row);
 
-        for (const renderedRow of this.Grid.UI.domController.renderedRows) {
+        for (const renderedRow of this.Grid.domController.renderedRows) {
 
             if (renderedRow.index == row.index) {
                 this.toggleSelectionClasses(renderedRow);

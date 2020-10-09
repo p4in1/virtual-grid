@@ -22,8 +22,13 @@ export class VirtualGridDragAndDropController {
     ghostHeight: number = 40;
     ghostWidth: number = 0;
 
+    scrollOffset: number = 0;
+    scrollInterval;
+
+    currentCursorX: number = 0
+
     constructor(private Grid: IVirtualGrid) {
-        this.domController = this.Grid.UI.domController
+        this.domController = this.Grid.domController
         this.dom = this.domController.dom
     }
 
@@ -55,8 +60,12 @@ export class VirtualGridDragAndDropController {
 
             if (this.isGhostAttached) {
                 this.isGhostAttached = false;
+                this.scrollOffset = 0
+
                 this.dom.virtualGrid.classList.remove("moving")
                 this.dom.ghost.parentNode.removeChild(this.dom.ghost)
+
+                clearInterval(this.scrollInterval)
             }
         }
 
@@ -72,7 +81,7 @@ export class VirtualGridDragAndDropController {
      * @private
      */
     private getCurrentColMoveIndex(data, event) {
-        let currentX = event.clientX - data.offset
+        let currentX = event.clientX - data.offset + this.scrollOffset
         let isMovingLeft = event.clientX - data.x < 0
 
         let left = 0;
@@ -90,6 +99,57 @@ export class VirtualGridDragAndDropController {
                 left += _col.width
             }
         }
+    }
+
+    /**
+     * scrolls the view horizontally when the user drags a column and the grid has some
+     * spare space to scroll with
+     * @param dragData
+     * @private
+     */
+    private scrollHorizontally(dragData) {
+        let scrollDirection = this.getScrollDirection(dragData.offset)
+
+        if (scrollDirection) {
+            clearTimeout(this.scrollInterval)
+
+            this.scrollInterval = setInterval(() => {
+
+                let scrollDirection = this.getScrollDirection(dragData.offset)
+
+                if (scrollDirection == void 0) {
+                    clearInterval(this.scrollInterval)
+                    return
+                }
+
+                this.scrollOffset += scrollDirection == "left" ? -4 : 4;
+                this.domController.dom.scrollYCenterScrollPort.scrollLeft += scrollDirection == "left" ? -4 : 4
+            }, 12)
+        }
+    }
+
+    /**
+     * determine in which direction the viewport should scroll
+     * @param offset - the offset left of the grid
+     */
+    getScrollDirection(offset) {
+        let widths = this.domController.calculatePartialWidths()
+        let scrollPortWidth = this.domController.scrollPortWidth
+        let isScrollingRight = this.currentCursorX > scrollPortWidth - 40
+        let isScrollingLeft = this.currentCursorX < offset + 40
+        let scrollLeft = this.Grid.eventController.scrollLeft
+        let isScrolledToTheRight = scrollLeft + scrollPortWidth >= Math.round(widths.center)
+        let isScrolledToTheLeft = scrollLeft === 0
+
+        if (!isScrollingLeft && !isScrollingRight) {
+            return null
+        }
+
+        if ((isScrolledToTheRight && isScrollingRight) || (isScrolledToTheLeft && isScrollingLeft)) {
+            return null
+        }
+
+        return isScrollingRight ? "right" : "left"
     }
 
     /**
@@ -122,7 +182,11 @@ export class VirtualGridDragAndDropController {
             let isOutOfBounds = top + this.ghostHeight < dragData.rect.top;
 
             if (!isOutOfBounds) {
+
+                this.currentCursorX = event.clientX - dragData.offset
+
                 let nextIndex = this.getCurrentColMoveIndex(dragData, event)
+                this.scrollHorizontally(dragData)
                 this.moveColumn(dragData.col.currentIndex, nextIndex)
                 this.checkPinState(dragData, event, nextIndex)
             }
@@ -130,18 +194,18 @@ export class VirtualGridDragAndDropController {
     }
 
     checkPinState(dragData, event, nextIndex) {
-        let width = this.Grid.UI.domController.calculatePartialWidths()
-        let currentX = event.clientX - dragData.offset;
+        let width = this.Grid.domController.calculatePartialWidths()
+        let currentX = event.clientX - dragData.offset + this.scrollOffset;
 
-        if (currentX < width.bodyLeftWidth && dragData.col.pinned != "left") {
+        if (currentX < width.left && dragData.col.pinned != "left") {
             this.pinColumn(dragData.col, "left", nextIndex)
         }
 
-        if (currentX > width.bodyLeftWidth && currentX < (width.bodyLeftWidth + width.bodyCenterWidth) && dragData.col.pinned != "center") {
+        if (currentX > width.left && currentX < (width.left + width.center) && dragData.col.pinned != "center") {
             this.pinColumn(dragData.col, "center", nextIndex)
         }
 
-        if (currentX > (width.bodyLeftWidth + width.bodyCenterWidth) && dragData.col.pinned != "right") {
+        if (currentX > (width.left + width.center) && dragData.col.pinned != "right") {
             this.pinColumn(dragData.col, "right", nextIndex)
         }
     }
@@ -186,8 +250,8 @@ export class VirtualGridDragAndDropController {
 
         this.Grid.ColumnController.setCurrentColumnIndex()
 
-        this.Grid.UI.eventController.adjustCell(this.Grid.columns, 0)
-        this.Grid.UI.eventController.updateGridWidth()
+        this.Grid.eventController.adjustCell(this.Grid.columns, 0)
+        this.Grid.eventController.updateGridWidth()
         this.domController.calculateScrollGuard()
 
     }
@@ -209,14 +273,14 @@ export class VirtualGridDragAndDropController {
             }
 
             // set width and left
-            this.Grid.UI.eventController.adjustCell([this.Grid.columns[fromIndex], this.Grid.columns[toIndex]], 0)
+            this.Grid.eventController.adjustCell([this.Grid.columns[fromIndex], this.Grid.columns[toIndex]], 0)
 
             let left = this.Grid.columns.filter(x => x.pinned == "left")
             let right = this.Grid.columns.filter(x => x.pinned == "right")
 
             if (toIndex < left.length) {
                 this.pinColumn(this.Grid.columns[toIndex], "left", toIndex)
-            }else if (toIndex > this.Grid.columns.length - right.length) {
+            } else if (toIndex > this.Grid.columns.length - right.length) {
                 this.pinColumn(this.Grid.columns[toIndex], "right", toIndex)
             }
         }

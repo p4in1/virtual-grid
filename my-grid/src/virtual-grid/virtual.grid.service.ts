@@ -2,7 +2,6 @@ import {VirtualGridApi} from './virtual.grid.api.srv';
 import {VirtualGridColumnController} from './virtual.grid.column.srv';
 import {VirtualGridRowController} from './virtual.grid.row.srv';
 import {VirtualGridUtils} from './virtual.grid.utils';
-import {VirtualGridUIController} from './virtual.grid.ui.srv';
 import {VirtualGridConfigController} from "./virtual.grid.config.srv";
 import {VirtualGridFilterController} from "./virtual.grid.filter.srv";
 import {
@@ -12,6 +11,8 @@ import {
     IVirtualGridRow
 } from "./interfaces/virtual.grid.interfaces";
 import {VirtualGridDragAndDropController} from "./virtual.grid.drag.srv";
+import {VirtualGridUIDomController} from "./virtual.grid.ui.dom.srv";
+import {VirtualGridUIEventController} from "./virtual.grid.ui.event.srv";
 
 export class VirtualGrid implements IVirtualGrid {
     /**
@@ -22,110 +23,74 @@ export class VirtualGrid implements IVirtualGrid {
     ColumnController: VirtualGridColumnController;
     RowController: VirtualGridRowController;
     Utils: VirtualGridUtils;
-    UI: VirtualGridUIController;
     ConfigController: VirtualGridConfigController
     FilterController: VirtualGridFilterController
     DnDController: VirtualGridDragAndDropController
 
-    readonly initDone: boolean;
+    domController: VirtualGridUIDomController;
+    eventController: VirtualGridUIEventController;
 
     rows: IVirtualGridRow[] = [];
     originalColumns: IVirtualGridColumn[] = [];
 
     columns: IVirtualGridColumn[] = [];
 
-    childNodesKey: string;
+    readonly initDone: boolean;
 
-    enableLogging: boolean = false
-
-    constructor(readonly config: IVirtualGridConfig) {
+    constructor(config: IVirtualGridConfig) {
 
         let gStart = +new Date();
         this.initDone = false;
 
-        this.childNodesKey = this.config.childNodesKey != void 0 && this.config.childNodesKey !== '' ? this.config.childNodesKey : 'children';
+        this.ConfigController = new VirtualGridConfigController(this, config)
 
-        this.config = config;
+        this.api = new VirtualGridApi(this, this.ConfigController);
+        this.Utils = new VirtualGridUtils();
 
-        this.logTime("create api and utils -->", () => {
-            this.api = new VirtualGridApi(this, this.config);
-            this.Utils = new VirtualGridUtils();
-        })
+        this.domController = new VirtualGridUIDomController(this, this.ConfigController);
+        this.eventController = new VirtualGridUIEventController(this, this.ConfigController, this.domController);
 
-        this.logTime("parsing config -->", () => {
-            this.ConfigController = new VirtualGridConfigController(this, this.config)
-        })
+        this.ColumnController = new VirtualGridColumnController(this, this.ConfigController, this.domController);
+        this.RowController = new VirtualGridRowController(this, this.ConfigController, this.domController);
 
-        this.logTime("create Row and Column Controller -->", () => {
-            this.ColumnController = new VirtualGridColumnController(this, this.config);
-            this.RowController = new VirtualGridRowController(this, this.config);
-        })
+        this.rows = this.RowController.createRowModels(config.rows);
 
-        this.logTime("creating row models -->", () => {
-            this.rows = this.RowController.createRowModels(this.config.rows);
-        })
+        this.originalColumns = this.ColumnController.createColumnModels();
 
-        this.logTime("creating column models -->", () => {
-            this.originalColumns = this.ColumnController.createColumnModels();
+        let center = this.originalColumns.filter(col => col.pinned === "center")
+        let left = this.originalColumns.filter(col => col.pinned === "left")
+        let right = this.originalColumns.filter(col => col.pinned === "right")
 
-            let center = this.originalColumns.filter(col => col.pinned === "center")
-            let left  = this.originalColumns.filter(col => col.pinned === "left")
-            let right = this.originalColumns.filter(col => col.pinned === "right")
+        this.columns = [...left, ...center, ...right]
+        this.ColumnController.setCurrentColumnIndex()
 
-            this.columns = [...left, ...center, ...right]
-            this.ColumnController.setCurrentColumnIndex()
-        })
-
-        this.logTime("create UI and Filter controller -->", () => {
-            this.UI = new VirtualGridUIController(this, this.config);
-            this.FilterController = new VirtualGridFilterController(this, this.config)
-            this.DnDController = new VirtualGridDragAndDropController(this, this.config)
-        })
+        this.FilterController = new VirtualGridFilterController(this, this.ConfigController)
+        this.DnDController = new VirtualGridDragAndDropController(this)
 
         if (this.initDone == false) {
 
-            this.logTime("create dom elements -->", () => {
-                this.UI.createGrid();
-            })
+            this.domController.createGrid();
 
-            this.logTime("set grid content -->", () => {
-                this.api.setGridContent();
-            })
+            this.eventController.bindEvents();
 
-            if (this.config.onGridReady && typeof (this.config.onGridReady) == 'function' && !this.initDone) {
-                setTimeout(() => {
-                    this.config.onGridReady(this);
-                })
-            }
+            // this needs to happen after the initial drawing
+            setTimeout(() => {
+                this.domController.calculateWrapper()
+                this.ColumnController.calculateColumnWidth()
+                this.domController.calculateScrollGuard()
+                this.eventController.adjustCell(this.originalColumns, 0)
+                this.eventController.bindGlobalOnResize()
+            });
+
+            this.api.setGridContent();
+
+            setTimeout(() => {
+                this.ConfigController.onGridReady(this);
+            })
 
             this.initDone = true;
         }
 
         console.log("grid ready after --> ", +new Date() - gStart)
-    }
-
-    /**
-     * update the configuration of the grid once a new grid config is set
-     */
-    public updateConfigProperties = (): void => {
-
-        this.RowController.updateConfigProperties(this.config);
-        this.ColumnController.updateConfigProperties(this.config);
-        this.api.updateConfigProperties(this.config);
-
-        // this.rows = this.config.rows.slice();
-
-        this.childNodesKey = this.config.childNodesKey != void 0 && this.config.childNodesKey !== '' ? this.config.childNodesKey : 'children';
-    };
-
-
-    public logTime(message, func) {
-        if (this.enableLogging) {
-            let s = +new Date();
-            func()
-            console.log(message, +new Date() - s);
-        } else {
-            func()
-        }
     }
 }

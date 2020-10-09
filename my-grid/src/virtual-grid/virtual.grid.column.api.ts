@@ -25,12 +25,12 @@ export class VirtualGridColumnApi {
     }
 
     private _addMovingClass(func) {
-        this.Grid.UI.domController.dom.virtualGrid.classList.add("moving")
+        this.Grid.domController.dom.virtualGrid.classList.add("moving")
 
         func()
 
         setTimeout(() => {
-            this.Grid.UI.domController.dom.virtualGrid.classList.remove("moving")
+            this.Grid.domController.dom.virtualGrid.classList.remove("moving")
         }, 250)
     }
 }

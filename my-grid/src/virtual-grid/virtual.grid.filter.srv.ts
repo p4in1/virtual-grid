@@ -1,9 +1,10 @@
 import {
     IVirtualGrid,
-    IVirtualGridColumn, IVirtualGridConfig,
+    IVirtualGridColumn,
     IVirtualGridRow,
     VirtualGridCurrentFilter
 } from "./interfaces/virtual.grid.interfaces";
+import {VirtualGridConfigController} from "./virtual.grid.config.srv";
 
 /**
  * instance of column controller
@@ -11,14 +12,11 @@ import {
  */
 export class VirtualGridFilterController {
 
-    private readonly externalFilter: any;
     private filterValue = "";
 
     currentFilter: VirtualGridCurrentFilter = {text: "", columns: {}}
 
-    constructor(protected Grid: IVirtualGrid, private config: IVirtualGridConfig) {
-        this.externalFilter = this.config.externalFilter;
-
+    constructor(protected Grid: IVirtualGrid, private config: VirtualGridConfigController) {
         this.resetFilter()
     }
 
@@ -91,9 +89,9 @@ export class VirtualGridFilterController {
                 this.currentFilter.columns[col.index].content = col.filter.content
             }
 
-            if (typeof (this.externalFilter) === 'function') {
+            if (typeof (this.config.externalFilter) === 'function') {
                 filteredArray = filteredArray.filter((row: IVirtualGridRow) => {
-                    return this.externalFilter(row, this.filterValue);
+                    return this.config.externalFilter(row, this.filterValue);
                 });
             }
 

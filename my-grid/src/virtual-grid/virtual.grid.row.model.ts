@@ -31,9 +31,9 @@ export class VirtualGridRow implements IVirtualGridRow {
             this.parent = parent;
         }
 
-        if (node[Grid.childNodesKey]) {
-            this.isExpanded = Grid.RowController.expandNodesByDefault || node.expanded;
-            this.isSelectable = Grid.RowController.useIntermediateNodes;
+        if (node[Grid.ConfigController.childNodesKey]) {
+            this.isExpanded = Grid.ConfigController.expandNodesByDefault || node.expanded;
+            this.isSelectable = Grid.ConfigController.useIntermediateNodes;
         }
 
         // TODO observe changes on the rowData

@@ -9,14 +9,73 @@ export class VirtualGridConfigController {
 
     colDefs: IVirtualColDefConfig[] = [];
 
-    rowHeight: number = 40;
     rowLineCount: number = 1
-
+    rowHeight: number = 40;
     headerRowHeight: number = 40;
 
-    constructor(private Grid: IVirtualGrid, private config: IVirtualGridConfig) {
+    suppressSorting: boolean = false
+    suppressResize: boolean = false
+    suppressAutoSize: boolean = false
+    suppressDragging: boolean = false
+    suppressPinning: boolean = false
+    showHeader: boolean = false
+    showColumnFilter: boolean = false;
+    selectionMethod: string
+    element: HTMLElement;
+    autoSizeColumns: boolean = false;
+    headerValueGetter: Function
+    childNodesKey: string
 
-        for (let col of this.config.columns) {
+    externalFilter: Function
+
+    onGridReady: Function
+    onRowClick: Function
+    onRowMouseEnter: Function
+    onRowDoubleClick: Function
+    onRowRightClick: Function
+
+    onNodeExpandAsync: Function;
+
+    expandNodesByDefault = false;
+    useCheckboxSelection = false;
+    useIntermediateNodes = false;
+    deselectWhenCollapse = false;
+
+    constructor(private Grid: IVirtualGrid, config: IVirtualGridConfig) {
+
+        this.suppressSorting = config.suppressSorting
+        this.suppressResize = config.suppressResize
+        this.suppressAutoSize = config.suppressAutoSize
+        this.suppressDragging = config.suppressDragging
+        this.suppressPinning = config.suppressPinning
+        this.showHeader = config.showHeader
+        this.showColumnFilter = config.showColumnFilter
+        this.element = config.element
+        this.selectionMethod = config.selectionMethod == void 0 ? "single" : config.selectionMethod
+        this.autoSizeColumns = config.autoSizeColumns
+        this.headerValueGetter = config.headerValueGetter
+        this.childNodesKey = config.childNodesKey != void 0 && config.childNodesKey !== '' ? config.childNodesKey : 'children';
+        this.getColDefs(config)
+        this.onGridReady = typeof config.onGridReady == "function" ? config.onGridReady : this._noop
+        this.onRowClick = typeof config.onRowClick == "function" ? config.onRowClick : this._noop
+        this.onRowMouseEnter = typeof config.onRowMouseEnter == "function" ? config.onRowMouseEnter : this._noop
+        this.onRowDoubleClick = typeof config.onRowDoubleClick == "function" ? config.onRowDoubleClick : this._noop
+        this.onRowRightClick = typeof config.onRowRightClick == "function" ? config.onRowRightClick : this._noop
+
+        this.onNodeExpandAsync = config.onNodeExpandAsync;
+        this.expandNodesByDefault = config.expandNodesByDefault == void 0 ? true : config.expandNodesByDefault;
+        this.useCheckboxSelection = config.selectionMethod == "checkbox";
+        this.useIntermediateNodes = config.useIntermediateNodes;
+        this.deselectWhenCollapse = config.deselectWhenCollapse;
+
+        this.externalFilter = config.externalFilter
+    }
+
+    private _noop = () => {
+    }
+
+    getColDefs(config) {
+        for (let col of config.columns) {
 
             let colDef: IVirtualColDefConfig = <IVirtualColDefConfig>{
                 isMultiLine: false,
@@ -25,7 +84,7 @@ export class VirtualGridConfigController {
                 fieldPath: col.field ? col.field.indexOf(".") != -1 ? col.field.split(".") : [col.field] : [],
                 type: col.type == void 0 ? "text" : col.type,
 
-                isShowFilter: this.config.showColumnFilter || col.showFilter,
+                isShowFilter: this.showColumnFilter || col.showFilter,
 
                 isActionColumn: col.type == "action",
                 isIconColumn: col.type == "icon",
@@ -34,11 +93,11 @@ export class VirtualGridConfigController {
 
                 isAutosize: !col.suppressResize,
 
-                isSuppressSort: col.suppressSorting || config.suppressSorting,
-                isSuppressResize: col.suppressResize || config.suppressResize,
-                isSuppressAutoSize: col.suppressAutoSize || config.suppressAutoSize,
-                isSuppressDragging: col.suppressDragging || config.suppressDragging,
-                isSuppressPinning: col.suppressPinning || config.suppressPinning,
+                isSuppressSort: col.suppressSorting || this.suppressSorting,
+                isSuppressResize: col.suppressResize || this.suppressResize,
+                isSuppressAutoSize: col.suppressAutoSize || this.suppressAutoSize,
+                isSuppressDragging: col.suppressDragging || this.suppressDragging,
+                isSuppressPinning: col.suppressPinning || this.suppressPinning,
 
                 pinned: col.pinned && ["left", "right"].includes(col.pinned) ? col.pinned : "center",
 
@@ -79,7 +138,7 @@ export class VirtualGridConfigController {
                 colDef.isShowFilter = false
             }
 
-            for (let row of this.config.rows) {
+            for (let row of config.rows) {
                 let value = this.getValue(colDef, row)
 
                 if (value === "") {

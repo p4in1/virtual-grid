@@ -2,10 +2,11 @@ import {
     IRenderedCell,
     IRenderedRow,
     IVirtualGrid,
-    IVirtualGridConfig,
     IVirtualGridRow
 } from "./interfaces/virtual.grid.interfaces";
 import {VirtualGridRow} from "./virtual.grid.row.model";
+import {VirtualGridConfigController} from "./virtual.grid.config.srv";
+import {VirtualGridUIDomController} from "./virtual.grid.ui.dom.srv";
 
 /**
  * the instance of the row controller
@@ -13,36 +14,11 @@ import {VirtualGridRow} from "./virtual.grid.row.model";
  */
 export class VirtualGridRowController {
 
-    expandNodesByDefault: boolean;
-    deselectWhenCollapse: boolean;
-    useIntermediateNodes: boolean;
-    useCheckboxSelection: boolean;
     selectedRows: IVirtualGridRow[] = [];
-    rowHeight: number = 40;
 
-    private gPadding: number = 16;
-    private onNodeExpandAsync: any;
-
-    constructor(protected Grid: IVirtualGrid, private config: IVirtualGridConfig) {
-        this.onNodeExpandAsync = config.onNodeExpandAsync;
-        this.expandNodesByDefault = config.expandNodesByDefault == void 0 ? true : config.expandNodesByDefault;
-        this.useCheckboxSelection = config.selectionMethod == "checkbox";
-        this.useIntermediateNodes = config.useIntermediateNodes;
-        this.deselectWhenCollapse = config.deselectWhenCollapse;
-        this.rowHeight = this.Grid.ConfigController.rowHeight;
+    constructor(protected Grid: IVirtualGrid, private config: VirtualGridConfigController, private domController: VirtualGridUIDomController) {
     }
 
-    /**
-     * updates the config properties
-     * @param config
-     */
-    public updateConfigProperties = (config: IVirtualGridConfig): void => {
-        this.onNodeExpandAsync = config.onNodeExpandAsync;
-        this.expandNodesByDefault = config.expandNodesByDefault == void 0 ? true : config.expandNodesByDefault;
-        this.useCheckboxSelection = config.selectionMethod == "checkbox";
-        this.useIntermediateNodes = config.useIntermediateNodes;
-        this.deselectWhenCollapse = config.deselectWhenCollapse;
-    };
     /**
      * processes the grid data and creates the grid rows from scratch
      */
@@ -92,11 +68,11 @@ export class VirtualGridRowController {
      * this does not mean that every row is visible on the screen but these rows can be reached by scrolling
      */
     public rebuildVisibleRowMap = (): void => {
-        this.Grid.UI.domController.visibleRowIndices = [];
+        this.domController.visibleRowIndices = [];
 
         for (let i = 0; i < this.Grid.rows.length; i++) {
             if (this.Grid.rows[i].isVisible && this.Grid.rows[i].isVisibleAfterFilter) {
-                this.Grid.UI.domController.visibleRowIndices.push(i);
+                this.domController.visibleRowIndices.push(i);
             }
         }
     };
@@ -104,10 +80,10 @@ export class VirtualGridRowController {
      * toggle the visibility of the rendered rows when there are more rendered rows than content rows
      */
     public toggleRenderedRowVisibility = (): void => {
-        for (const row of this.Grid.UI.domController.renderedRows) {
+        for (const row of this.domController.renderedRows) {
 
             [row.left, row.center, row.right].forEach((rowPartial) => {
-                if (this.Grid.UI.domController.visibleRowIndices.indexOf(row.index) == -1) {
+                if (this.domController.visibleRowIndices.indexOf(row.index) == -1) {
                     if (rowPartial.element.style["display"] != "none") {
                         rowPartial.element.style["display"] = "none";
                     }
@@ -124,7 +100,7 @@ export class VirtualGridRowController {
      */
     public renderRows = (): void => {
 
-        for (const row of this.Grid.UI.domController.renderedRows) {
+        for (const row of this.domController.renderedRows) {
             if (row.index > this.Grid.rows.length - 1 || row.index < 0) {
                 break;
             }
@@ -139,18 +115,18 @@ export class VirtualGridRowController {
      */
     public calculateRowPosition = (startFromTop: boolean): void => {
 
-        this.Grid.UI.domController.reorderRenderedRows();
+        this.domController.reorderRenderedRows();
 
-        const rowHeight: number = this.rowHeight;
-        const renderedRows: IRenderedRow[] = this.Grid.UI.domController.renderedRows;
-        const renderedRowCount: number = this.Grid.UI.domController.renderedRowCount;
-        const visibleRowIndices: number[] = this.Grid.UI.domController.visibleRowIndices;
+        const rowHeight: number = this.config.rowHeight;
+        const renderedRows: IRenderedRow[] = this.domController.renderedRows;
+        const renderedRowCount: number = this.domController.renderedRowCount;
+        const visibleRowIndices: number[] = this.domController.visibleRowIndices;
 
         let currentIndex: number = startFromTop == true ? 0 : renderedRows[0].index;
         const firstRowTop: number = startFromTop == true ? 0 : renderedRows[0].top;
 
         if (startFromTop) {
-            this.Grid.UI.domController.dom.bodyWrapper.scrollTop = 0;
+            this.domController.dom.bodyWrapper.scrollTop = 0;
         }
 
         let count: number = 0;
@@ -215,11 +191,11 @@ export class VirtualGridRowController {
         }
 
         if (rowToStart.parent != void 0) {
-            for (const i in rowToStart.parent[this.Grid.childNodesKey]) {
-                const childNode: any = rowToStart.parent[this.Grid.childNodesKey][i];
+            for (const i in rowToStart.parent[this.config.childNodesKey]) {
+                const childNode: any = rowToStart.parent[this.config.childNodesKey][i];
 
                 if (childNode.index == rowToStart.index) {
-                    rowToStart.parent[this.Grid.childNodesKey].splice(i, 1);
+                    rowToStart.parent[this.config.childNodesKey].splice(i, 1);
                     break;
                 }
             }
@@ -265,7 +241,7 @@ export class VirtualGridRowController {
 
         const sourceRow: IVirtualGridRow = rowToMove.parent;
         rowToMove.parent = targetRow;
-        targetRow[this.Grid.childNodesKey].push(rowToMove);
+        targetRow[this.config.childNodesKey].push(rowToMove);
 
         this.Grid.ColumnController.applySorting();
 
@@ -300,7 +276,7 @@ export class VirtualGridRowController {
             args = argsStart.concat(rows);
             Array.prototype.splice.apply(this.Grid.rows, args);
 
-            startRow[this.Grid.childNodesKey] = startRow[this.Grid.childNodesKey].concat(rowsToInsert);
+            startRow[this.config.childNodesKey] = startRow[this.config.childNodesKey].concat(rowsToInsert);
         } else {
             this.Grid.rows = this.Grid.rows.concat(rows);
         }
@@ -324,17 +300,17 @@ export class VirtualGridRowController {
 
         row.isExpanded = bool != void 0 ? bool : !row.isExpanded;
 
-        if (row.isExpanded && typeof (this.onNodeExpandAsync) == "function") {
+        if (row.isExpanded && typeof (this.config.onNodeExpandAsync) == "function") {
             row.isLoading = true;
 
-            for (const renderedRow of this.Grid.UI.domController.renderedRows) {
+            for (const renderedRow of this.domController.renderedRows) {
                 if (renderedRow.index == row.index) {
                     this.renderRow(renderedRow);
                     break;
                 }
             }
 
-            this.onNodeExpandAsync({row, api: this.Grid.api},
+            this.config.onNodeExpandAsync({row, api: this.Grid.api},
                 () => {
                     row.isLoading = false;
 
@@ -506,7 +482,7 @@ export class VirtualGridRowController {
 
     private _renderTreeNode(cell: IRenderedCell) {
         if (cell.colModel.isHierarchyColumn) {
-            cell.cellNode.style["padding-left"] = `${this.gPadding * cell.rowModel.level}px`;
+            cell.cellNode.style["padding-left"] = `${16 * cell.rowModel.level}px`;
 
             if (cell.treeNode != void 0) {
                 const children: IVirtualGridRow[] = cell.rowModel.children;
@@ -576,7 +552,7 @@ export class VirtualGridRowController {
         }
 
         // config property ... only deselect when this property is set to true, default is true
-        if (this.deselectWhenCollapse) {
+        if (this.config.deselectWhenCollapse) {
             this.deselectInvisible();
         }
     }
@@ -598,8 +574,8 @@ export class VirtualGridRowController {
                 this.selectedRows.push(row);
             }
 
-            if (node[this.Grid.childNodesKey]) {
-                row.children = this.createRowModels(node[this.Grid.childNodesKey], row.level + 1, row, true);
+            if (node[this.config.childNodesKey]) {
+                row.children = this.createRowModels(node[this.config.childNodesKey], row.level + 1, row, true);
             }
 
             rows.push(row)
@@ -659,9 +635,9 @@ export class VirtualGridRowController {
     private rebaseRowLevel(row: any, baseLevel: number): void {
         row.level = baseLevel;
 
-        if (row[this.Grid.childNodesKey] != void 0) {
-            for (const i in row[this.Grid.childNodesKey]) {
-                this.rebaseRowLevel(row[this.Grid.childNodesKey][i], baseLevel + 1);
+        if (row[this.config.childNodesKey] != void 0) {
+            for (const i in row[this.config.childNodesKey]) {
+                this.rebaseRowLevel(row[this.config.childNodesKey][i], baseLevel + 1);
             }
         }
     }

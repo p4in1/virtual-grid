@@ -1,36 +1,22 @@
 import {
     IVirtualGrid,
     IVirtualGridColumn,
-    IVirtualGridConfig,
     IVirtualGridDom,
     IVirtualGridRow
 } from "./interfaces/virtual.grid.interfaces";
 import {VirtualGridUIDomController} from "./virtual.grid.ui.dom.srv";
+import {VirtualGridConfigController} from "./virtual.grid.config.srv";
 
 export class VirtualGridUIEventController {
 
-    readonly onRowRightClick: any;
-    readonly onRowMouseEnter: any;
-    readonly onRowDoubleClick: any;
-    readonly onRowClick: any;
-    readonly onSwipeStart: any;
-
     private dom: IVirtualGridDom;
-
-    private gPadding: number = 16;
 
     private globalResizeObserver;
 
     scrollLeft: number = 0
 
-    constructor(private Grid: IVirtualGrid, private config: IVirtualGridConfig, private domController: VirtualGridUIDomController) {
+    constructor(private Grid: IVirtualGrid, private config: VirtualGridConfigController, private domController: VirtualGridUIDomController) {
         this.dom = domController.dom;
-        // callbacks
-        this.onRowRightClick = this.config.onRowRightClick;
-        this.onRowDoubleClick = this.config.onRowDoubleClick;
-        this.onRowMouseEnter = this.config.onRowMouseEnter;
-        this.onRowClick = this.config.onRowClick;
-        this.onSwipeStart = this.config.onSwipeStart;
     }
 
     /**
@@ -50,8 +36,8 @@ export class VirtualGridUIEventController {
 
         this.Grid.api.select(row, useCtrl, useShift, isCheckboxSelection);
 
-        if (this.onRowClick != void 0) {
-            this.onRowClick({row, event, api: this.Grid.api});
+        if (this.config.onRowClick != void 0) {
+            this.config.onRowClick({row, event, api: this.Grid.api});
         }
     };
 
@@ -68,8 +54,8 @@ export class VirtualGridUIEventController {
 
         this.Grid.api.select(row);
 
-        if (this.onRowDoubleClick != void 0) {
-            this.onRowDoubleClick({row, event, api: this.Grid.api});
+        if (this.config.onRowDoubleClick != void 0) {
+            this.config.onRowDoubleClick({row, event, api: this.Grid.api});
         }
     };
 
@@ -84,8 +70,8 @@ export class VirtualGridUIEventController {
             return;
         }
 
-        if (this.onRowRightClick != void 0) {
-            this.onRowRightClick({row, event, api: this.Grid.api});
+        if (this.config.onRowRightClick != void 0) {
+            this.config.onRowRightClick({row, event, api: this.Grid.api});
         }
 
         event.preventDefault();
@@ -102,8 +88,8 @@ export class VirtualGridUIEventController {
             return;
         }
 
-        if (this.onRowMouseEnter != void 0) {
-            this.onRowMouseEnter({row, event, api: this.Grid.api});
+        if (this.config.onRowMouseEnter != void 0) {
+            this.config.onRowMouseEnter({row, event, api: this.Grid.api});
         }
 
         event.preventDefault();
@@ -152,8 +138,6 @@ export class VirtualGridUIEventController {
                 }
 
                 currentX += diff
-
-                console.log(col.currentIndex)
 
                 this.updateCellWidth(col.currentIndex, diff)
                 this.updateGridWidth()
@@ -237,9 +221,9 @@ export class VirtualGridUIEventController {
             let isVerticalScrolling: boolean = this.Grid.ColumnController.isVerticalScrolling;
             let scrollbarWidth = isVerticalScrolling ? this.Grid.ColumnController.scrollbarWidth : 0;
             let width = this.domController.calculatePartialWidths()
-            let remaining = this.domController.bodyWrapperWidth - width.bodyLeftWidth - width.bodyRightWidth - scrollbarWidth
+            let remaining = this.domController.bodyWrapperWidth - width.left - width.right - scrollbarWidth
 
-            diff = width.bodyCenterWidth - remaining
+            diff = width.center - remaining
             autosizableCols = this.getAutoSizableColumns(centerColumns, diff < 0);
             diffPerColumn = autosizableCols.length > 0 ? diff / autosizableCols.length : 0
 
@@ -254,21 +238,21 @@ export class VirtualGridUIEventController {
         let gridWidth: number = this.domController.bodyWrapperWidth - scrollbarWidth
         let widths = this.domController.calculatePartialWidths()
 
-        const scrollPortWidth = gridWidth - widths.bodyRightWidth - widths.bodyLeftWidth;
+        const scrollPortWidth = gridWidth - widths.right - widths.left;
 
-        if (widths.bodyCenterWidth < scrollPortWidth) {
-            let scrollDiff = scrollPortWidth - widths.bodyCenterWidth
+        if (widths.center < scrollPortWidth) {
+            let scrollDiff = scrollPortWidth - widths.center
             let scrollDiffPerCol = scrollDiff / centerColumns.length
 
             this.adjustCell(centerColumns, scrollDiffPerCol);
         }
 
-        this.domController.setStyles(this.dom.headerLeft, {"width": `${widths.bodyLeftWidth}px`})
-        this.domController.setStyles(this.dom.bodyLeft, {"width": `${widths.bodyLeftWidth}px`})
-        this.domController.setStyles(this.dom.headerRight, {"width": `${widths.bodyRightWidth}px`})
-        this.domController.setStyles(this.dom.bodyRight, {"width": `${widths.bodyRightWidth}px`})
-        this.domController.setStyles(this.dom.headerCenter, {"width": `${widths.bodyCenterWidth}px`})
-        this.domController.setStyles(this.dom.bodyCenter, {"width": `${widths.bodyCenterWidth}px`})
+        this.domController.setStyles(this.dom.headerLeft, {"width": `${widths.left}px`})
+        this.domController.setStyles(this.dom.bodyLeft, {"width": `${widths.left}px`})
+        this.domController.setStyles(this.dom.headerRight, {"width": `${widths.right}px`})
+        this.domController.setStyles(this.dom.bodyRight, {"width": `${widths.right}px`})
+        this.domController.setStyles(this.dom.headerCenter, {"width": `${widths.center}px`})
+        this.domController.setStyles(this.dom.bodyCenter, {"width": `${widths.center}px`})
         this.domController.setStyles(this.dom.bodyCenterScrollPort, {"width": `${scrollPortWidth}px`})
         this.domController.setStyles(this.dom.headerCenterScrollPort, {"width": `${scrollPortWidth}px`})
     }
@@ -316,7 +300,7 @@ export class VirtualGridUIEventController {
                 styles["width"] = `${Math.floor(currentColumn.width)}px`
 
                 if (currentColumn.isHierarchyColumn) {
-                    styles["padding-left"] = `${this.Grid.rows[row.index].level * this.gPadding}px`
+                    styles["padding-left"] = `${this.Grid.rows[row.index].level * 16}px`
                 }
 
                 this.domController.setStyles(cell, styles)
@@ -352,163 +336,14 @@ export class VirtualGridUIEventController {
         }
     }
 
-    /**
-     * the touch handler for the swipe events
-     * @param event
-     */
-    // private touchHandler = (event: any): void => {
-    //
-    //     this.resetSwipeActionElement(event);
-    //
-    //     this.swipedElement = event.currentTarget;
-    //
-    //     let rowIndex = Number(this.swipedElement.closest(".virtual-grid-row").getAttribute("number"));
-    //     let isHorizontallyScrolling = false;
-    //     let movement = 0;
-    //     let isActionSet = false;
-    //     let swipeActions: any = {};
-    //
-    //     const row: any = this.Grid.api.getRowByIndex(rowIndex);
-    //
-    //     if (typeof (this.onSwipeStart) == "function") {
-    //         this.onSwipeStart(row)
-    //     }
-    //
-    //     if (typeof (this.swipeConfig.swipeActionGetter) == "function") {
-    //         swipeActions = this.swipeConfig.swipeActionGetter(this.Grid.api, rowIndex)
-    //     } else {
-    //         swipeActions = {
-    //             resolve: this.swipeConfig.onSwipeResolveActions,
-    //             reject: this.swipeConfig.onSwipeRejectActions,
-    //         }
-    //     }
-    //
-    //     this.dom.swipeActionElement.css({
-    //         width: 0,
-    //         position: "absolute",
-    //         top: row.index * this.Grid.RowController.rowHeight,
-    //         height: this.Grid.RowController.rowHeight,
-    //         display: "flex",
-    //         "flex-direction": "row"
-    //     });
-    //
-    //     let touchEvent = event.originalEvent.touches[0];
-    //     let start = touchEvent.clientX;
-    //
-    //     this.dom.bodyWrapper.on("scroll", (event) => {
-    //         if (this.Grid.UI.domController.showHeader) {
-    //             this.dom.headerWrapper.scrollLeft(this.dom.bodyWrapper.scrollLeft() as number);
-    //         }
-    //
-    //         // this.swipedElement.off("touchmove touchend");
-    //         $(window).off("click");
-    //         this.resetSwipeActionElement();
-    //         this._onScroll();
-    //     });
-    //
-    //     this.swipedElement.addEventListener("touchmove", (moveEvent: any) => {
-    //         let moveTouch = moveEvent.originalEvent.touches[0];
-    //         let newMovement = moveTouch.clientX - start;
-    //
-    //         if (isActionSet && (movement < 0 && newMovement >= 0) || (movement > 0 && newMovement <= 0)) {
-    //             isActionSet = false;
-    //         }
-    //
-    //         movement = moveTouch.clientX - start;
-    //
-    //         if (Math.abs(movement) < 15 && !isHorizontallyScrolling) {
-    //             return;
-    //         }
-    //
-    //         if (!isHorizontallyScrolling) {
-    //             movement = 0;
-    //             isHorizontallyScrolling = true;
-    //             isActionSet = false;
-    //             this.isSwipeActionVisible = true;
-    //         }
-    //
-    //         if (!isActionSet && movement != 0) {
-    //
-    //             isActionSet = true;
-    //             this.dom.swipeActionElement.empty();
-    //
-    //             let _swipeActions = movement > 0 ? swipeActions.resolve : swipeActions.reject;
-    //
-    //             this.addSwipeActions(this.dom.swipeActionElement, _swipeActions, rowIndex)
-    //         }
-    //
-    //         if (movement < 0) {
-    //             this.dom.swipeActionElement.css({width: Math.abs(movement), right: 0, left: "auto"});
-    //         } else if (movement > 0) {
-    //             this.dom.swipeActionElement.css({width: movement, left: 0, right: "auto"});
-    //         }
-    //
-    //         this.swipedElement.style["left"] = `${movement}px`
-    //     });
-    //
-    //     this.swipedElement.addEventListener("touchend", () => {
-    //         // this.swipedElement.off("touchmove touchend");
-    //
-    //         if (Math.abs(movement) >= this.dom.bodyWrapper.width() / 2) {
-    //             if (movement < 0 && swipeActions.reject.length == 1) {
-    //                 swipeActions.reject[0].callback(row);
-    //                 this.resetSwipeActionElement()
-    //             } else if (movement > 0 && swipeActions.resolve.length == 1) {
-    //                 swipeActions.resolve[0].callback(row);
-    //                 this.resetSwipeActionElement()
-    //             }
-    //
-    //             $(window).off("click")
-    //         }
-    //
-    //         if (Math.abs(movement) < this.dom.bodyWrapper.width() / 4) {
-    //             this.resetSwipeActionElement()
-    //         }
-    //     });
-    //
-    //     $(window).on("click", (event) => {
-    //         this.resetSwipeActionElement(event);
-    //         $(window).off("click")
-    //     });
-    // };
-    /**
-     * resets the action element to its original position and hides it
-     */
-    // private resetSwipeActionElement = (event?): void => {
-    //     if (this.swipedElement) {
-    //         this.swipedElement.style["left"] = "0px";
-    //     }
-    //
-    //     this.dom.swipeActionElement && this.dom.swipeActionElement.css({width: 0});
-    //
-    //     if (this.isSwipeActionVisible && event) {
-    //         event.stopImmediatePropagation();
-    //         event.stopPropagation();
-    //         event.preventDefault();
-    //     }
-    //
-    //     this.isSwipeActionVisible = false;
-    // };
-
     private bindRowEvents() {
         for (const renderedRow of this.domController.renderedRows) {
 
             [renderedRow.left.element, renderedRow.center.element, renderedRow.right.element].forEach((listNode) => {
-                if (typeof (this.onRowClick) == "function") {
-                    listNode.addEventListener("click", this.onClick);
-                }
-
-                if (typeof (this.onRowDoubleClick) == "function") {
-                    listNode.addEventListener("dblclick", this.onDoubleClick);
-                }
-
-                if (typeof (this.onRowRightClick) == "function") {
-                    listNode.addEventListener("contextmenu", this.onRightClick);
-                }
-
-                if (typeof (this.onRowMouseEnter) == "function") {
-                    listNode.addEventListener("mouseenter", this.onMouseEnter);
-                }
+                listNode.addEventListener("click", this.onClick);
+                listNode.addEventListener("dblclick", this.onDoubleClick);
+                listNode.addEventListener("contextmenu", this.onRightClick);
+                listNode.addEventListener("mouseenter", this.onMouseEnter);
 
                 if (this.Grid.Utils.isPhone()) {
                     // listNode.addEventListener("touchstart", this.touchHandler)
@@ -614,52 +449,4 @@ export class VirtualGridUIEventController {
     private getAutoSizableColumns(colsToBeResized: IVirtualGridColumn[], isGrowing: boolean): IVirtualGridColumn[] {
         return colsToBeResized.filter((col) => col.pinned === "center" && ((!isGrowing && col.isAutoResize && col.canShrink) || (isGrowing && col.isAutoResize)))
     }
-
-    /**
-     * adds swipe actions to the action container
-     * @param actionElement - the action element where the swipe actions are stored and shown
-     * @param actions - the action models
-     * @param rowIndex - the rowIndex where the action element should show up
-     */
-    // private addSwipeActions(actionElement, actions, rowIndex) {
-    //     for (const action of actions) {
-    //         let element = $("<div></div>");
-    //
-    //         if (!action.icon) {
-    //             element.append($(`<span>${action.title}</span>`));
-    //             element.css(
-    //                 {
-    //                     "background-color": action.backgroundColor,
-    //                     "width": "100%",
-    //                     "display": "flex",
-    //                     "align-items": "center",
-    //                     "font-size": "16px",
-    //                     "overflow": "hidden",
-    //                     "justify-content": "center",
-    //                     "white-space": "nowrap",
-    //                     "text-overflow": "ellipsis",
-    //                 });
-    //         } else {
-    //             element.addClass(action.icon);
-    //             element.css(
-    //                 {
-    //                     "background-color": action.backgroundColor,
-    //                     "background-repeat": "no-repeat",
-    //                     "background-size": "24px 24px",
-    //                     "background-position": "center",
-    //                     width: "100%"
-    //                 });
-    //         }
-    //
-    //
-    //         element.on("click", (event) => {
-    //             action.callback(this.Grid.api.getRowByIndex(rowIndex));
-    //             event.stopImmediatePropagation();
-    //             event.stopPropagation();
-    //             this.resetSwipeActionElement()
-    //         });
-    //
-    //         actionElement.append(element)
-    //     }
-    // }
 }

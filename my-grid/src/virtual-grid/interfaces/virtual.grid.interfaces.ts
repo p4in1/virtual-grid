@@ -4,8 +4,9 @@ import {VirtualGridColumnController} from "../virtual.grid.column.srv";
 import {VirtualGridRowController} from "../virtual.grid.row.srv";
 import {VirtualGridFilterController} from "../virtual.grid.filter.srv";
 import {VirtualGridUtils} from "../virtual.grid.utils";
-import {VirtualGridUIController} from "../virtual.grid.ui.srv";
 import {VirtualGridDragAndDropController} from "../virtual.grid.drag.srv";
+import {VirtualGridUIDomController} from "../virtual.grid.ui.dom.srv";
+import {VirtualGridUIEventController} from "../virtual.grid.ui.event.srv";
 
 export interface IVirtualGridConfig {
 
@@ -163,14 +164,6 @@ export interface IVirtualGridConfig {
     onRowClick?(row: IVirtualGridRow, event: any, api: VirtualGridApi): void
 
     /**
-     * swipe start callback
-     * @param row - the VirtualGridRow the event was executed on
-     * @param event - the original event
-     * @param api - grid api
-     */
-    onSwipeStart?(row: IVirtualGridRow, event: any, api: VirtualGridApi): void
-
-    /**
      * grid ready callback
      * @param Grid - returns the grid as parameter
      */
@@ -200,26 +193,22 @@ export interface IVirtualGridColumnConfig {
 
 export interface IVirtualGrid {
     api: VirtualGridApi
+    Utils: VirtualGridUtils
+
     DnDController: VirtualGridDragAndDropController
     ColumnController: VirtualGridColumnController
+
     RowController: VirtualGridRowController
     ConfigController: VirtualGridConfigController
     FilterController: VirtualGridFilterController
-    Utils: VirtualGridUtils
-    UI: VirtualGridUIController
 
-    childNodesKey: string
 
-    config: any
+    domController: VirtualGridUIDomController
+    eventController: VirtualGridUIEventController
 
     rows: IVirtualGridRow[]
     originalColumns: IVirtualGridColumn[]
-
-    columns: IVirtualGridColumn[],
-
-    logTime(message: string, callback: Function): void
-
-    updateConfigProperties(): void
+    columns: IVirtualGridColumn[]
 }
 
 export interface VirtualGridCurrentFilter {

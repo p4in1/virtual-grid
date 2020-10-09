@@ -1,10 +1,12 @@
 import {
     IVirtualGrid,
     IVirtualGridColumn,
-    IVirtualGridConfig,
     IVirtualGridRow
 } from "./interfaces/virtual.grid.interfaces";
+
 import {VirtualGridColumn} from "./virtual.grid.column.model";
+import {VirtualGridConfigController} from "./virtual.grid.config.srv";
+import {VirtualGridUIDomController} from "./virtual.grid.ui.dom.srv";
 
 /**
  * instance of column controller
@@ -14,20 +16,13 @@ export class VirtualGridColumnController {
     public isVerticalScrolling: boolean = false;
     public scrollbarWidth: number = 17;
 
-    private colDefs: any[] = [];
     private sortConfig: any = {};
     private gPadding: number = 16;
 
-    private headerValueGetter: any;
-    private autoSizeColumns: boolean;
-
     public sortedColumns: IVirtualGridColumn[];
 
-    constructor(protected Grid: IVirtualGrid, config: IVirtualGridConfig) {
+    constructor(protected Grid: IVirtualGrid, private config: VirtualGridConfigController, private domController: VirtualGridUIDomController) {
 
-        this.colDefs = config.columns.slice();
-        this.headerValueGetter = config.headerValueGetter;
-        this.autoSizeColumns = config.autoSizeColumns;
         this.sortedColumns = [];
 
         this.scrollbarWidth = this.getScrollbarWidth()
@@ -41,16 +36,6 @@ export class VirtualGridColumnController {
     }
 
     /**
-     * updates the config properties
-     * @param config
-     */
-    public updateConfigProperties = (config: any): void => {
-        this.colDefs = config.columns;
-        this.headerValueGetter = config.headerValueGetter;
-        this.autoSizeColumns = config.autoSizeColumns;
-    };
-
-    /**
      * refreshes the header and each header cell
      * replaces the header value or calls the headerValueGetter
      */
@@ -59,8 +44,8 @@ export class VirtualGridColumnController {
 
             let headerValue: string = "";
 
-            if (this.headerValueGetter && typeof (this.headerValueGetter) == "function") {
-                headerValue = this.headerValueGetter({column, api: this.Grid.api});
+            if (typeof (this.config.headerValueGetter) == "function") {
+                headerValue = this.config.headerValueGetter({column, api: this.Grid.api});
             } else {
                 headerValue = column.title;
             }
@@ -319,11 +304,10 @@ export class VirtualGridColumnController {
     public createColumnModels() {
 
         let columns: IVirtualGridColumn[] = [];
-        for (let i = 0; i < this.colDefs.length; i++) {
-            let col: IVirtualGridColumn = new VirtualGridColumn(this.Grid, this.colDefs[i], i);
 
-            columns.push(col)
-        }
+        this.config.colDefs.forEach((col, index) => {
+            columns.push(new VirtualGridColumn(this.Grid, col, index))
+        })
 
         return columns
     }
@@ -363,16 +347,16 @@ export class VirtualGridColumnController {
     public calculateColumnWidth(): void {
 
         // the grid now has a scrollbar, so we have to create some space
-        if ((this.Grid.rows.length - 1) * this.Grid.RowController.rowHeight > this.Grid.UI.domController.dom.virtualGrid.offsetHeight) {
+        if ((this.Grid.rows.length - 1) * this.config.rowHeight > this.domController.dom.virtualGrid.offsetHeight) {
             this.isVerticalScrolling = true;
         }
 
-        if (this.autoSizeColumns) {
+        if (this.config.autoSizeColumns) {
             this.autoSizeColumn();
             return
         }
 
-        let availableWidth: number = this.Grid.UI.domController.dom.virtualGrid.clientWidth;
+        let availableWidth: number = this.domController.dom.virtualGrid.clientWidth;
         let upsizedColumns: number = 0; // we count the columns without a predefined width
 
         if (this.isVerticalScrolling) {
