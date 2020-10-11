@@ -464,6 +464,10 @@ export class VirtualGridRowController {
             let avatarConfig = cell.colModel.avatarConfig
             let avatarURL = this.getCellData(cell.rowModel.rowData, avatarConfig.url.split("."))
 
+            cell.avatarPlaceholder.innerText = ""
+            cell.avatarNode.style["background-image"] = ""
+            cell.avatarNode.style["background-color"] = "transparent"
+
             if (avatarURL != "" && avatarURL != void 0) {
                 cell.avatarPlaceholder.innerText = ""
                 cell.avatarNode.style["background-image"] = `url(${avatarURL})`
@@ -471,6 +475,10 @@ export class VirtualGridRowController {
                 for (let agg of avatarConfig.placeholderAgg) {
                     let data = this.getCellData(cell.rowModel.rowData, agg.split("."))
                     ph += data.charAt(0).toUpperCase()
+                }
+
+                if(ph == "" && avatarConfig.hideEmptyPlaceholder){
+                    return
                 }
 
                 cell.avatarNode.style["background-image"] = ""
@@ -488,24 +496,13 @@ export class VirtualGridRowController {
                 const children: IVirtualGridRow[] = cell.rowModel.children;
 
                 if (children != void 0 && children.length > 0) {
-
-                    cell.treeNode.classList.remove("tree-empty");
-
                     if (cell.rowModel.isExpanded && !cell.rowModel.isLoading) {
-                        cell.treeNode.classList.add("tree-expanded");
-                        cell.treeNode.classList.remove("tree-collapsed");
-                        cell.treeNode.classList.remove("loading-content");
+                        cell.treeNode.innerHTML = "remove"
                     } else {
-                        cell.treeNode.classList.add("tree-collapsed");
-                        cell.treeNode.classList.remove("tree-expanded");
-                        if (cell.rowModel.isLoading) {
-                            cell.treeNode.classList.remove("loading-content");
-                        }
+                        cell.treeNode.innerHTML = "add"
                     }
                 } else {
-                    cell.treeNode.classList.add("tree-empty");
-                    cell.treeNode.classList.remove("tree-expanded");
-                    cell.treeNode.classList.remove("tree-collapsed");
+                    cell.treeNode.innerHTML = ""
                 }
             }
         }

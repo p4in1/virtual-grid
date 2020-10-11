@@ -327,13 +327,13 @@ export class VirtualGridColumnController {
         outer.style.overflow = "hidden";
         outer.appendChild(inner);
 
-        document.body.appendChild(outer);
+        this.domController.dom.virtualGrid.appendChild(outer);
         const w1 = inner.offsetWidth;
         outer.style.overflow = 'scroll';
         let w2 = inner.offsetWidth;
         if (w1 == w2) w2 = outer.clientWidth;
 
-        document.body.removeChild(outer);
+        this.domController.dom.virtualGrid.removeChild(outer);
 
         return (w1 - w2);
     }

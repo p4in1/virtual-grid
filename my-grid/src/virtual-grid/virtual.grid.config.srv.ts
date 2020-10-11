@@ -84,13 +84,14 @@ export class VirtualGridConfigController {
                 fieldPath: col.field ? col.field.indexOf(".") != -1 ? col.field.split(".") : [col.field] : [],
                 type: col.type == void 0 ? "text" : col.type,
 
-                isShowFilter: this.showColumnFilter || col.showFilter,
+                isShowFilter: col.showFilter != void 0 ? col.showFilter : this.showColumnFilter,
 
                 isActionColumn: col.type == "action",
                 isIconColumn: col.type == "icon",
                 isCheckboxColumn: col.type == "checkbox",
                 isAvatarColumn: col.type == "avatar",
 
+                isHierarchyColumn: col.isHierarchyColumn,
                 isAutosize: !col.suppressResize,
 
                 isSuppressSort: col.suppressSorting || this.suppressSorting,
@@ -115,6 +116,7 @@ export class VirtualGridConfigController {
 
             if (colDef.isShowFilter) {
                 this.headerRowHeight = 80
+                this.showColumnFilter = true
             }
 
             if (colDef.isActionColumn) {

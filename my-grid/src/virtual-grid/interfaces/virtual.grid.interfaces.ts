@@ -172,7 +172,7 @@ export interface IVirtualGridConfig {
 
 export interface IVirtualGridColumnConfig {
 
-    field: string
+    field?: string
 
     title?: string
     type?: string
@@ -189,6 +189,8 @@ export interface IVirtualGridColumnConfig {
     width?: number
     minWidth?: number
     valueFormat?: string
+
+    isHierarchyColumn?: boolean
 }
 
 export interface IVirtualGrid {
@@ -395,6 +397,7 @@ export interface IRenderedCell {
     treeNode: HTMLElement
     checkboxNode: HTMLElement
     cellNode: HTMLElement
+    cellContentNode: HTMLElement
     avatarNode: HTMLElement
     avatarPlaceholder: HTMLElement
     colId: string
@@ -487,14 +490,21 @@ export interface IVirtualAvatar {
      * the image url
      */
     url: string
+
     /**
      * the aggregation for the placeholder
      */
     placeholderAgg: string[]
+
     /**
      * the background-color
      */
     placeholderBgColor: string
+
+    /**
+     * hides empty placeholder in case there is no data to show
+     */
+    hideEmptyPlaceholder: boolean
 }
 
 export interface IVirtualColDefConfig {

@@ -220,6 +220,7 @@ export class VirtualGridUIEventController {
         } else {
             let isVerticalScrolling: boolean = this.Grid.ColumnController.isVerticalScrolling;
             let scrollbarWidth = isVerticalScrolling ? this.Grid.ColumnController.scrollbarWidth : 0;
+
             let width = this.domController.calculatePartialWidths()
             let remaining = this.domController.bodyWrapperWidth - width.left - width.right - scrollbarWidth
 
@@ -299,7 +300,7 @@ export class VirtualGridUIEventController {
                 let cell = row.cells[currentColumn.currentIndex].cellNode
                 styles["width"] = `${Math.floor(currentColumn.width)}px`
 
-                if (currentColumn.isHierarchyColumn) {
+                if (currentColumn.isHierarchyColumn && this.Grid.rows[row.index] != void 0) {
                     styles["padding-left"] = `${this.Grid.rows[row.index].level * 16}px`
                 }
 

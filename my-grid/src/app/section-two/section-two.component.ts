@@ -16,14 +16,103 @@ export class SectionTwoComponent implements AfterViewInit {
     }
 
     ngAfterViewInit() {
-        let config: IVirtualGridConfig = {
-            showHeader: true,
-            element: this.grid.nativeElement,
-            columns: [{field: "value", title: "test"}],
-            rows: [{value: "2"}, {value: "3"}, {value: "4"}]
-        }
 
-        this.gridInstance = new VirtualGrid(config)
+        //
+        // this.gridInstance = new VirtualGrid(config)
+
+
+        fetch('assets/data.json').then(response => response.json()).then((data) => {
+
+            let map: any = {}
+
+            let tree = []
+
+            for (let item of data.rows) {
+                let user = item.data.user
+                let groups = user.groups
+
+                for (let g of groups) {
+                    if (map[g._id] == void 0) {
+                        map[g._id] = g
+                    }
+                }
+            }
+
+            for (let item in map) {
+                let group = map[item]
+
+                if (!group.parent) {
+                    tree.push(group)
+                }
+
+                if (group.parent && map[group.parent]) {
+                    if (map[group.parent].children == void 0) {
+                        map[group.parent].children = []
+                    }
+
+                    map[group.parent].children.push(group)
+                }
+            }
+
+            for (let item in map) {
+                let group = map[item]
+                if (group.parent && group.children == void 0) {
+                    group.isLeaf = true
+                    group.children = []
+                }
+            }
+
+            for (let item of data.rows) {
+                let user = item.data.user
+                let groups = user.groups
+
+                for (let g of groups) {
+                    if (map[g._id].isLeaf) {
+                        map[g._id].children.push({
+                            title: `${user.userFirstName} ${user.userLastName}`,
+                            userFirstName: user.userFirstName,
+                            userLastName: user.userLastName,
+                            email: user.email
+                        })
+                    }
+                }
+            }
+
+            console.log(tree)
+
+            let config: IVirtualGridConfig = {
+                rows: tree,
+                columns: [
+                    {
+                        type: "avatar",
+                        avatarConfig: {
+                            url: "data.user.avatarURL",
+                            placeholderAgg: ["userFirstName", "userLastName"],
+                            placeholderBgColor: "var(--color-primary)",
+                            hideEmptyPlaceholder: true
+                        },
+                    },
+                    {
+                        field: "title",
+                        title: "Gruppenstruktur",
+                        isHierarchyColumn: true
+                    },
+                    {
+                        field: "email",
+                        title: "Email",
+                        showFilter: false
+                    }
+                ],
+                element: this.grid.nativeElement,
+                showHeader: true,
+                showColumnFilter: true,
+                deselectWhenCollapse: true,
+                selectionMethod: "multi"
+            }
+
+            this.gridInstance = new VirtualGrid(config)
+        })
+
     }
 
 }

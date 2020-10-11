@@ -119,9 +119,56 @@
 
                         &.text-node {
                             display: flex;
-                            flex-direction: column;
-                            justify-content: center;
+                            flex-direction: row;
+                            align-items: center;
                             padding-left: $eob-pane-padding/2;
+
+                            .tree-node-icon {
+                                height: 26px;
+                                width: 26px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                            }
+
+                            .tree-expanded {
+                                margin-left: 0;
+                                cursor: pointer;
+                            }
+
+                            .tree-empty {
+                                background-image: none;
+                                float: left;
+                                flex-shrink: 0;
+                            }
+
+                            .virtual-grid-cell-content {
+                                display: flex;
+                                flex-direction: column;
+                                overflow: hidden;
+
+                                .virtual-grid-cell-text {
+
+                                    &:first-child {
+                                        font-size: $font-big;
+                                        position: relative;
+                                        top: 1px;
+                                    }
+
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+                                    white-space: nowrap;
+
+                                    font-size: $font-medium;
+                                    width: 100%;
+
+                                    &.boolean-node {
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                    }
+                                }
+                            }
                         }
 
                         &.avatar-node {
@@ -155,26 +202,6 @@
                             .tree-action-icon {
                                 cursor: pointer;
                                 padding: $eob-pane-padding/2;
-                            }
-                        }
-
-                        .virtual-grid-cell-text {
-
-                            &:first-child {
-                                font-size: $font-big;
-                            }
-
-                            overflow: hidden;
-                            text-overflow: ellipsis;
-                            white-space: nowrap;
-
-                            font-size: $font-medium;
-                            width: 100%;
-
-                            &.boolean-node {
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
                             }
                         }
                     }
@@ -336,11 +363,6 @@
         display: flex;
     }
 
-    .tree-node-icon {
-        height: 26px;
-        width: 26px;
-    }
-
     .tree-node-marker {
         height: 24px;
         position: absolute;
@@ -361,15 +383,6 @@
         }
     }
 
-    .tree-expanded {
-        margin-left: 0;
-        cursor: pointer;
-        position: relative;
-        top: 50%;
-        transform: translateY(-50%);
-        display: inline-block;
-    }
-
     .tree-checkbox-icon {
         min-width: 32px !important;
         height: 32px;
@@ -377,11 +390,6 @@
         z-index: 3000;
     }
 
-    .tree-empty {
-        background-image: none;
-        float: left;
-        flex-shrink: 0;
-    }
 
     .virtual-material-icons {
         font-family: 'Virtual Material Icons', sans-serif;

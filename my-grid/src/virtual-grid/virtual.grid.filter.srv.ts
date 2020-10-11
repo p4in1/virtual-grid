@@ -108,7 +108,7 @@ export class VirtualGridFilterController {
 
         console.log("is more precise", isMorePreciseFilter)
 
-        let filteredColIndexes = this.Grid.columns.map(x => x.isFilterPresent ? x.currentIndex : null).filter(x => x)
+        let filteredColIndexes = this.Grid.columns.map(x => x.isFilterPresent ? x.currentIndex : null).filter(x => x != void 0)
         let filteredArray = []
         if (isFilterSet) {
 
@@ -136,6 +136,8 @@ export class VirtualGridFilterController {
                     }
 
                     let cellValue = this._getCellValue(row, col).toLowerCase()
+
+                    cellValue = cellValue.replace(/  +/g, ' ')
 
                     if (isColumnFilter && isColumnFilterMatching) {
                         isColumnFilterMatching = this._isColumnFilterMatching(cellValue, col)
@@ -291,6 +293,7 @@ export class VirtualGridFilterController {
             cellValue = cell.colModel.cellValueGetter(cell, cellData)
         } else {
             if (col.colType == "multiLine") {
+                // replacing multiple spaces with a single space in case an entry has multiple spaces
                 cellValue = cellData.join(" ")
             } else if (col.colType == "date") {
                 cellValue = this.Grid.Utils.parseDate(cellData)

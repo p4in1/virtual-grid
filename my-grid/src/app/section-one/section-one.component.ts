@@ -22,8 +22,8 @@ export class SectionOneComponent implements OnInit {
                 columns: data.columns,
                 element: this.grid.nativeElement,
                 showHeader: true,
-                showColumnFilter: false,
-                selectionMethod:"multi"
+                showColumnFilter: true,
+                selectionMethod: "multi"
             }
 
             this.gridInstance = new VirtualGrid(config)
