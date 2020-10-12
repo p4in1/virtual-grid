@@ -154,30 +154,6 @@ export class VirtualGridApi {
     public getRows = (): any[] => {
         return this.Grid == void 0 ? [] : this.Grid.rows;
     };
-    /**
-     * return the row where key and value are matching
-     *
-     * @param {string} key   - the key to use
-     * @param {string} value - the value to find
-     * @param {boolean} useRowData - searches the given key/value pair inside the original data
-     * @returns {VirtualGridRow|null}
-     */
-    public getRowByKey = (key: string, value: string | number, useRowData: boolean = false): IVirtualGridRow => {
-
-        if (this.Grid == void 0) {
-            return;
-        }
-
-        for (const i in this.Grid.rows) {
-
-            let searchObject = useRowData ? this.Grid.rows[i].rowData : this.Grid.rows[i];
-            if (searchObject[key] == value) {
-                return this.Grid.rows[i];
-            }
-        }
-
-        return null;
-    };
 
     /**
      * return the row with the given index
@@ -201,22 +177,6 @@ export class VirtualGridApi {
     };
 
     /**
-     * return all visible rows
-     * @returns {Array}
-     */
-    public getVisibleRows = (): IVirtualGridRow[] => {
-        const rows: any[] = [];
-
-        for (const i in this.Grid.rows) {
-            if (this.Grid.rows[i].isVisible && this.Grid.rows[i].isVisibleAfterFilter) {
-                rows.push(this.Grid.rows[i]);
-            }
-        }
-
-        return rows;
-    };
-
-    /**
      * return the selected rows
      * @returns {Array}
      */
@@ -230,197 +190,6 @@ export class VirtualGridApi {
      */
     public getRowCount = (): number => {
         return this.Grid == void 0 ? 0 : this.Grid.rows.length;
-    };
-
-    /**
-     * select one or multiple rows according to ctrl and shift key
-     *
-     * @param row - the clicked row
-     * @param {boolean} useCtrl - boolean if the ctrl key is used
-     * @param {boolean} useShift - boolean if the shift key is used
-     * @param {boolean} isCheckboxSelect - boolean - true if checkbox was clicked (only tablet)
-     */
-    public select = (row: IVirtualGridRow, useCtrl: boolean = false, useShift: boolean = false, isCheckboxSelect: boolean = false): void => {
-        // the row is already selected
-        if (row.isSelected) {
-            if (!useCtrl && !useShift && !isCheckboxSelect) {
-                this.deselectAll();
-                this.selectRow(row);
-            } else if (useCtrl || isCheckboxSelect && !useShift) {
-                this.deselectRow(row);
-            }
-
-            return;
-        }
-
-        // in this case we deselect all other selected rows
-        if (((!useCtrl && !useShift) || this.config.selectionMethod !== "multi") && !isCheckboxSelect) {
-            this.deselectAll();
-        }
-
-        if (useShift) {
-            if (this.Grid.RowController.selectedRows.length > 0) {
-                const lastSelectedIndex: number = this.Grid.RowController.selectedRows[this.Grid.RowController.selectedRows.length - 1].index;
-                const currentIndex: number = row.index;
-
-                const min: number = Math.min(lastSelectedIndex, currentIndex);
-                const max: number = Math.max(lastSelectedIndex, currentIndex);
-
-                for (let i: number = min; i <= max; i++) {
-                    if (this.Grid.rows[i].isSelectable && !this.Grid.rows[i].isSelected) {
-                        this.selectRow(this.Grid.rows[i]);
-                    }
-                }
-            } else {
-                this.selectRow(row);
-            }
-        } else {
-            this.selectRow(row);
-        }
-
-        this.Grid.RowController.renderRows();
-    };
-
-    /**
-     * select the row with the given index
-     * @param {string} index - the index of the row to select
-     */
-    public selectIndex = (index: number): void => {
-        const row: IVirtualGridRow | null = this.getRowByIndex(index);
-        if (row != void 0) {
-            this.select(row);
-        }
-    };
-
-    /**
-     * select the given values if possible
-     * scroll to the first selected row
-     * render the nodes
-     *
-     * @param values - the values to select
-     * @param selectCaseInsensitive - boolean whether to select case insensitive or not
-     */
-    public selectValues = (values: any, selectCaseInsensitive: boolean = false): void => {
-
-        if (values == void 0 || values == '') {
-            return;
-        }
-
-        if (!Array.isArray(values)) {
-            values = [values];
-        }
-
-        if (this.config.selectionMethod !== "multi") {
-            values = [values[0]];
-        }
-
-        const valueList: string[] = [];
-        for (const i in values) {
-            const value: string = selectCaseInsensitive ? values[i].toLowerCase() : values[i];
-            valueList.push(value);
-        }
-
-        for (const row of this.Grid.rows) {
-
-            for (const col of this.Grid.originalColumns) {
-
-                let cellValue: string = row.rowData[col.field];
-
-                if (cellValue == void 0) {
-                    continue;
-                }
-
-                cellValue = selectCaseInsensitive ? cellValue.toLowerCase() : cellValue;
-
-                if (valueList.indexOf(cellValue) != -1) {
-                    this.selectRow(row);
-                    break;
-                }
-            }
-        }
-
-        if (this.Grid.RowController.selectedRows[0] != void 0) {
-            this.scrollToIndex(this.Grid.RowController.selectedRows[0].index);
-        }
-
-        this.Grid.RowController.renderRows();
-    };
-
-    /**
-     * select the given values by the given paths (the path is parent/child related)
-     * scroll to the first selected row
-     * render the nodes
-     *
-     * @param valuePaths - the given paths to the values
-     * @param selectCaseInsensitive - boolean whether to select case insensitive or not
-     */
-    public selectValuesByPaths = (valuePaths: string[], selectCaseInsensitive: boolean = false): void => {
-
-        for (const path of valuePaths) {
-            const pathString: string = path[path.length - 1];
-            const elementToFind: string = selectCaseInsensitive ? pathString.toLowerCase() : pathString;
-
-            for (const row of this.Grid.rows) {
-
-                for (const col of this.Grid.originalColumns) {
-                    let cellValue: any = row.rowData[col.field];
-
-                    if (cellValue == void 0) {
-                        continue;
-                    }
-
-                    cellValue = selectCaseInsensitive ? cellValue.toLowerCase() : cellValue;
-                    if (cellValue == elementToFind) {
-                        const currentPath: string[] = [];
-                        currentPath.push(elementToFind);
-
-                        let currentItem: IVirtualGridRow = row;
-                        let hasParent: boolean = currentItem.parent != void 0;
-
-                        while (hasParent) {
-                            currentItem = currentItem.parent;
-
-                            currentPath.unshift(currentItem.rowData[col.field]);
-
-                            if (currentItem.parent == void 0) {
-                                hasParent = false;
-                            }
-                        }
-
-                        if (path.toString().toLowerCase() === currentPath.toString().toLowerCase()) {
-                            this.selectRow(row);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        if (this.Grid.RowController.selectedRows[0] != void 0) {
-            this.scrollToIndex(this.Grid.RowController.selectedRows[0].index);
-        }
-
-        this.Grid.RowController.renderRows();
-    };
-
-    /**
-     * deselect all rows
-     */
-    public deselectAll = (): void => {
-
-        for (const renderedRow of this.Grid.domController.renderedRows) {
-
-            [renderedRow.left, renderedRow.center, renderedRow.right].forEach((rowPartial) => {
-                rowPartial.element.classList.remove('selected');
-            })
-
-        }
-
-        for (const i in this.Grid.rows) {
-            this.Grid.rows[i].isSelected = false;
-        }
-
-        this.Grid.RowController.selectedRows = [];
     };
 
     /**
@@ -560,6 +329,68 @@ export class VirtualGridApi {
     }
 
     /**
+     * select one or multiple rows according to ctrl and shift key
+     *
+     * @param row - the clicked row
+     * @param {boolean} useCtrl - boolean if the ctrl key is used
+     * @param {boolean} useShift - boolean if the shift key is used
+     */
+    public select = (row: IVirtualGridRow, useCtrl: boolean = false, useShift: boolean = false): void => {
+        // the row is already selected
+        if (row.isSelected) {
+            if (!useCtrl && !useShift) {
+                this.deselectAll();
+                this.selectRow(row);
+            } else if (useCtrl && !useShift) {
+                this.deselectRow(row);
+                this.Grid.RowController.renderRows();
+            }
+
+            return;
+        }
+
+        // in this case we deselect all other selected rows
+        if ((!useCtrl && !useShift) || this.config.selectionMethod !== "multi") {
+            this.deselectAll();
+        }
+
+        if (useShift) {
+            let selectedRows = this.Grid.RowController.selectedRows
+            if (selectedRows.length > 0) {
+                const lastSelectedIndex: number = selectedRows[selectedRows.length - 1].index;
+                const currentIndex: number = row.index;
+
+                const min: number = Math.min(lastSelectedIndex, currentIndex);
+                const max: number = Math.max(lastSelectedIndex, currentIndex);
+
+                for (let i: number = min; i <= max; i++) {
+                    let row = this.Grid.rows[i]
+                    if (row.isSelectable && !row.isSelected) {
+                        this.selectRow(row);
+                    }
+                }
+            } else {
+                this.selectRow(row);
+            }
+        } else {
+            this.selectRow(row);
+        }
+
+        this.Grid.RowController.renderRows();
+    };
+
+    /**
+     * select the row with the given index
+     * @param {string} index - the index of the row to select
+     */
+    public selectIndex = (index: number): void => {
+        const row: IVirtualGridRow | null = this.getRowByIndex(index);
+        if (row != void 0) {
+            this.select(row);
+        }
+    };
+
+    /**
      * deselect a single row
      * @param row
      */
@@ -576,15 +407,28 @@ export class VirtualGridApi {
 
         for (const renderedRow of this.Grid.domController.renderedRows) {
             if (renderedRow.index == row.index) {
-
-                [renderedRow.left, renderedRow.center, renderedRow.right].forEach((rowPartial) => {
-                    rowPartial.element.classList.remove('selected');
-                })
-
+                this.toggleSelectionClasses(renderedRow, false);
                 break;
             }
         }
     }
+
+    /**
+     * deselect all rows
+     */
+    public deselectAll = (): void => {
+
+        for (const renderedRow of this.Grid.domController.renderedRows) {
+            this.toggleSelectionClasses(renderedRow, false);
+        }
+
+        for (const i in this.Grid.rows) {
+            this.Grid.rows[i].isSelected = false;
+        }
+
+        this.Grid.RowController.selectedRows = [];
+    };
+
 
     /**
      * select a single row
@@ -611,13 +455,14 @@ export class VirtualGridApi {
     /**
      * Alter the selection class of the row
      * @param row
+     * @param isSelected
      */
-    private toggleSelectionClasses(row: IRenderedRow): void {
+    private toggleSelectionClasses(row: IRenderedRow, isSelected?): void {
 
         [row.left, row.center, row.right].forEach((rowPartial) => {
-
-            if (this.Grid.rows[row.index].isSelected) {
+             if (isSelected !== false && (this.Grid.rows[row.index].isSelected || isSelected === true)) {
                 rowPartial.element.classList.add('selected');
+
             } else {
                 rowPartial.element.classList.remove('selected');
             }
@@ -631,6 +476,4 @@ export class VirtualGridApi {
             }
         })
     }
-
-
 }

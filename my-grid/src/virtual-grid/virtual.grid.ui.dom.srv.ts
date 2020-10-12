@@ -465,6 +465,7 @@ export class VirtualGridUIDomController {
                 cellNode: this.Utils.el("div", ["virtual-grid-cell"]),
                 cellContentNode: this.Utils.el("div", ["virtual-grid-cell-content"]),
                 colId: col.id,
+                colModel: col,
                 field: col.field,
                 fieldPath: col.fieldPath,
                 cellRenderer: col.cellRenderer,
@@ -473,29 +474,34 @@ export class VirtualGridUIDomController {
             };
 
             if (col.isHierarchyColumn) {
-                cell.treeNode = this.Utils.el("i", ["tree-node-icon", "virtual-material-icons", "small"]);
+                cell.treeNode = this.Utils.el("i", ["virtual-grid-node-icon", "virtual-material-icons", "small"]);
                 cell.treeNode.addEventListener("click", this.Grid.RowController.toggleNodeListener);
                 cell.cellNode.appendChild(cell.treeNode)
+
             }
 
             if (this.config.useCheckboxSelection && col.isCheckboxColumn) {
-                cell.checkboxNode = this.Utils.el("i", ["tree-checkbox-icon"])
+                cell.checkboxNode = this.Utils.el("div", ["virtual-grid-checkbox"])
+                cell.checkboxIcon = this.Utils.el("i", ["virtual-grid-checkbox-icon", "virtual-material-icons", "small"]);
+                cell.cellNode.classList.add("virtual-grid-checkbox-node")
                 cell.cellNode.appendChild(cell.checkboxNode)
+                cell.checkboxNode.appendChild(cell.checkboxIcon)
+
             } else if (col.isAvatarColumn) {
 
-                cell.avatarNode = this.Utils.el("div", ["tree-avatar-icon"]);
-                cell.avatarPlaceholder = this.Utils.el("span", ["tree-avatar-placeholder"]);
+                cell.avatarNode = this.Utils.el("div", ["virtual-grid-avatar-icon"]);
+                cell.avatarPlaceholder = this.Utils.el("span", ["virtual-grid-avatar-placeholder"]);
 
                 cell.avatarNode.appendChild(cell.avatarPlaceholder)
 
-                cell.cellNode.classList.add("avatar-node")
+                cell.cellNode.classList.add("virtual-grid-avatar-node")
                 cell.cellNode.appendChild(cell.avatarNode)
             } else if (col.isActionColumn) {
 
-                cell.cellNode.classList.add("action-node")
+                cell.cellNode.classList.add("virtual-grid-action-node")
 
                 for (let action of col.actions) {
-                    let actionTag = this.Utils.el("i", ["tree-action-icon", "virtual-material-icons"]);
+                    let actionTag = this.Utils.el("i", ["virtual-grid-action-icon", "virtual-material-icons"]);
                     actionTag.innerHTML = action.icon
                     actionTag.style.color = action.color
 
@@ -507,7 +513,7 @@ export class VirtualGridUIDomController {
                 }
 
             } else {
-                cell.cellNode.classList.add("text-node")
+                cell.cellNode.classList.add("virtual-grid-text-node")
 
                 for (let i = 0; i < col.lineCount; i++) {
                     let textNode = this.Utils.el("span", ["virtual-grid-cell-text"]);

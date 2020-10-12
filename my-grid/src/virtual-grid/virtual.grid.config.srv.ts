@@ -64,7 +64,7 @@ export class VirtualGridConfigController {
 
         this.onNodeExpandAsync = config.onNodeExpandAsync;
         this.expandNodesByDefault = config.expandNodesByDefault == void 0 ? true : config.expandNodesByDefault;
-        this.useCheckboxSelection = config.selectionMethod == "checkbox";
+        this.useCheckboxSelection = config.useCheckboxSelection;
         this.useIntermediateNodes = config.useIntermediateNodes;
         this.deselectWhenCollapse = config.deselectWhenCollapse;
 
@@ -88,9 +88,10 @@ export class VirtualGridConfigController {
 
                 isActionColumn: col.type == "action",
                 isIconColumn: col.type == "icon",
-                isCheckboxColumn: col.type == "checkbox",
                 isAvatarColumn: col.type == "avatar",
 
+
+                isCheckboxColumn: col.isCheckboxColumn,
                 isHierarchyColumn: col.isHierarchyColumn,
                 isAutosize: !col.suppressResize,
 
@@ -114,6 +115,10 @@ export class VirtualGridConfigController {
 
             colDef.isPinned = colDef.pinned == "left" || colDef.pinned == "right";
 
+            if (colDef.isCheckboxColumn) {
+                colDef.type = "checkbox"
+            }
+
             if (colDef.isShowFilter) {
                 this.headerRowHeight = 80
                 this.showColumnFilter = true
@@ -121,23 +126,13 @@ export class VirtualGridConfigController {
 
             if (colDef.isActionColumn) {
                 colDef.actions = col.actions
-                colDef.isSuppressSort = true;
-                colDef.isSuppressFilter = true;
                 colDef.width = 40 * col.actions.length
-                colDef.isAutosize = false;
-                colDef.isSuppressAutoSize = true;
-                colDef.isSuppressResize = true;
-                colDef.isShowFilter = false
+                this.setMinimumProperties(colDef)
             }
 
-            if (colDef.isAvatarColumn) {
-                colDef.isSuppressSort = true;
-                colDef.isSuppressFilter = true;
+            if (colDef.isAvatarColumn || colDef.isCheckboxColumn) {
                 colDef.width = 56
-                colDef.isAutosize = false;
-                colDef.isSuppressAutoSize = true;
-                colDef.isSuppressResize = true;
-                colDef.isShowFilter = false
+                this.setMinimumProperties(colDef)
             }
 
             for (let row of config.rows) {
@@ -187,6 +182,15 @@ export class VirtualGridConfigController {
         }
 
         return currentObject
+    }
+
+    setMinimumProperties(colDef) {
+        colDef.isSuppressSort = true;
+        colDef.isSuppressFilter = true;
+        colDef.isAutosize = false;
+        colDef.isSuppressAutoSize = true;
+        colDef.isSuppressResize = true;
+        colDef.isShowFilter = false
     }
 
 }

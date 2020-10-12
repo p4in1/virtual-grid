@@ -25,6 +25,10 @@
     flex-direction: column;
     background-color: $color-background-grid;
 
+    * {
+        user-select: none;
+    }
+
     &.moving {
         .virtual-grid-cell, .header-cell {
             transition: transform 150ms;
@@ -117,13 +121,13 @@
                         white-space: nowrap;
                         color: rgba(0, 0, 0, .87);
 
-                        &.text-node {
+                        &.virtual-grid-text-node {
                             display: flex;
                             flex-direction: row;
                             align-items: center;
                             padding-left: $eob-pane-padding/2;
 
-                            .tree-node-icon {
+                            .virtual-grid-node-icon {
                                 height: 26px;
                                 width: 26px;
                                 display: flex;
@@ -131,12 +135,12 @@
                                 justify-content: center;
                             }
 
-                            .tree-expanded {
+                            .virtual-grid-expanded {
                                 margin-left: 0;
                                 cursor: pointer;
                             }
 
-                            .tree-empty {
+                            .virtual-grid-empty {
                                 background-image: none;
                                 float: left;
                                 flex-shrink: 0;
@@ -171,12 +175,24 @@
                             }
                         }
 
-                        &.avatar-node {
+                        &.virtual-grid-checkbox-node {
                             display: flex;
                             align-items: center;
                             justify-content: center;
 
-                            .tree-avatar-icon {
+                            .virtual-grid-checkbox {
+                                width: 16px;
+                                height: 16px;
+                                border: 1px solid rgba(0, 0, 0, .2);
+                            }
+                        }
+
+                        &.virtual-grid-avatar-node {
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+
+                            .virtual-grid-avatar-icon {
                                 height: 40px;
                                 width: 40px;
                                 color: white;
@@ -193,13 +209,13 @@
                             }
                         }
 
-                        &.action-node {
+                        &.virtual-grid-action-node {
                             display: flex;
                             flex-direction: row;
                             align-items: center;
                             justify-content: center;
 
-                            .tree-action-icon {
+                            .virtual-grid-action-icon {
                                 cursor: pointer;
                                 padding: $eob-pane-padding/2;
                             }
@@ -215,17 +231,13 @@
                     &.not-selectable {
                         opacity: 0.7;
 
-                        .tree-checkbox-icon {
+                        .virtual-grid-checkbox {
                             opacity: 0.6;
                         }
                     }
 
                     &.selectable.selected {
                         background-color: $color-accent-extra-light !important;
-
-                        .tree-checkbox-icon {
-                            background-size: $eob-pane-padding*2 $eob-pane-padding*2;
-                        }
                     }
                 }
             }
@@ -362,34 +374,6 @@
         background-color: rgba(0, 0, 0, 0.08);
         display: flex;
     }
-
-    .tree-node-marker {
-        height: 24px;
-        position: absolute;
-        left: 0;
-        width: 100%;
-    }
-
-    .tree-collapsed {
-        margin-left: 0;
-        cursor: pointer;
-        position: relative;
-        top: 50%;
-        transform: translateY(-50%);
-        display: inline-block;
-
-        &.loading-content {
-            animation: rotating 1s linear infinite;
-        }
-    }
-
-    .tree-checkbox-icon {
-        min-width: 32px !important;
-        height: 32px;
-        background-size: 32px 32px;
-        z-index: 3000;
-    }
-
 
     .virtual-material-icons {
         font-family: 'Virtual Material Icons', sans-serif;

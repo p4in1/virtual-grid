@@ -403,6 +403,7 @@ export class VirtualGridRowController {
             cell.colModel = this.Grid.columns[cell.colIndex];
 
             this._renderContent(cell)
+            this._renderCheckbox(cell)
             this._renderAvatar(cell)
             this._renderCustomStyles(cell)
             this._renderTreeNode(cell)
@@ -413,7 +414,7 @@ export class VirtualGridRowController {
     private _renderContent(cell: IRenderedCell) {
         let colType = cell.colModel.colType
 
-        if (colType === "avatar" || colType === "action") {
+        if (colType === "avatar" || colType === "action" || colType == "checkbox") {
             return
         }
 
@@ -439,9 +440,8 @@ export class VirtualGridRowController {
             return
         }
 
-
         if (colType == "boolean") {
-            let cellNode = this.Grid.Utils.el("i", ["tree-action-icon", "virtual-material-icons"])
+            let cellNode = this.Grid.Utils.el("i", ["virtual-grid-action-icon", "virtual-material-icons"])
 
             cell.textNodes[0].innerHTML = ""
             cell.textNodes[0].classList.add("boolean-node");
@@ -455,7 +455,12 @@ export class VirtualGridRowController {
         } else {
             cell.textNodes[0].textContent = this._formatValue(cell, cellData);
         }
+    }
 
+    private _renderCheckbox(cell: IRenderedCell) {
+        if (cell.checkboxNode) {
+            cell.checkboxIcon.innerHTML = cell.rowModel.isSelected ? "done" : ""
+        }
     }
 
     private _renderAvatar(cell: IRenderedCell) {
@@ -477,7 +482,7 @@ export class VirtualGridRowController {
                     ph += data.charAt(0).toUpperCase()
                 }
 
-                if(ph == "" && avatarConfig.hideEmptyPlaceholder){
+                if (ph == "" && avatarConfig.hideEmptyPlaceholder) {
                     return
                 }
 

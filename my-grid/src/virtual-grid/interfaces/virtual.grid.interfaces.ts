@@ -51,6 +51,11 @@ export interface IVirtualGridConfig {
     selectionMethod?: string
 
     /**
+     * when set to true only the checkboxes can be used to select rows
+     */
+    useCheckboxSelection?: boolean
+
+    /**
      * defines if the column shrinks or grows automatically
      * @default false
      */
@@ -190,6 +195,7 @@ export interface IVirtualGridColumnConfig {
     minWidth?: number
     valueFormat?: string
 
+    isCheckboxColumn?: boolean
     isHierarchyColumn?: boolean
 }
 
@@ -396,6 +402,7 @@ export interface IRenderedCell {
     textNodes: HTMLElement[]
     treeNode: HTMLElement
     checkboxNode: HTMLElement
+    checkboxIcon: HTMLElement
     cellNode: HTMLElement
     cellContentNode: HTMLElement
     avatarNode: HTMLElement

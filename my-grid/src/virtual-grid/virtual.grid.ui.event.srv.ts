@@ -24,17 +24,14 @@ export class VirtualGridUIEventController {
      * @param event - the click event
      */
     private onClick = (event: any): void => {
-        const row: IVirtualGridRow = this.getRowByEvent(event);
 
+        const row: IVirtualGridRow = this.getRowByEvent(event);
+        const ctrlSelection = event.ctrlKey || this.Grid.ConfigController.useCheckboxSelection
         if (!row.isSelectable) {
             return;
         }
 
-        const isCheckboxSelection: boolean = event.target.classList.contains("tree-checkbox-icon");
-        const useCtrl: boolean = event.ctrlKey,
-            useShift: boolean = event.shiftKey;
-
-        this.Grid.api.select(row, useCtrl, useShift, isCheckboxSelection);
+        this.Grid.api.select(row, ctrlSelection, event.shiftKey);
 
         if (this.config.onRowClick != void 0) {
             this.config.onRowClick({row, event, api: this.Grid.api});
@@ -52,7 +49,9 @@ export class VirtualGridUIEventController {
             return;
         }
 
-        this.Grid.api.select(row);
+        if (!this.Grid.ConfigController.useCheckboxSelection) {
+            this.Grid.api.select(row);
+        }
 
         if (this.config.onRowDoubleClick != void 0) {
             this.config.onRowDoubleClick({row, event, api: this.Grid.api});
@@ -340,11 +339,20 @@ export class VirtualGridUIEventController {
     private bindRowEvents() {
         for (const renderedRow of this.domController.renderedRows) {
 
-            [renderedRow.left.element, renderedRow.center.element, renderedRow.right.element].forEach((listNode) => {
-                listNode.addEventListener("click", this.onClick);
-                listNode.addEventListener("dblclick", this.onDoubleClick);
-                listNode.addEventListener("contextmenu", this.onRightClick);
-                listNode.addEventListener("mouseenter", this.onMouseEnter);
+            [renderedRow.left, renderedRow.center, renderedRow.right].forEach((partial) => {
+                if (this.Grid.ConfigController.useCheckboxSelection) {
+                    let checkbox = partial.cells.find(x => x.colModel.isCheckboxColumn)
+
+                    if (checkbox) {
+                        checkbox.checkboxNode.addEventListener("click", this.onClick)
+                    }
+                } else {
+                    partial.element.addEventListener("click", this.onClick);
+                }
+
+                partial.element.addEventListener("dblclick", this.onDoubleClick);
+                partial.element.addEventListener("contextmenu", this.onRightClick);
+                partial.element.addEventListener("mouseenter", this.onMouseEnter);
 
                 if (this.Grid.Utils.isPhone()) {
                     // listNode.addEventListener("touchstart", this.touchHandler)
