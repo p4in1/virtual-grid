@@ -354,9 +354,9 @@ export class VirtualGridUIEventController {
                 partial.element.addEventListener("contextmenu", this.onRightClick);
                 partial.element.addEventListener("mouseenter", this.onMouseEnter);
 
-                if (this.Grid.Utils.isPhone()) {
+                // if (this.Grid.Utils.isPhone()) {
                     // listNode.addEventListener("touchstart", this.touchHandler)
-                }
+                // }
             })
         }
     }
