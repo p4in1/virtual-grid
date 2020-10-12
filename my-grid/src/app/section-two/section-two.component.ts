@@ -84,9 +84,6 @@ export class SectionTwoComponent implements AfterViewInit {
                 rows: tree,
                 columns: [
                     {
-                        isCheckboxColumn: true
-                    },
-                    {
                         type: "avatar",
                         avatarConfig: {
                             url: "data.user.avatarURL",

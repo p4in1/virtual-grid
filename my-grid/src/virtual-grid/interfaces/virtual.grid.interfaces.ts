@@ -105,6 +105,11 @@ export interface IVirtualGridConfig {
     suppressDragging?: boolean
 
     /**
+     * suppresses the moving of columns
+     * you can still drag them, but they won't change it's order
+     */
+    suppressMoving?: boolean
+    /**
      * suppresses pinning on all columns
      * @default false
      */
@@ -178,13 +183,15 @@ export interface IVirtualGridConfig {
 export interface IVirtualGridColumnConfig {
 
     field?: string
-
     title?: string
     type?: string
+
     showFilter?: boolean
+
     suppressResize?: boolean
     suppressSorting?: boolean
     suppressAutoSize?: boolean
+    suppressMoving?: boolean
     suppressDragging?: boolean
     suppressPinning?: boolean
 
@@ -384,6 +391,7 @@ export interface IVirtualGridColumn {
     isSuppressFilter?: boolean
     isSuppressSort?: boolean
     isSuppressDragging?: boolean
+    isSuppressMoving?: boolean
 
     width?: number
     minWidth?: number
@@ -542,6 +550,7 @@ export interface IVirtualColDefConfig {
     isSuppressResize: boolean
     isSuppressSort: boolean
     isSuppressFilter: boolean
+    isSuppressMoving:boolean
 
     actions: IVirtualColumnAction[]
     avatarConfig?: IVirtualAvatar

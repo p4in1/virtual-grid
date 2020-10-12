@@ -44,6 +44,7 @@ export class VirtualGridColumn implements IVirtualGridColumn {
     isSuppressSort: boolean = false;
     isSuppressDragging: boolean = false;
     isSuppressPinning: boolean = false;
+    isSuppressMoving: boolean = false;
 
     sortDirection: string = null;
 
@@ -134,6 +135,7 @@ export class VirtualGridColumn implements IVirtualGridColumn {
         this.isSuppressAutoSize = configColDef.isSuppressAutoSize;
         this.isSuppressDragging = configColDef.isSuppressDragging;
         this.isSuppressPinning = configColDef.isSuppressPinning;
+        this.isSuppressMoving = configColDef.isSuppressMoving
 
         this.isSuppressSort = configColDef.isSuppressSort;
         this.isSuppressFilter = configColDef.isSuppressFilter;

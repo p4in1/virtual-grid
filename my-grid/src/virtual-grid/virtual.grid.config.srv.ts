@@ -18,6 +18,8 @@ export class VirtualGridConfigController {
     suppressAutoSize: boolean = false
     suppressDragging: boolean = false
     suppressPinning: boolean = false
+    suppressMoving:boolean = false
+
     showHeader: boolean = false
     showColumnFilter: boolean = false;
     selectionMethod: string
@@ -55,7 +57,7 @@ export class VirtualGridConfigController {
         this.autoSizeColumns = config.autoSizeColumns
         this.headerValueGetter = config.headerValueGetter
         this.childNodesKey = config.childNodesKey != void 0 && config.childNodesKey !== '' ? config.childNodesKey : 'children';
-        this.getColDefs(config)
+
         this.onGridReady = typeof config.onGridReady == "function" ? config.onGridReady : this._noop
         this.onRowClick = typeof config.onRowClick == "function" ? config.onRowClick : this._noop
         this.onRowMouseEnter = typeof config.onRowMouseEnter == "function" ? config.onRowMouseEnter : this._noop
@@ -69,17 +71,25 @@ export class VirtualGridConfigController {
         this.deselectWhenCollapse = config.deselectWhenCollapse;
 
         this.externalFilter = config.externalFilter
+
+        this.getColDefs(config)
     }
 
     private _noop = () => {
     }
 
     getColDefs(config) {
+
+        if (this.useCheckboxSelection) {
+            config.columns.unshift({isCheckboxColumn: true, pinned: "left", suppressMoving: true})
+        }
+
         for (let col of config.columns) {
 
             let colDef: IVirtualColDefConfig = <IVirtualColDefConfig>{
                 isMultiLine: false,
                 lineCount: 1,
+                title: col.title == void 0 ? "" : col.title,
                 field: col.field,
                 fieldPath: col.field ? col.field.indexOf(".") != -1 ? col.field.split(".") : [col.field] : [],
                 type: col.type == void 0 ? "text" : col.type,
@@ -90,7 +100,6 @@ export class VirtualGridConfigController {
                 isIconColumn: col.type == "icon",
                 isAvatarColumn: col.type == "avatar",
 
-
                 isCheckboxColumn: col.isCheckboxColumn,
                 isHierarchyColumn: col.isHierarchyColumn,
                 isAutosize: !col.suppressResize,
@@ -100,6 +109,7 @@ export class VirtualGridConfigController {
                 isSuppressAutoSize: col.suppressAutoSize || this.suppressAutoSize,
                 isSuppressDragging: col.suppressDragging || this.suppressDragging,
                 isSuppressPinning: col.suppressPinning || this.suppressPinning,
+                isSuppressMoving: col.suppressMoving || this.suppressMoving,
 
                 pinned: col.pinned && ["left", "right"].includes(col.pinned) ? col.pinned : "center",
 
@@ -109,7 +119,6 @@ export class VirtualGridConfigController {
                 width: col.width,
                 minWidth: col.minWidth,
 
-                title: col.title == void 0 ? "" : col.title,
                 valueFormat: col.valueFormat
             }
 

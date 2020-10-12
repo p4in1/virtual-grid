@@ -186,9 +186,16 @@ export class VirtualGridDragAndDropController {
                 this.currentCursorX = event.clientX - dragData.offset
 
                 let nextIndex = this.getCurrentColMoveIndex(dragData, event)
-                this.scrollHorizontally(dragData)
-                this.moveColumn(dragData.col.currentIndex, nextIndex)
-                this.checkPinState(dragData, event, nextIndex)
+                if (nextIndex >= 0 && nextIndex < this.Grid.columns.length) {
+
+                    this.scrollHorizontally(dragData)
+
+                    if (!this.Grid.columns[nextIndex].isSuppressMoving) {
+                        this.moveColumn(dragData.col.currentIndex, nextIndex)
+                    }
+
+                    this.checkPinState(dragData, event, nextIndex)
+                }
             }
         }
     }
