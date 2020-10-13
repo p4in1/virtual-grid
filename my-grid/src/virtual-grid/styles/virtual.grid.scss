@@ -29,13 +29,37 @@
         user-select: none;
     }
 
+    &.range-selection{
+        .virtual-grid-row.hover {
+            background-color: transparent;
+        }
+
+        .virtual-grid-cell.hover {
+            background-color: $color-background-panel;
+        }
+
+        .virtual-grid-cell.selected {
+            background-color: $color-accent-extra-light;
+        }
+    }
+
+    &.default-selection{
+        .virtual-grid-row.hover {
+            background-color: $color-background-panel;
+        }
+
+        .virtual-grid-cell.hover {
+            background-color: transparent;
+        }
+    }
+
     &.moving {
         .virtual-grid-cell, .header-cell {
             transition: transform 150ms;
         }
 
-        .virtual-grid-row:hover {
-            background-color: transparent !important;
+        .virtual-grid-row.hover {
+            background-color: transparent;
         }
     }
 
@@ -223,12 +247,6 @@
                             }
                         }
                     }
-
-
-                    &:hover {
-                        background-color: $color-background-panel;
-                    }
-
 
                     &.not-selectable {
                         opacity: 0.7;

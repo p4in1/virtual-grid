@@ -394,7 +394,7 @@ export class VirtualGridApi {
      * deselect a single row
      * @param row
      */
-    public deselectRow(row: any): void {
+    public deselectRow(row: IVirtualGridRow): void {
 
         row.isSelected = false;
 
@@ -405,12 +405,7 @@ export class VirtualGridApi {
             }
         }
 
-        for (const renderedRow of this.Grid.domController.renderedRows) {
-            if (renderedRow.index == row.index) {
-                this.toggleSelectionClasses(renderedRow, false);
-                break;
-            }
-        }
+        this.Grid.RowController.toggleSelectionClasses(row, false);
     }
 
     /**
@@ -418,8 +413,8 @@ export class VirtualGridApi {
      */
     public deselectAll = (): void => {
 
-        for (const renderedRow of this.Grid.domController.renderedRows) {
-            this.toggleSelectionClasses(renderedRow, false);
+        for (let row of this.Grid.RowController.selectedRows) {
+            this.Grid.RowController.toggleSelectionClasses(row, false);
         }
 
         for (const i in this.Grid.rows) {
@@ -443,37 +438,6 @@ export class VirtualGridApi {
         row.isSelected = true;
 
         this.Grid.RowController.selectedRows.push(row);
-
-        for (const renderedRow of this.Grid.domController.renderedRows) {
-
-            if (renderedRow.index == row.index) {
-                this.toggleSelectionClasses(renderedRow);
-            }
-        }
-    }
-
-    /**
-     * Alter the selection class of the row
-     * @param row
-     * @param isSelected
-     */
-    private toggleSelectionClasses(row: IRenderedRow, isSelected?): void {
-
-        [row.left, row.center, row.right].forEach((rowPartial) => {
-             if (isSelected !== false && (this.Grid.rows[row.index].isSelected || isSelected === true)) {
-                rowPartial.element.classList.add('selected');
-
-            } else {
-                rowPartial.element.classList.remove('selected');
-            }
-
-            if (!this.Grid.rows[row.index].isSelectable) {
-                rowPartial.element.classList.add('not-selectable');
-                rowPartial.element.classList.remove('selectable');
-            } else {
-                rowPartial.element.classList.add('selectable');
-                rowPartial.element.classList.remove('not-selectable');
-            }
-        })
+        this.Grid.RowController.toggleSelectionClasses(row);
     }
 }

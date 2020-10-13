@@ -1,4 +1,6 @@
 import {
+    IRenderedCell,
+    IRenderedRow,
     IVirtualGrid,
     IVirtualGridColumn,
     IVirtualGridDom,
@@ -27,15 +29,12 @@ export class VirtualGridUIEventController {
 
         const row: IVirtualGridRow = this.getRowByEvent(event);
         const ctrlSelection = event.ctrlKey || this.Grid.ConfigController.useCheckboxSelection
-        if (!row.isSelectable) {
-            return;
+
+        if (row.isSelectable && this.Grid.ConfigController.selectionMethod != "range") {
+            this.Grid.api.select(row, ctrlSelection, event.shiftKey);
         }
 
-        this.Grid.api.select(row, ctrlSelection, event.shiftKey);
-
-        if (this.config.onRowClick != void 0) {
-            this.config.onRowClick({row, event, api: this.Grid.api});
-        }
+        this.config.onRowClick({row, event, api: this.Grid.api});
     };
 
     /**
@@ -45,17 +44,11 @@ export class VirtualGridUIEventController {
     private onDoubleClick = (event: any): void => {
         const row: IVirtualGridRow = this.getRowByEvent(event);
 
-        if (!row.isSelectable) {
-            return;
-        }
-
-        if (!this.Grid.ConfigController.useCheckboxSelection) {
+        if (!this.Grid.ConfigController.useCheckboxSelection && this.Grid.ConfigController.selectionMethod != "range" && row.isSelectable) {
             this.Grid.api.select(row);
         }
 
-        if (this.config.onRowDoubleClick != void 0) {
-            this.config.onRowDoubleClick({row, event, api: this.Grid.api});
-        }
+        this.config.onRowDoubleClick({row, event, api: this.Grid.api});
     };
 
     /**
@@ -64,35 +57,122 @@ export class VirtualGridUIEventController {
      */
     private onRightClick = (event: any): void => {
         const row: IVirtualGridRow = this.getRowByEvent(event);
+        this.config.onRowRightClick({row, event, api: this.Grid.api});
+    };
 
-        if (!row || !row.isSelectable) {
-            return;
-        }
+    private _toggleHoverState(row: IVirtualGridRow, isHover: boolean) {
+        [row.renderedRow.left, row.renderedRow.center, row.renderedRow.right].forEach((rowPartial) => {
+            this.Grid.Utils.toggleClass("hover", rowPartial.element, isHover)
+        })
+    }
 
-        if (this.config.onRowRightClick != void 0) {
-            this.config.onRowRightClick({row, event, api: this.Grid.api});
-        }
-
-        event.preventDefault();
+    /**
+     * onMouseEnter callback
+     * @param event - the click event
+     */
+    private onMouseEnter = (event: any): void => {
+        const row: IVirtualGridRow = this.getRowByEvent(event);
+        this._toggleHoverState(row, true)
+        this.config.onRowMouseEnter({row, event, api: this.Grid.api});
     };
 
     /**
      * onRightClick callback
      * @param event - the click event
      */
-    private onMouseEnter = (event: any): void => {
+    private onMouseLeave = (event: any): void => {
         const row: IVirtualGridRow = this.getRowByEvent(event);
-
-        if (!row || !row.isSelectable) {
-            return;
-        }
-
-        if (this.config.onRowMouseEnter != void 0) {
-            this.config.onRowMouseEnter({row, event, api: this.Grid.api});
-        }
-
-        event.preventDefault();
+        this._toggleHoverState(row, false)
+        this.config.onRowMouseLeave({row, event, api: this.Grid.api});
     };
+
+    private onCellMouseEnter = (event: any, cell: IRenderedCell): void => {
+
+        if (this.Grid.ConfigController.selectionMethod != "range") {
+            return
+        }
+
+        if (this.isRangeSelectActive) {
+            this.handleRangeSelect(cell)
+            return
+        }
+
+        this.Grid.Utils.toggleClass("hover", cell.cellNode, true)
+    }
+
+    private _clearRangeSelection = (): void => {
+        for (let selectedRow of this.rangeSelect.selection) {
+            for (let cell of selectedRow) {
+                cell.cellNode.classList.remove("selected")
+            }
+        }
+
+        this.rangeSelect.selection = []
+    }
+
+    private handleRangeSelect = (cell: IRenderedCell): void => {
+
+        this._clearRangeSelection()
+
+        let minColIndex = Math.min(this.rangeSelect.start.col.currentIndex, cell.colModel.currentIndex)
+        let maxColIndex = Math.max(this.rangeSelect.start.col.currentIndex, cell.colModel.currentIndex)
+        let minRowIndex = Math.min(this.rangeSelect.start.row.index, cell.rowModel.index)
+        let maxRowIndex = Math.max(this.rangeSelect.start.row.index, cell.rowModel.index)
+
+        for (let i = minRowIndex; i <= maxRowIndex; i++) {
+            let _row = []
+            for (let j = minColIndex; j <= maxColIndex; j++) {
+                let cell = this.Grid.domController.renderedRows[i].cells[j]
+
+                cell.cellNode.classList.add("selected")
+
+                _row.push(cell)
+            }
+
+            this.rangeSelect.selection.push(_row)
+        }
+    }
+
+    private onCellMouseLeave = (event: any, cell: IRenderedCell): void => {
+        if (this.Grid.ConfigController.selectionMethod != "range") {
+            return
+        }
+
+        this.Grid.Utils.toggleClass("hover", cell.cellNode, false)
+    }
+
+    rangeSelect: any = {
+        start: {},
+        selection: []
+    }
+    isRangeSelectActive: boolean = false
+
+    private onCellMouseDown = (event: any, cell: IRenderedCell): void => {
+        if (this.Grid.ConfigController.selectionMethod != "range") {
+            return
+        }
+
+        this._clearRangeSelection()
+
+        this.isRangeSelectActive = true
+        this.rangeSelect = {
+            start: {
+                row: cell.rowModel,
+                col: cell.colModel
+            },
+            selection: []
+        }
+
+        const _unbind = (): void => {
+
+            this.isRangeSelectActive = false;
+
+            window.removeEventListener("mouseup", _unbind)
+        }
+
+        window.addEventListener("mouseup", _unbind);
+    }
+
 
     /**
      * catch the scroll event of the scroll guard and apply it to the body and the header
@@ -353,10 +433,28 @@ export class VirtualGridUIEventController {
                 partial.element.addEventListener("dblclick", this.onDoubleClick);
                 partial.element.addEventListener("contextmenu", this.onRightClick);
                 partial.element.addEventListener("mouseenter", this.onMouseEnter);
+                partial.element.addEventListener("mouseleave", this.onMouseLeave);
+
 
                 // if (this.Grid.Utils.isPhone()) {
-                    // listNode.addEventListener("touchstart", this.touchHandler)
+                // listNode.addEventListener("touchstart", this.touchHandler)
                 // }
+            })
+
+            this.bindCellEvents(renderedRow)
+        }
+    }
+
+    private bindCellEvents(renderedRow: IRenderedRow) {
+        for (let cell of renderedRow.cells) {
+            cell.cellNode.addEventListener("mouseenter", (event) => {
+                this.onCellMouseEnter(event, cell)
+            })
+            cell.cellNode.addEventListener("mouseleave", (event) => {
+                this.onCellMouseLeave(event, cell)
+            })
+            cell.cellNode.addEventListener("mousedown", (event) => {
+                this.onCellMouseDown(event, cell)
             })
         }
     }
@@ -434,7 +532,7 @@ export class VirtualGridUIEventController {
      * @param event
      * @return {VirtualGridRow}
      */
-    protected getRowByEvent(event: any): IVirtualGridRow {
+    public getRowByEvent(event: any): IVirtualGridRow {
         const rowElement: HTMLElement = event.target.closest(".virtual-grid-row");
         const index: any = rowElement.getAttribute("number");
         return this.Grid.rows[index];

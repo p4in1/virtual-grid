@@ -294,7 +294,7 @@ export class VirtualGridFilterController {
         } else {
             if (col.colType == "multiLine") {
                 // replacing multiple spaces with a single space in case an entry has multiple spaces
-                cellValue = cellData.join(" ")
+                cellValue = Array.isArray(cellData) ? cellData.join(" ") : cellData != void 0 ? cellData.toString() : ""
             } else if (col.colType == "date") {
                 cellValue = this.Grid.Utils.parseDate(cellData)
             } else {

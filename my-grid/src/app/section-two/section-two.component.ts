@@ -59,6 +59,7 @@ export class SectionTwoComponent implements AfterViewInit {
                 if (group.parent && group.children == void 0) {
                     group.isLeaf = true
                     group.children = []
+                    group.title = [group.title, group.type]
                 }
             }
 
@@ -69,7 +70,7 @@ export class SectionTwoComponent implements AfterViewInit {
                 for (let g of groups) {
                     if (map[g._id].isLeaf) {
                         map[g._id].children.push({
-                            title: `${user.userFirstName} ${user.userLastName}`,
+                            title: [user.userFirstName, user.userLastName],
                             userFirstName: user.userFirstName,
                             userLastName: user.userLastName,
                             email: user.email
@@ -95,7 +96,8 @@ export class SectionTwoComponent implements AfterViewInit {
                     {
                         field: "title",
                         title: "Gruppenstruktur",
-                        isHierarchyColumn: true
+                        isHierarchyColumn: true,
+                        type: "multiLine"
                     },
                     {
                         field: "email",

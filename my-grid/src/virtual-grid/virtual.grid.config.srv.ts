@@ -18,7 +18,7 @@ export class VirtualGridConfigController {
     suppressAutoSize: boolean = false
     suppressDragging: boolean = false
     suppressPinning: boolean = false
-    suppressMoving:boolean = false
+    suppressMoving: boolean = false
 
     showHeader: boolean = false
     showColumnFilter: boolean = false;
@@ -33,6 +33,7 @@ export class VirtualGridConfigController {
     onGridReady: Function
     onRowClick: Function
     onRowMouseEnter: Function
+    onRowMouseLeave: Function
     onRowDoubleClick: Function
     onRowRightClick: Function
 
@@ -61,6 +62,7 @@ export class VirtualGridConfigController {
         this.onGridReady = typeof config.onGridReady == "function" ? config.onGridReady : this._noop
         this.onRowClick = typeof config.onRowClick == "function" ? config.onRowClick : this._noop
         this.onRowMouseEnter = typeof config.onRowMouseEnter == "function" ? config.onRowMouseEnter : this._noop
+        this.onRowMouseLeave = typeof config.onRowMouseLeave == "function" ? config.onRowMouseLeave : this._noop
         this.onRowDoubleClick = typeof config.onRowDoubleClick == "function" ? config.onRowDoubleClick : this._noop
         this.onRowRightClick = typeof config.onRowRightClick == "function" ? config.onRowRightClick : this._noop
 
@@ -92,6 +94,7 @@ export class VirtualGridConfigController {
                 title: col.title == void 0 ? "" : col.title,
                 field: col.field,
                 fieldPath: col.field ? col.field.indexOf(".") != -1 ? col.field.split(".") : [col.field] : [],
+
                 type: col.type == void 0 ? "text" : col.type,
 
                 isShowFilter: col.showFilter != void 0 ? col.showFilter : this.showColumnFilter,
@@ -144,22 +147,14 @@ export class VirtualGridConfigController {
                 this.setMinimumProperties(colDef)
             }
 
-            for (let row of config.rows) {
-                let value = this.getValue(colDef, row)
 
-                if (value === "") {
-                    continue
-                }
+            if (colDef.type == "multiLine") {
+                colDef.isMultiLine = true
+                colDef.lineCount = this.getLineCount(colDef, config.rows)
+            }
 
-                if (Array.isArray(value)) {
-                    colDef.isMultiLine = true
-                    colDef.lineCount = value.length > colDef.lineCount ? value.length : colDef.lineCount
-                    colDef.type = "multiLine"
-
-                    if (colDef.lineCount > this.rowLineCount) {
-                        this.rowLineCount = colDef.lineCount
-                    }
-                }
+            if (config.type == void 0) {
+                this.detectType(colDef, config)
             }
 
             this.colDefs.push(colDef)
@@ -202,4 +197,41 @@ export class VirtualGridConfigController {
         colDef.isShowFilter = false
     }
 
+    detectType(colDef, config) {
+
+        for (let row of config.rows) {
+            let value = this.getValue(colDef, row)
+
+            if (value === "") {
+                continue
+            }
+
+            if (Array.isArray(value)) {
+                colDef.isMultiLine = true
+                colDef.lineCount = value.length > colDef.lineCount ? value.length : colDef.lineCount
+                colDef.type = "multiLine"
+
+                if (colDef.lineCount > this.rowLineCount) {
+                    this.rowLineCount = colDef.lineCount
+                }
+            }
+        }
+    }
+
+    getLineCount(colDef, rows) {
+        let lineCount = 1;
+
+        for (let row of rows) {
+            let value = this.getValue(colDef, row)
+
+            lineCount = Array.isArray(value) && value.length > lineCount ? value.length : lineCount
+
+            if (Array.isArray(row[this.childNodesKey])) {
+                let childLineCount = this.getLineCount(colDef, row[this.childNodesKey])
+                lineCount = childLineCount > lineCount ? childLineCount : lineCount
+            }
+        }
+
+        return lineCount
+    }
 }

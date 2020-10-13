@@ -1,4 +1,4 @@
-import {IVirtualGrid, IVirtualGridRow} from "./interfaces/virtual.grid.interfaces";
+import {IRenderedRow, IVirtualGrid, IVirtualGridRow} from "./interfaces/virtual.grid.interfaces";
 
 export class VirtualGridRow implements IVirtualGridRow {
 
@@ -7,7 +7,7 @@ export class VirtualGridRow implements IVirtualGridRow {
 
     rowData: any;
 
-    children: VirtualGridRow[] = [];
+    children: IVirtualGridRow[] = [];
     childCountTotal: number = 0;
 
     initialIndex: number;
@@ -18,10 +18,12 @@ export class VirtualGridRow implements IVirtualGridRow {
     isVisible: boolean = true;
     isVisibleAfterFilter: boolean = true;
 
-    parent?: VirtualGridRow;
+    renderedRow?: IRenderedRow
+
+    parent?: IVirtualGridRow;
     isExpanded?: boolean = false;
 
-    constructor(private Grid: IVirtualGrid, node: any, level: number = 0, parent?: VirtualGridRow) {
+    constructor(private Grid: IVirtualGrid, node: any, level: number = 0, parent?: IVirtualGridRow) {
         this.level = level;
         this.isSelectable = true;
         this.isSelected = !!node.isSelected;

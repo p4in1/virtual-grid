@@ -203,4 +203,8 @@ export class VirtualGridUtils {
             (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
         );
     }
+
+    toggleClass = (elementClass: string, element: HTMLElement, setClass: boolean): void => {
+        setClass ? element.classList.add(elementClass) : element.classList.remove(elementClass)
+    }
 }

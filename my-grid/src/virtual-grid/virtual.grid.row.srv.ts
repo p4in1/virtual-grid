@@ -84,13 +84,9 @@ export class VirtualGridRowController {
 
             [row.left, row.center, row.right].forEach((rowPartial) => {
                 if (this.domController.visibleRowIndices.indexOf(row.index) == -1) {
-                    if (rowPartial.element.style["display"] != "none") {
-                        rowPartial.element.style["display"] = "none";
-                    }
+                    rowPartial.element.style["display"] = "none";
                 } else {
-                    if (rowPartial.element.style["display"] != "flex") {
-                        rowPartial.element.style["display"] = "flex";
-                    }
+                    rowPartial.element.style["display"] = "flex";
                 }
             });
         }
@@ -326,10 +322,7 @@ export class VirtualGridRowController {
     };
 
     executeAction = (event: any, action: any): void => {
-        const rowElement: HTMLElement = event.target.closest(".virtual-grid-row");
-        const index: string = rowElement.getAttribute("number");
-
-        const row: IVirtualGridRow = this.Grid.rows[index];
+        const row: IVirtualGridRow = this.Grid.eventController.getRowByEvent(event);
 
         event.preventDefault();
         event.stopPropagation();
@@ -343,11 +336,7 @@ export class VirtualGridRowController {
      * @param {Object} event
      */
     public toggleNodeListener = (event: any): void => {
-
-        const rowElement: HTMLElement = event.target.closest(".virtual-grid-row");
-        const index: string = rowElement.getAttribute("number");
-
-        const row: IVirtualGridRow = this.Grid.rows[index];
+        const row: IVirtualGridRow = this.Grid.eventController.getRowByEvent(event);
 
         if (row.children != void 0) {
             event.preventDefault();
@@ -390,9 +379,12 @@ export class VirtualGridRowController {
 
             rowPartial.element.setAttribute("number", row.index.toString());
             rowPartial.element.style["transform"] = `translateY(${row.top}px)`;
-
-            this.toggleSelectionClasses(row);
         });
+
+
+        this.Grid.rows[row.index].renderedRow = row
+        
+        this.toggleSelectionClasses(this.Grid.rows[row.index]);
 
         for (const j in row.cells) {
             const cell: IRenderedCell = row.cells[j];
@@ -608,23 +600,15 @@ export class VirtualGridRowController {
      * Alter the selection class of the row
      *
      * @param row
+     * @param isSelected
      */
-    private toggleSelectionClasses(row: IRenderedRow): void {
+    public toggleSelectionClasses(row: IVirtualGridRow, isSelected?: boolean): void {
+        [row.renderedRow.left, row.renderedRow.center, row.renderedRow.right].forEach((rowPartial) => {
+            let isRowSelected = isSelected !== false && (row.isSelected || isSelected === true);
 
-        [row.right, row.center, row.left].forEach((rowPartial) => {
-            if (this.Grid.rows[row.index].isSelected) {
-                rowPartial.element.classList.add("selected");
-            } else {
-                rowPartial.element.classList.remove("selected");
-            }
-
-            if (!this.Grid.rows[row.index].isSelectable) {
-                rowPartial.element.classList.add("not-selectable");
-                rowPartial.element.classList.remove("selectable");
-            } else {
-                rowPartial.element.classList.add("selectable");
-                rowPartial.element.classList.remove("not-selectable");
-            }
+            this.Grid.Utils.toggleClass('selected', rowPartial.element, isRowSelected)
+            this.Grid.Utils.toggleClass('selectable', rowPartial.element, row.isSelectable)
+            this.Grid.Utils.toggleClass('not-selectable', rowPartial.element, !row.isSelectable)
         })
     }
 

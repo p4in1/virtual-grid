@@ -84,6 +84,12 @@ export class VirtualGridUIDomController {
             ghostLabel: this.Utils.el("span", ["virtual-grid-ghost-label"])
         };
 
+        if (this.Grid.ConfigController.selectionMethod == "range") {
+            this.dom.virtualGrid.classList.add("range-selection")
+        } else {
+            this.dom.virtualGrid.classList.add("default-selection")
+        }
+
         this.dom.gridContainer.appendChild(this.dom.virtualGrid)
 
         this.dom.headerLeft.appendChild(this.dom.headerLeftResizer)
@@ -233,15 +239,15 @@ export class VirtualGridUIDomController {
                 cells: [],
                 left: {
                     cells: [],
-                    element: this.Utils.el("li", ["virtual-grid-row"])
+                    element: this.Utils.el("div", ["virtual-grid-row"])
                 },
                 center: {
                     cells: [],
-                    element: this.Utils.el("li", ["virtual-grid-row"])
+                    element: this.Utils.el("div", ["virtual-grid-row"])
                 },
                 right: {
                     cells: [],
-                    element: this.Utils.el("li", ["virtual-grid-row"])
+                    element: this.Utils.el("div", ["virtual-grid-row"])
                 },
             };
 
@@ -293,7 +299,6 @@ export class VirtualGridUIDomController {
         this.Utils.setStyles(this.dom.scrollYLeftSpacer, {"width": widths.left});
         this.Utils.setStyles(this.dom.scrollYCenterScrollPort, {"width": scrollPortWidth});
         this.Utils.setStyles(this.dom.scrollYRightSpacer, {"width": widths.right});
-
         this.Utils.setStyles(this.dom.scrollYCenterSpacer, {"width": widths.center})
 
         // we use a tolerance to not show the scrollbar in case it it less than 4 pixel bigger
@@ -324,22 +329,12 @@ export class VirtualGridUIDomController {
         let headerRight = this.dom.headerRight
 
         if (this.isHorizontalScrolling) {
-            if (!isScrolledToTheRight) {
-                bodyRight.classList.add("shadow")
-                headerRight.classList.add("shadow")
-            } else {
+            this.Utils.toggleClass("shadow", bodyRight, !isScrolledToTheRight)
+            this.Utils.toggleClass("shadow", headerRight, !isScrolledToTheRight)
 
-                bodyRight.classList.remove("shadow")
-                headerRight.classList.remove("shadow")
-            }
+            this.Utils.toggleClass("shadow", bodyLeft, scrollLeft > 0)
+            this.Utils.toggleClass("shadow", headerLeft, scrollLeft > 0)
 
-            if (scrollLeft === 0) {
-                bodyLeft.classList.remove("shadow")
-                headerLeft.classList.remove("shadow")
-            } else {
-                bodyLeft.classList.add("shadow")
-                headerLeft.classList.add("shadow")
-            }
         } else {
             bodyRight.classList.remove("shadow")
             headerRight.classList.remove("shadow")
@@ -423,7 +418,6 @@ export class VirtualGridUIDomController {
                 dom.cellFilterContainer.appendChild(dom.cellFilter)
             }
 
-
             dom.cellContent.appendChild(dom.cellFilterContainer)
         }
 
@@ -455,7 +449,6 @@ export class VirtualGridUIDomController {
 
         for (const col of columns) {
 
-
             const cell: IRenderedCell = <IRenderedCell>{
                 textNodes: [],
                 treeNode: null,
@@ -477,7 +470,6 @@ export class VirtualGridUIDomController {
                 cell.treeNode = this.Utils.el("i", ["virtual-grid-node-icon", "virtual-material-icons", "small"]);
                 cell.treeNode.addEventListener("click", this.Grid.RowController.toggleNodeListener);
                 cell.cellNode.appendChild(cell.treeNode)
-
             }
 
             if (this.config.useCheckboxSelection && col.isCheckboxColumn) {

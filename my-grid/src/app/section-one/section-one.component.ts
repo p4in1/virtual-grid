@@ -23,9 +23,11 @@ export class SectionOneComponent implements OnInit {
                 element: this.grid.nativeElement,
                 showHeader: true,
                 showColumnFilter: true,
-                selectionMethod: "multi",
-                useCheckboxSelection:true
+                selectionMethod: "range"
             }
+
+            data.columns[0].pinned = "left"
+            data.columns[1].pinned = "left"
 
             this.gridInstance = new VirtualGrid(config)
         });

@@ -166,6 +166,14 @@ export interface IVirtualGridConfig {
     onRowMouseEnter?(row: IVirtualGridRow, event: any, api: VirtualGridApi): void
 
     /**
+     * row mouse leave callback
+     * @param row - the VirtualGridRow the event was executed on
+     * @param event - the original event
+     * @param api - grid api
+     */
+    onRowMouseLeave?(row: IVirtualGridRow, event: any, api: VirtualGridApi): void
+
+    /**
      * row click callback
      * @param row - the VirtualGridRow the event was executed on
      * @param event - the original event
@@ -286,6 +294,7 @@ export interface IVirtualGridRow {
      * The original rowData given by the user to build the rows
      */
     rowData: any
+    renderedRow?: IRenderedRow
     /**
      * the total children count
      * This number is used once we want to add rows to a certain index
@@ -550,7 +559,7 @@ export interface IVirtualColDefConfig {
     isSuppressResize: boolean
     isSuppressSort: boolean
     isSuppressFilter: boolean
-    isSuppressMoving:boolean
+    isSuppressMoving: boolean
 
     actions: IVirtualColumnAction[]
     avatarConfig?: IVirtualAvatar
