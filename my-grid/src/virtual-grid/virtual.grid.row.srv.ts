@@ -365,7 +365,7 @@ export class VirtualGridRowController {
             currentObject = currentObject[value]
         }
 
-        return currentObject
+        return typeof currentObject == "string" ? currentObject.trim() : currentObject
     }
 
     /**
@@ -383,7 +383,7 @@ export class VirtualGridRowController {
 
 
         this.Grid.rows[row.index].renderedRow = row
-        
+
         this.toggleSelectionClasses(this.Grid.rows[row.index]);
 
         for (const j in row.cells) {
@@ -426,7 +426,7 @@ export class VirtualGridRowController {
         if (Array.isArray(cellData)) {
 
             for (let i = 0; i < cell.textNodes.length; i++) {
-                cell.textNodes[i].innerHTML = cellData[i] == void 0 ? "" : cellData[i]
+                cell.textNodes[i].innerHTML = cellData[i] == void 0 ? "" : cellData[i].toString().trim()
             }
 
             return
@@ -471,7 +471,7 @@ export class VirtualGridRowController {
             } else {
                 for (let agg of avatarConfig.placeholderAgg) {
                     let data = this.getCellData(cell.rowModel.rowData, agg.split("."))
-                    ph += data.charAt(0).toUpperCase()
+                    ph += data.trim().charAt(0).toUpperCase()
                 }
 
                 if (ph == "" && avatarConfig.hideEmptyPlaceholder) {

@@ -212,6 +212,8 @@ export interface IVirtualGridColumnConfig {
 
     isCheckboxColumn?: boolean
     isHierarchyColumn?: boolean
+
+    cellValueGetter?(cell: IRenderedCell, value: any): void
 }
 
 export interface IVirtualGrid {
@@ -528,7 +530,7 @@ export interface IVirtualAvatar {
     /**
      * hides empty placeholder in case there is no data to show
      */
-    hideEmptyPlaceholder: boolean
+    hideEmptyPlaceholder?: boolean
 }
 
 export interface IVirtualColDefConfig {
@@ -566,4 +568,11 @@ export interface IVirtualColDefConfig {
 
     width: number
     minWidth: number
+    maxWidth: number
+
+    cellRenderer(): void
+
+    cellStyleGetter(): void
+
+    cellValueGetter(): void
 }

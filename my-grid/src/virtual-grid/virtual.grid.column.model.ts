@@ -101,17 +101,16 @@ export class VirtualGridColumn implements IVirtualGridColumn {
             content: []
         }
 
-        this.maxWidth = colDef.maxWidth;
-        this.cellRenderer = colDef.cellRenderer;
-        this.cellStyleGetter = colDef.cellStyleGetter;
-        this.cellValueGetter = colDef.cellValueGetter;
+
         this.colDef = colDef;
 
-        // new variables
-
+        this.cellRenderer = typeof(configColDef.cellRenderer) == "function" ? configColDef.cellRenderer: null;
+        this.cellStyleGetter = typeof(configColDef.cellStyleGetter) == "function" ? configColDef.cellStyleGetter: null;
+        this.cellValueGetter = typeof(configColDef.cellValueGetter) == "function" ? configColDef.cellValueGetter: null;
 
         this.width = configColDef.width;
         this.minWidth = configColDef.minWidth == void 0 ? 80 : configColDef.minWidth;
+        this.maxWidth = configColDef.minWidth == void 0 ? null : configColDef.maxWidth;
         this.isAvatarColumn = configColDef.isAvatarColumn;
         this.isActionColumn = configColDef.isActionColumn;
         this.isIconColumn = configColDef.isIconColumn;

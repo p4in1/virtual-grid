@@ -135,8 +135,8 @@ export class VirtualGridDragAndDropController {
     getScrollDirection(offset) {
         let widths = this.domController.calculatePartialWidths()
         let scrollPortWidth = this.domController.scrollPortWidth
-        let isScrollingRight = this.currentCursorX > scrollPortWidth - 40
-        let isScrollingLeft = this.currentCursorX < offset + 40
+        let isScrollingRight = this.currentCursorX >  widths.left  + scrollPortWidth - 40
+        let isScrollingLeft = this.currentCursorX < widths.left + 40
         let scrollLeft = this.Grid.eventController.scrollLeft
         let isScrolledToTheRight = scrollLeft + scrollPortWidth >= Math.round(widths.center)
         let isScrolledToTheLeft = scrollLeft === 0

@@ -71,9 +71,7 @@ export class SectionTwoComponent implements AfterViewInit {
                     if (map[g._id].isLeaf) {
                         map[g._id].children.push({
                             title: [user.userFirstName, user.userLastName],
-                            userFirstName: user.userFirstName,
-                            userLastName: user.userLastName,
-                            email: user.email
+                            ...user
                         })
                     }
                 }
@@ -103,6 +101,21 @@ export class SectionTwoComponent implements AfterViewInit {
                         field: "email",
                         title: "Email",
                         showFilter: false
+                    },
+                    {
+                        field: "phoneNumber",
+                        title: "Telefonnummer",
+                        showFilter: false
+                    },
+                    {
+                        type: "boolean",
+                        field: "adminProperties.riskAssessment.deadlineDateSet",
+                        title: "Auszahlung gefordert"
+                    },
+                    {
+                        type: "date",
+                        field: "adminProperties.riskAssessment.deadlineDateSet",
+                        title: "Forderungs Datum",
                     }
                 ],
                 element: this.grid.nativeElement,

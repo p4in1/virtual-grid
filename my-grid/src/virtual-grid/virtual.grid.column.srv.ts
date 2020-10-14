@@ -77,8 +77,8 @@ export class VirtualGridColumnController {
                         b = b[0]
                     }
 
-                    a = !a ? "" : a.toString()
-                    b = !b ? "" : b.toString()
+                    a = !a ? "" : a.toString().toLowerCase()
+                    b = !b ? "" : b.toString().toLowerCase()
                     return a.localeCompare(b) * dir;
             }
 
@@ -196,6 +196,8 @@ export class VirtualGridColumnController {
      * apply the current sorting to each row set
      */
     public applySorting(): void {
+        let s = +new Date()
+
         let isHierarchy = this.Grid.columns.filter(x => x.isHierarchyColumn).length > 0
         if (isHierarchy) {
             let roots: IVirtualGridRow[] = [];
@@ -212,6 +214,8 @@ export class VirtualGridColumnController {
         } else {
             this.sortHelper.multiSort(this.Grid.rows, this.sortConfig);
         }
+
+        console.log("sorting took -->", +new Date() - s)
 
         this.Grid.api.refreshGrid(false, true);
     }
