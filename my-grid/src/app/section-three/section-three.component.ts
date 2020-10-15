@@ -25,11 +25,11 @@ export class SectionThreeComponent implements OnInit, AfterViewInit {
 
             let items = []
 
-            for(let i= 0; i < 100 ; i++){
-                data.rows.forEach((item)=>{
+            // for (let i = 0; i < 100; i++) {
+                data.rows.forEach((item) => {
                     items.push(item)
                 })
-            }
+            // }
 
             let config: IVirtualGridConfig = {
                 rows: items,
@@ -39,13 +39,14 @@ export class SectionThreeComponent implements OnInit, AfterViewInit {
                         avatarConfig: {
                             url: "data.user.avatarURL",
                             placeholderAgg: ["data.user.userFirstName", "data.user.userLastName"],
-                            placeholderBgColor: "var(--color-primary)"
+                            placeholderBgColor: "var(--color-primary)",
+                            hideEmptyPlaceholder: true
                         },
                     },
                     {
                         field: "data.user.userFirstName",
                         title: "Vorname",
-                        type:"text"
+                        type: "text"
                     },
                     {
                         field: "data.user.userLastName",
@@ -72,13 +73,13 @@ export class SectionThreeComponent implements OnInit, AfterViewInit {
                 ],
                 element: this.grid.nativeElement,
                 showHeader: true,
-                showColumnFilter: false,
-                deselectWhenCollapse: true,
-                useCheckboxSelection: false,
+                showGroupPanel: true,
                 selectionMethod: "multi"
             }
 
             this.gridInstance = new VirtualGrid(config)
+
+            window["grid"] = this.gridInstance
         })
 
     }

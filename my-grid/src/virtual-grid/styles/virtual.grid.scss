@@ -9,6 +9,7 @@
     background-color: white;
     justify-content: center;
     box-shadow: 0 0 4px 4px rgba(0, 0, 0, 0.2);
+    pointer-events: none;
 }
 
 .virtual-grid {
@@ -29,7 +30,7 @@
         user-select: none;
     }
 
-    &.range-selection{
+    &.range-selection {
         .virtual-grid-row.hover {
             background-color: transparent;
         }
@@ -43,7 +44,7 @@
         }
     }
 
-    &.default-selection{
+    &.default-selection {
         .virtual-grid-row.hover {
             background-color: $color-background-panel;
         }
@@ -85,7 +86,7 @@
         z-index: 1;
 
         &.shadow {
-            box-shadow: -4px -2px 4px 0px rgba(0, 0, 0, 0.2);
+            box-shadow: -8px 0 8px -4px rgba(0, 0, 0, 0.2);
         }
     }
 
@@ -94,7 +95,65 @@
         z-index: 1;
 
         &.shadow {
-            box-shadow: 4px -2px 4px 0px rgba(0, 0, 0, 0.2);
+            box-shadow: 8px 0 8px -4px rgba(0, 0, 0, 0.2);
+        }
+    }
+
+    .virtual-grid-group-panel {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        background-color: rgba(0, 0, 0, 0.08);
+        height: 40px;
+        min-height: 40px;
+        border-bottom: 1px solid $color-background-panel;
+
+        .virtual-grid-group-panel-placeholder {
+            font-size: $font-medium;
+            color: rgba(0, 0, 0, .87);
+            padding-left: $eob-pane-padding;
+        }
+
+        .virtual-grid-group-panel-content {
+            display: flex;
+            margin-left: $eob-pane-padding;
+
+            .virtual-grid-group-spacer {
+                display: inline-flex;
+                align-items: center;
+                margin: 0 $eob-pane-padding / 2;
+                opacity: 0.6;
+            }
+
+            .virtual-grid-group {
+                background-color: rgba(0, 0, 0, .08);
+                padding: $eob-pane-padding / 4 $eob-pane-padding / 2;
+                border-radius: $font-small;
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+                font-size: $font-medium;
+
+                &.inactive {
+                    opacity: .6;
+                }
+
+                .virtual-grid-group-remove-button {
+                    margin-left: $eob-pane-padding / 2;
+                    border-radius: $eob-pane-padding / 2;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: $font-small;
+                    height: $eob-pane-padding;
+                    width: $eob-pane-padding;
+                    transition: background-color linear 150ms;
+
+                    &:hover {
+                        background-color: rgba(0, 0, 0, .2);
+                    }
+                }
+            }
         }
     }
 
@@ -191,14 +250,14 @@
 
                                     font-size: $font-medium;
                                     width: 100%;
-
-                                    &.boolean-node {
-                                        display: flex;
-                                        align-items: center;
-                                        justify-content: center;
-                                    }
                                 }
                             }
+                        }
+
+                        &.virtual-grid-boolean-node {
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
                         }
 
                         &.virtual-grid-checkbox-node {
@@ -269,7 +328,6 @@
         display: flex;
         background-color: rgba(0, 0, 0, 0.08);
 
-
         .virtual-grid-header-left-resizer {
             cursor: col-resize;
             position: absolute;
@@ -322,6 +380,7 @@
                             line-height: 40px;
                             overflow: hidden;
                             text-overflow: ellipsis;
+                            font-size: $font-medium;
                         }
 
                         .header-sort-arrow {

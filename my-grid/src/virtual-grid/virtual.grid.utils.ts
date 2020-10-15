@@ -1,3 +1,5 @@
+import {IVirtualGridColumn, IVirtualGridRow} from "./interfaces/virtual.grid.interfaces";
+
 export class VirtualGridUtils {
     CHAR_WIDTH_MAP = {};
     DEFAULT_CHAR = 'M';
@@ -207,4 +209,5 @@ export class VirtualGridUtils {
     toggleClass = (elementClass: string, element: HTMLElement, setClass: boolean): void => {
         setClass ? element.classList.add(elementClass) : element.classList.remove(elementClass)
     }
+
 }

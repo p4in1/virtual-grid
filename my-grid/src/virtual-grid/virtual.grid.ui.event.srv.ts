@@ -190,7 +190,7 @@ export class VirtualGridUIEventController {
      * on scroll callback
      */
     private onScroll = (): void => {
-        if (this.domController.showHeader) {
+        if (this.config.showHeader) {
             this.dom.headerWrapper.scrollLeft = this.dom.bodyWrapper.scrollLeft;
         }
 
@@ -202,7 +202,7 @@ export class VirtualGridUIEventController {
      * @param {IVirtualGridColumn} col
      * @param {Object} event
      */
-    private onResize = (col: IVirtualGridColumn, event): void => {
+    public onResize = (col: IVirtualGridColumn, event): void => {
 
         let currentX: number = event.screenX;
 
@@ -261,7 +261,7 @@ export class VirtualGridUIEventController {
      * @param {number} start - the index to start calculating from
      * @param {number} diff - the difference in width for the given column from the start parameter
      */
-    private updateCellWidth: (start?: number, diff?: number) => void = (start?: number, diff?: number): void => {
+    public updateCellWidth: (start?: number, diff?: number) => void = (start?: number, diff?: number): void => {
 
         let startColumn = this.Grid.columns[start];
         let nextColumn = this.Grid.columns[start + 1]
@@ -272,7 +272,7 @@ export class VirtualGridUIEventController {
         let autosizableCols: IVirtualGridColumn[];
         let diffPerColumn: number
 
-        if (diff < 0 && startColumn.width + diff <= startColumn.minWidth && !isRightPinResizing) {
+        if (diff < 0 && startColumn.isVisible && startColumn.width + diff <= startColumn.minWidth && !isRightPinResizing) {
             diff = 0
         }
 
@@ -359,7 +359,9 @@ export class VirtualGridUIEventController {
 
             let width: number;
 
-            if (currentColumn.isAutoResize && !currentColumn.isSuppressResize) {
+            if (!currentColumn.isVisible) {
+                currentColumn.width = 0;
+            } else if (currentColumn.isAutoResize && !currentColumn.isSuppressResize) {
                 width = currentColumn.width + diffPerColumn;
 
                 if (width <= currentColumn.minWidth) {
@@ -466,17 +468,17 @@ export class VirtualGridUIEventController {
             const filterField: HTMLInputElement = column.dom.cellFilter
 
 
-            if (!column.isSuppressSort) {
-                headerCell.addEventListener("click", (event: any) => {
+            headerCell.addEventListener("click", (event: any) => {
+                if (!column.isSuppressSort) {
                     this.Grid.ColumnController.sortColumn(column, event.shiftKey)
-                })
-            }
+                }
+            })
 
-            if (!column.isSuppressDragging) {
-                headerCell.addEventListener("mousedown", (event) => {
+            headerCell.addEventListener("mousedown", (event) => {
+                if (!column.isSuppressDragging) {
                     this.Grid.DnDController.onColDragStart(event, column)
-                })
-            }
+                }
+            })
 
             if (column.isShowFilter) {
 
@@ -522,6 +524,10 @@ export class VirtualGridUIEventController {
         }
 
         this.dom.scrollYCenterScrollPort.addEventListener("scroll", this.onBodyScrollX)
+
+        this.dom.groupPanel.addEventListener("mouseenter", this.Grid.DnDController.onGroupPanelMouseEnter)
+        this.dom.groupPanel.addEventListener("mouseleave", this.Grid.DnDController.onGroupPanelMouseLeave)
+        this.dom.groupPanel.addEventListener("mouseup", this.Grid.DnDController.onGroupPanelMouseUp)
 
         this.bindRowEvents()
         this.bindColumnEvents()

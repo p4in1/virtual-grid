@@ -1,4 +1,4 @@
-import {IRenderedRow, IVirtualGrid, IVirtualGridRow} from "./interfaces/virtual.grid.interfaces";
+import {IRenderedRow, IVirtualGrid, IVirtualGridColumn, IVirtualGridRow} from "./interfaces/virtual.grid.interfaces";
 
 export class VirtualGridRow implements IVirtualGridRow {
 
@@ -13,6 +13,7 @@ export class VirtualGridRow implements IVirtualGridRow {
     initialIndex: number;
 
     isLoading: boolean;
+    isRowGroup: boolean = false
     isSelectable: boolean = true;
     isSelected: boolean = false;
     isVisible: boolean = true;
@@ -28,6 +29,7 @@ export class VirtualGridRow implements IVirtualGridRow {
         this.isSelectable = true;
         this.isSelected = !!node.isSelected;
         this.isVisible = parent == void 0 || parent != void 0 && parent.isExpanded;
+        this.isRowGroup = node.isRowGroup
 
         if (parent != void 0) {
             this.parent = parent;
@@ -60,6 +62,43 @@ export class VirtualGridRow implements IVirtualGridRow {
             }
         }
     };
+
+    /**
+     * returns the cell value of a given row and column
+     *
+     * filter prioritization
+     * 1. cellRenderer              -> this might not have the highest value, but if there is a cellRenderer, the content of the cell is all we have
+     * 2. cellValueGetter           -> this should return the value of the cell
+     * 3. data type as Array        -> there is a special need in case the cellContent is an array .. we have to join the array
+     * 4. data type of the column   -> this is the lowest priority but the highest probability and we interpret the datatype which should not be problematic
+     *
+     * @param col
+     */
+    public getCellValue = (col: IVirtualGridColumn): string => {
+        let cellData: any = this.Grid.RowController.getCellData(this.rowData, col.fieldPath);
+        let cellValue: string;
+        let cell: any = {
+            rowModel: this.Grid.rows[this.index],
+            colModel: this.Grid.originalColumns[col.index]
+        };
+
+        if (typeof cell.colModel.cellRenderer === "function") {
+            cellValue = cell.colModel.cellRenderer(cell)
+        } else if (typeof cell.colModel.cellValueGetter === "function") {
+            cellValue = cell.colModel.cellValueGetter(cell, cellData)
+        } else {
+            if (col.colType == "multiLine") {
+                // replacing multiple spaces with a single space in case an entry has multiple spaces
+                cellValue = Array.isArray(cellData) ? cellData.join(" ") : cellData != void 0 ? cellData.toString() : ""
+            } else if (col.colType == "date") {
+                cellValue = this.Grid.Utils.parseDate(cellData)
+            } else {
+                cellValue = cellData
+            }
+        }
+
+        return cellValue.toString();
+    }
 
     // private renderRow() {
     //     // TODO - when reordering rows the grid should attach the rendered row to the row model

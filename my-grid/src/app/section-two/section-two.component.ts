@@ -77,8 +77,6 @@ export class SectionTwoComponent implements AfterViewInit {
                 }
             }
 
-            console.log(tree)
-
             let config: IVirtualGridConfig = {
                 rows: tree,
                 columns: [
@@ -95,7 +93,8 @@ export class SectionTwoComponent implements AfterViewInit {
                         field: "title",
                         title: "Gruppenstruktur",
                         isHierarchyColumn: true,
-                        type: "multiLine"
+                        type: "multiLine",
+                        minWidth: 200
                     },
                     {
                         field: "email",
@@ -110,7 +109,8 @@ export class SectionTwoComponent implements AfterViewInit {
                     {
                         type: "boolean",
                         field: "adminProperties.riskAssessment.deadlineDateSet",
-                        title: "Auszahlung gefordert"
+                        title: "Auszahlung gefordert",
+
                     },
                     {
                         type: "date",
@@ -128,7 +128,5 @@ export class SectionTwoComponent implements AfterViewInit {
 
             this.gridInstance = new VirtualGrid(config)
         })
-
     }
-
 }

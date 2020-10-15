@@ -9,7 +9,6 @@ export class VirtualGridConfigController {
 
     colDefs: IVirtualColDefConfig[] = [];
 
-    rowLineCount: number = 1
     rowHeight: number = 40;
     headerRowHeight: number = 40;
 
@@ -21,7 +20,9 @@ export class VirtualGridConfigController {
     suppressMoving: boolean = false
 
     showHeader: boolean = false
+    showGroupPanel: boolean = false
     showColumnFilter: boolean = false;
+
     selectionMethod: string
     element: HTMLElement;
     autoSizeColumns: boolean = false;
@@ -44,6 +45,8 @@ export class VirtualGridConfigController {
     useIntermediateNodes = false;
     deselectWhenCollapse = false;
 
+    originalRows: any[] = []
+
     constructor(private Grid: IVirtualGrid, config: IVirtualGridConfig) {
 
         this.suppressSorting = config.suppressSorting
@@ -51,8 +54,11 @@ export class VirtualGridConfigController {
         this.suppressAutoSize = config.suppressAutoSize
         this.suppressDragging = config.suppressDragging
         this.suppressPinning = config.suppressPinning
+
         this.showHeader = config.showHeader
         this.showColumnFilter = config.showColumnFilter
+        this.showGroupPanel = config.showHeader && config.showGroupPanel
+
         this.element = config.element
         this.selectionMethod = config.selectionMethod == void 0 ? "single" : config.selectionMethod
         this.autoSizeColumns = config.autoSizeColumns
@@ -67,12 +73,15 @@ export class VirtualGridConfigController {
         this.onRowRightClick = typeof config.onRowRightClick == "function" ? config.onRowRightClick : this._noop
 
         this.onNodeExpandAsync = config.onNodeExpandAsync;
+
         this.expandNodesByDefault = config.expandNodesByDefault == void 0 ? true : config.expandNodesByDefault;
         this.useCheckboxSelection = config.useCheckboxSelection;
         this.useIntermediateNodes = config.useIntermediateNodes;
         this.deselectWhenCollapse = config.deselectWhenCollapse;
 
         this.externalFilter = config.externalFilter
+
+        this.originalRows = config.rows
 
         this.getColDefs(config)
     }
@@ -83,7 +92,20 @@ export class VirtualGridConfigController {
     getColDefs(config) {
 
         if (this.useCheckboxSelection) {
-            config.columns.unshift({isCheckboxColumn: true, pinned: "left", suppressMoving: true})
+            config.columns.unshift({isCheckboxColumn: true, pinned: "left", suppressMoving: true, isSystemColumn: true})
+        }
+
+        if (this.showGroupPanel) {
+            config.columns.unshift({
+                isGroupColumn: true,
+                pinned: "left",
+                suppressMoving: true,
+                isSystemColumn: true,
+                isHierarchyColumn: true,
+                isVisible: false,
+                field: "value",
+                title: "Groups"
+            })
         }
 
         for (let col of config.columns) {
@@ -102,10 +124,12 @@ export class VirtualGridConfigController {
                 isActionColumn: col.type == "action",
                 isIconColumn: col.type == "icon",
                 isAvatarColumn: col.type == "avatar",
-
                 isCheckboxColumn: col.isCheckboxColumn,
                 isHierarchyColumn: col.isHierarchyColumn,
+                isSystemColumn: col.isSystemColumn,
+
                 isAutosize: !col.suppressResize,
+                isVisible: col.isVisible == void 0 ? true : col.isVisible,
 
                 isSuppressSort: col.suppressSorting || this.suppressSorting,
                 isSuppressResize: col.suppressResize || this.suppressResize,
@@ -153,10 +177,6 @@ export class VirtualGridConfigController {
                 colDef.lineCount = this.getLineCount(colDef, config.rows)
             }
 
-            if (config.type == void 0) {
-                this.detectType(colDef, config)
-            }
-
             this.colDefs.push(colDef)
         }
 
@@ -195,27 +215,6 @@ export class VirtualGridConfigController {
         colDef.isSuppressAutoSize = true;
         colDef.isSuppressResize = true;
         colDef.isShowFilter = false
-    }
-
-    detectType(colDef, config) {
-
-        for (let row of config.rows) {
-            let value = this.getValue(colDef, row)
-
-            if (value === "") {
-                continue
-            }
-
-            if (Array.isArray(value)) {
-                colDef.isMultiLine = true
-                colDef.lineCount = value.length > colDef.lineCount ? value.length : colDef.lineCount
-                colDef.type = "multiLine"
-
-                if (colDef.lineCount > this.rowLineCount) {
-                    this.rowLineCount = colDef.lineCount
-                }
-            }
-        }
     }
 
     getLineCount(colDef, rows) {

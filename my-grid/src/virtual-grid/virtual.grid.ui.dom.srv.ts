@@ -28,8 +28,6 @@ export class VirtualGridUIDomController {
     gridHeight: number = 0
     bodyHeight: number = 0
 
-    showHeader: boolean = false;
-
     visibleRowIndices: number[] = [];
 
     isHorizontalScrolling: boolean = false;
@@ -44,7 +42,6 @@ export class VirtualGridUIDomController {
 
         this.lastTop = 0;
         this.Utils = this.Grid.Utils
-        this.showHeader = this.config.showHeader;
         this.headerRowHeight = this.config.headerRowHeight;
         this.rowHeight = this.config.rowHeight
 
@@ -81,25 +78,31 @@ export class VirtualGridUIDomController {
             scrollYCenterScrollPort: this.Utils.el("div", ['virtual-grid-scroll-y-center-scroll-port']),
 
             ghost: this.Utils.el("div", ["virtual-grid-ghost"]),
-            ghostLabel: this.Utils.el("span", ["virtual-grid-ghost-label"])
+            ghostLabel: this.Utils.el("span", ["virtual-grid-ghost-label"]),
+
+            groupPanel: this.Utils.el("div", ["virtual-grid-group-panel"]),
+            groupPanelPlaceholder: this.Utils.el("span", ["virtual-grid-group-panel-placeholder"]),
+            groupPanelContent: this.Utils.el("div", ["virtual-grid-group-panel-content"]),
+
         };
 
-        if (this.Grid.ConfigController.selectionMethod == "range") {
-            this.dom.virtualGrid.classList.add("range-selection")
-        } else {
-            this.dom.virtualGrid.classList.add("default-selection")
-        }
-
+        // add the grid to the given dom node
         this.dom.gridContainer.appendChild(this.dom.virtualGrid)
+
+        // add the main parts of the grid
+        this.dom.virtualGrid.appendChild(this.dom.groupPanel)
+        this.dom.virtualGrid.appendChild(this.dom.headerWrapper);
+        this.dom.virtualGrid.appendChild(this.dom.bodyWrapper);
+        this.dom.virtualGrid.appendChild(this.dom.scrollYGuard)
+
+        this.dom.groupPanel.appendChild(this.dom.groupPanelPlaceholder)
+        this.dom.groupPanel.appendChild(this.dom.groupPanelContent)
 
         this.dom.headerLeft.appendChild(this.dom.headerLeftResizer)
         this.dom.headerRight.appendChild(this.dom.headerRightResizer)
 
-        this.dom.virtualGrid.appendChild(this.dom.bodyWrapper);
-
         this.dom.scrollYCenterScrollPort.appendChild(this.dom.scrollYCenterSpacer)
 
-        this.dom.virtualGrid.appendChild(this.dom.scrollYGuard)
         this.dom.scrollYGuard.appendChild(this.dom.scrollYLeftSpacer)
         this.dom.scrollYGuard.appendChild(this.dom.scrollYCenterScrollPort)
         this.dom.scrollYGuard.appendChild(this.dom.scrollYRightSpacer)
@@ -118,7 +121,18 @@ export class VirtualGridUIDomController {
 
         this.dom.ghost.appendChild(this.dom.ghostLabel)
 
+        this.setGridDefaults()
         this.styleUpdater()
+    }
+
+    setGridDefaults() {
+        if (this.Grid.ConfigController.selectionMethod == "range") {
+            this.dom.virtualGrid.classList.add("range-selection")
+        } else {
+            this.dom.virtualGrid.classList.add("default-selection")
+        }
+
+        this.dom.groupPanelPlaceholder.textContent = "Drag and drop columns here to group"
     }
 
     setStyles(element, styles) {
@@ -203,14 +217,18 @@ export class VirtualGridUIDomController {
         let bodyCenterFragment = document.createDocumentFragment();
         let bodyRightFragment = document.createDocumentFragment();
 
-        if (this.showHeader) {
-            this.dom.virtualGrid.prepend(this.dom.headerWrapper);
-
+        if (this.config.showHeader) {
             this.dom.headerLeft.style["height"] = `${this.headerRowHeight}px`;
             this.dom.headerCenter.style["height"] = `${this.headerRowHeight}px`;
             this.dom.headerRight.style["height"] = `${this.headerRowHeight}px`;
 
             this.dom.headerWrapper.style["height"] = `${this.headerRowHeight}px`;
+        } else {
+            this.dom.headerWrapper.classList.add("hidden")
+        }
+
+        if (!this.config.showGroupPanel) {
+            this.dom.groupPanel.classList.add("hidden")
         }
 
         for (let i: number = 0; i < this.renderedColumnCount; i++) {
@@ -349,21 +367,12 @@ export class VirtualGridUIDomController {
         let right = 0
 
         for (const col of this.Grid.originalColumns) {
-            if (col.pinned === "left") {
-                left += col.width
-            }
-
-            if (col.pinned === "center") {
-                center += col.width
-            }
-
-            if (col.pinned === "right") {
-                right += col.width
-            }
+            col.pinned === "left" ? left += col.width : null
+            col.pinned === "center" ? center += col.width : null
+            col.pinned === "right" ? right += col.width : null
         }
 
         return {left, center, right}
-
     }
 
     /**
@@ -466,7 +475,7 @@ export class VirtualGridUIDomController {
                 cellStyleGetter: col.cellStyleGetter
             };
 
-            if (col.isHierarchyColumn) {
+            if (col.isHierarchyColumn || col.isRowGroupColumn) {
                 cell.treeNode = this.Utils.el("i", ["virtual-grid-node-icon", "virtual-material-icons", "small"]);
                 cell.treeNode.addEventListener("click", this.Grid.RowController.toggleNodeListener);
                 cell.cellNode.appendChild(cell.treeNode)
@@ -505,7 +514,12 @@ export class VirtualGridUIDomController {
                 }
 
             } else {
-                cell.cellNode.classList.add("virtual-grid-text-node")
+
+                if (col.colType == "boolean") {
+                    cell.cellNode.classList.add("virtual-grid-boolean-node")
+                } else {
+                    cell.cellNode.classList.add("virtual-grid-text-node")
+                }
 
                 for (let i = 0; i < col.lineCount; i++) {
                     let textNode = this.Utils.el("span", ["virtual-grid-cell-text"]);

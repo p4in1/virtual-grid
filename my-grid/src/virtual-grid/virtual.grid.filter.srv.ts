@@ -135,7 +135,7 @@ export class VirtualGridFilterController {
                         continue
                     }
 
-                    let cellValue = this._getCellValue(row, col).toLowerCase()
+                    let cellValue = row.getCellValue(col).toLowerCase()
 
                     cellValue = cellValue.replace(/  +/g, ' ')
 
@@ -265,44 +265,6 @@ export class VirtualGridFilterController {
         }
 
         return false
-    }
-
-    /**
-     * returns the cell value of a given row and column
-     *
-     * filter prioritization
-     * 1. cellRenderer              -> this might not have the highest value, but if there is a cellRenderer, the content of the cell is all we have
-     * 2. cellValueGetter           -> this should return the value of the cell
-     * 3. data type as Array        -> there is a special need in case the cellContent is an array .. we have to join the array
-     * 4. data type of the column   -> this is the lowest priority but the highest probability and we interpret the datatype which should not be problematic
-     *
-     * @param row
-     * @param col
-     */
-    private _getCellValue = (row: IVirtualGridRow, col: IVirtualGridColumn): string => {
-        let cellData: any = this.Grid.RowController.getCellData(row.rowData, col.fieldPath);
-        let cellValue: string;
-        let cell: any = {
-            rowModel: this.Grid.rows[row.index],
-            colModel: this.Grid.originalColumns[col.index]
-        };
-
-        if (typeof cell.colModel.cellRenderer === "function") {
-            cellValue = cell.colModel.cellRenderer(cell)
-        } else if (typeof cell.colModel.cellValueGetter === "function") {
-            cellValue = cell.colModel.cellValueGetter(cell, cellData)
-        } else {
-            if (col.colType == "multiLine") {
-                // replacing multiple spaces with a single space in case an entry has multiple spaces
-                cellValue = Array.isArray(cellData) ? cellData.join(" ") : cellData != void 0 ? cellData.toString() : ""
-            } else if (col.colType == "date") {
-                cellValue = this.Grid.Utils.parseDate(cellData)
-            } else {
-                cellValue = cellData
-            }
-        }
-
-        return cellValue.toString();
     }
 
     private _expandParentsAfterFilter = (filteredArray: IVirtualGridRow[], expandParents: boolean): void => {

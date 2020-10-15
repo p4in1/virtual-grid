@@ -28,6 +28,14 @@ export interface IVirtualGridConfig {
      * @default true
      */
     showHeader?: boolean
+
+    /**
+     * whether the group panel is visible or not
+     * if the option showHeader is set to false the group panel is not visible too
+     * @default false
+     */
+    showGroupPanel?: boolean
+
     /**
      * whether to show the column filter or not
      * @default false
@@ -210,7 +218,6 @@ export interface IVirtualGridColumnConfig {
     minWidth?: number
     valueFormat?: string
 
-    isCheckboxColumn?: boolean
     isHierarchyColumn?: boolean
 
     cellValueGetter?(cell: IRenderedCell, value: any): void
@@ -263,6 +270,10 @@ export interface IVirtualGridRow {
      * Also selected rows are highlighted in a appealing color given by the theme
      */
     isSelected: boolean
+    /**
+     * is true when this is an aggregation row
+     */
+    isRowGroup: boolean
     /**
      * Determines if the Row can be found whilst scrolling
      * a row that is not visible might be the child of a collapsed parent or be filtered from the rows array
@@ -318,6 +329,8 @@ export interface IVirtualGridRow {
      * @param rowData - the new data
      */
     updateRowData(rowData: any): void
+
+    getCellValue(col: IVirtualGridColumn): string
 }
 
 export interface IVirtualGridColumnApi {
@@ -344,6 +357,15 @@ export interface IVirtualGridColumnApi {
      * @param index
      */
     move(index: number): void
+
+    /**
+     * removes the grouping of this column
+     */
+    removeRowGroup(): void
+
+    show(): void
+
+    hide(): void
 }
 
 export interface IVirtualGridColumn {
@@ -384,12 +406,18 @@ export interface IVirtualGridColumn {
     isFilterPresent: boolean
     isShowFilter?: boolean
     isAutoResize?: boolean
+
     isPinned: boolean
+    isGrouped: boolean
+    isRowGrouped: boolean
+
     isIconColumn?: boolean
     isAvatarColumn?: boolean
     isActionColumn?: boolean
     isCheckboxColumn?: boolean
     isHierarchyColumn?: boolean
+    isRowGroupColumn?: boolean
+    isSystemColumn?: boolean
 
     canShrink?: boolean
 
@@ -415,6 +443,8 @@ export interface IVirtualGridColumn {
     avatarConfig?: IVirtualAvatar
 
     filter: IVirtualColumnFilter
+
+    rowGroup: IVirtualColumnRowGroup
 }
 
 export interface IRenderedCell {
@@ -485,6 +515,10 @@ export interface IVirtualGridDom {
 
     ghost: HTMLElement
     ghostLabel: HTMLElement
+
+    groupPanel: HTMLElement
+    groupPanelPlaceholder: HTMLSpanElement
+    groupPanelContent: HTMLElement
 }
 
 export interface IVirtualCellDom {
@@ -509,6 +543,15 @@ export interface IVirtualColumnAction {
     color: string
     icon: string
     callback: Function
+}
+
+export interface IVirtualColumnRowGroup {
+    index: number
+    label: string
+    element: HTMLElement
+    removeButton: HTMLElement
+    col: IVirtualGridColumn
+    isActive: boolean
 }
 
 export interface IVirtualAvatar {
@@ -548,10 +591,12 @@ export interface IVirtualColDefConfig {
     isIconColumn: boolean
     isCheckboxColumn: boolean
     isHierarchyColumn: boolean
+    isSystemColumn: boolean
 
     isAutosize: boolean
     isShowFilter: boolean
     isPinned: boolean
+    isVisible: boolean
 
     pinned: string
 

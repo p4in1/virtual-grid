@@ -3,12 +3,14 @@ import {
     IVirtualCellDom,
     IVirtualColumnAction,
     IVirtualColumnFilter,
+    IVirtualColumnRowGroup,
     IVirtualGrid,
     IVirtualGridColumn,
     IVirtualGridColumnApi
 } from "./interfaces/virtual.grid.interfaces";
 
 import {VirtualGridColumnApi} from "./virtual.grid.column.api";
+import {config} from "rxjs";
 
 export class VirtualGridColumn implements IVirtualGridColumn {
 
@@ -24,7 +26,12 @@ export class VirtualGridColumn implements IVirtualGridColumn {
 
     pinned: string = "center";
 
+    rowGroup: IVirtualColumnRowGroup
+
+    isRowGrouped: boolean = false
+    isGrouped: boolean = false
     isPinned: boolean = false;
+
     isFilterPresent: boolean = false;
     isShowFilter: boolean = false;
     isAutoResize: boolean = false;
@@ -35,6 +42,8 @@ export class VirtualGridColumn implements IVirtualGridColumn {
     isCheckboxColumn: boolean = false;
     isActionColumn: boolean = false;
     isAvatarColumn: boolean = false;
+    isSystemColumn: boolean = false;
+    isRowGroupColumn:boolean = false;
 
     canShrink: boolean = false;
 
@@ -104,18 +113,22 @@ export class VirtualGridColumn implements IVirtualGridColumn {
 
         this.colDef = colDef;
 
-        this.cellRenderer = typeof(configColDef.cellRenderer) == "function" ? configColDef.cellRenderer: null;
-        this.cellStyleGetter = typeof(configColDef.cellStyleGetter) == "function" ? configColDef.cellStyleGetter: null;
-        this.cellValueGetter = typeof(configColDef.cellValueGetter) == "function" ? configColDef.cellValueGetter: null;
+        this.cellRenderer = typeof (configColDef.cellRenderer) == "function" ? configColDef.cellRenderer : null;
+        this.cellStyleGetter = typeof (configColDef.cellStyleGetter) == "function" ? configColDef.cellStyleGetter : null;
+        this.cellValueGetter = typeof (configColDef.cellValueGetter) == "function" ? configColDef.cellValueGetter : null;
 
         this.width = configColDef.width;
         this.minWidth = configColDef.minWidth == void 0 ? 80 : configColDef.minWidth;
         this.maxWidth = configColDef.minWidth == void 0 ? null : configColDef.maxWidth;
+
         this.isAvatarColumn = configColDef.isAvatarColumn;
         this.isActionColumn = configColDef.isActionColumn;
         this.isIconColumn = configColDef.isIconColumn;
         this.isCheckboxColumn = configColDef.isCheckboxColumn;
         this.isHierarchyColumn = configColDef.isHierarchyColumn;
+        this.isSystemColumn = configColDef.isSystemColumn
+        this.isRowGroupColumn = configColDef.isSystemColumn
+
         this.colType = configColDef.type;
 
         this.field = configColDef.field;
@@ -127,6 +140,7 @@ export class VirtualGridColumn implements IVirtualGridColumn {
 
         this.pinned = configColDef.pinned;
         this.isPinned = configColDef.isPinned;
+        this.isVisible = configColDef.isVisible
 
         this.isShowFilter = configColDef.isShowFilter;
         this.isAutoResize = !configColDef.isSuppressResize;

@@ -72,9 +72,13 @@ export class VirtualGridApi {
      *
      * @param {Array} rows
      * @param {boolean} resetRowConfig
+     * @param {boolean} isRowGrouping
      */
-    public updateGridRows = (rows: any[], resetRowConfig: boolean): void => {
-        // resetting and setting general properties
+    public updateGridRows = (rows: any[], resetRowConfig?: boolean, isRowGrouping?): void => {
+
+        if (!isRowGrouping) {
+            this.Grid.ConfigController.originalRows = rows
+        }
 
         this.scrollPosTopBackup = this.Grid.domController.dom.bodyWrapper.scrollTop
 

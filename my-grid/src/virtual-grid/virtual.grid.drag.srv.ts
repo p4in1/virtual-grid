@@ -1,4 +1,5 @@
 import {
+    IVirtualColumnRowGroup,
     IVirtualGrid,
     IVirtualGridColumn,
     IVirtualGridDom
@@ -14,11 +15,24 @@ interface IVirtualDragData {
     offset: number
 }
 
+interface IVirtualDragData {
+    x: number,
+    y: number,
+    col: IVirtualGridColumn,
+    cell: HTMLElement,
+    rect: ClientRect,
+    offset: number,
+    pinned: string
+}
+
 export class VirtualGridDragAndDropController {
     dom: IVirtualGridDom
     domController: VirtualGridUIDomController
 
-    isGhostAttached: boolean = false;
+    isColDragActive: boolean = false;
+
+    colDragData: IVirtualDragData
+
     ghostHeight: number = 40;
     ghostWidth: number = 0;
 
@@ -27,9 +41,156 @@ export class VirtualGridDragAndDropController {
 
     currentCursorX: number = 0
 
+    groups: IVirtualColumnRowGroup[] = []
+
     constructor(private Grid: IVirtualGrid) {
         this.domController = this.Grid.domController
         this.dom = this.domController.dom
+    }
+
+    _removeGroup = (event): void => {
+        let groupElement: HTMLElement = event.target.closest(".virtual-grid-group")
+        if (groupElement) {
+            let colId = groupElement.getAttribute("col-id")
+            let col = this.Grid.columns.find(x => x.id == colId)
+            col.api.removeRowGroup()
+        }
+    }
+
+    onGroupPanelMouseEnter = (): void => {
+        if (this.isColDragActive && !this.colDragData.col.isRowGrouped) {
+            let element = this.Grid.Utils.el("div", ["virtual-grid-group", "inactive"], {"col-id": this.colDragData.col.id})
+            let group: IVirtualColumnRowGroup = {
+                index: this.groups.length,
+                col: this.colDragData.col,
+                element,
+                removeButton: this.Grid.Utils.el("i", ["virtual-grid-group-remove-button", "virtual-material-icons", "small"]),
+                label: this.colDragData.col.title,
+                isActive: false
+            }
+
+            element.textContent = group.label
+            element.appendChild(group.removeButton)
+
+            group.removeButton.addEventListener("click", this._removeGroup)
+            group.removeButton.textContent = "clear"
+
+            this.groups.push(group)
+
+            this.colDragData.col.isRowGrouped = true
+            this.colDragData.col.rowGroup = group
+
+            this.createGroupElements()
+        }
+    }
+
+    onGroupPanelMouseLeave = (): void => {
+        if (this.isColDragActive && this.colDragData.col.rowGroup.isActive === false) {
+            this.colDragData.col.api.removeRowGroup()
+        }
+    }
+
+    onGroupPanelMouseUp = (): void => {
+        if (this.isColDragActive) {
+            this.colDragData.col.rowGroup.element.classList.remove("inactive")
+            this.colDragData.col.rowGroup.isActive = true
+            this.applyGrouping()
+        }
+    }
+
+    applyGrouping() {
+        let s = +new Date()
+        let rows
+        let groupColumn = this.Grid.columns.find(x => x.isRowGroupColumn)
+        let groupTree = {}
+
+        if (this.groups.length > 0) {
+            !groupColumn.isVisible && groupColumn.api.show()
+
+            for (let row of this.Grid.rows) {
+                if (!row.isRowGroup) {
+                    this._addGroupRows(groupTree, row)
+                }
+            }
+
+            rows = this._createGroupRows(groupTree)
+
+        } else {
+            groupColumn.api.hide()
+            rows = this.Grid.ConfigController.originalRows
+        }
+
+        console.log("grouping took --> ", +new Date - s)
+
+        this.Grid.api.updateGridRows(rows, false, true)
+    }
+
+    _createGroupRows(treePart) {
+
+        let rows = []
+
+        let keys = Object.keys(treePart).sort((a, b) => {
+            return a.localeCompare(b)
+        })
+
+        for (let key of keys) {
+            let rowNode: any = {isRowGroup: true}
+
+            rowNode.value = key
+            rowNode[this.Grid.ConfigController.childNodesKey] = []
+
+            rows.push(rowNode)
+
+            if (Object.keys(treePart[key].rowGroups).length > 0) {
+                rowNode[this.Grid.ConfigController.childNodesKey] = this._createGroupRows(treePart[key].rowGroups)
+            } else {
+                for (let _row of treePart[key].children) {
+                    rowNode[this.Grid.ConfigController.childNodesKey].push(_row.rowData)
+                }
+            }
+        }
+
+        return rows
+    }
+
+    _addGroupRows(rowGroupTree, row) {
+        let currentNode = rowGroupTree
+
+        for (let i = 0; i < this.groups.length; i++) {
+            let currentGroup = this.groups[i]
+            let value = row.getCellValue(currentGroup.col).trim()
+
+            if (currentNode[value] == void 0) {
+                currentNode[value] = {
+                    children: [],
+                    rowGroups: {}
+                }
+            }
+
+            currentNode[value].children.push(row)
+
+            if (i !== this.groups.length - 1) {
+                currentNode = currentNode[value].rowGroups
+            }
+        }
+    }
+
+    createGroupElements() {
+        let placeholder = this.dom.groupPanelPlaceholder
+
+        placeholder.style.display = this.groups.length == 0 ? "block" : "none"
+
+        this.dom.groupPanelContent.innerHTML = ""
+
+        for (let i = 0; i < this.groups.length; i++) {
+            this.dom.groupPanelContent.appendChild(this.groups[i].element)
+
+            if (this.groups[i + 1] != void 0) {
+                let spacer = this.Grid.Utils.el("i", ["virtual-grid-group-spacer", "virtual-material-icons", "small"])
+                spacer.textContent = "trending_flat"
+                this.dom.groupPanelContent.appendChild(spacer)
+            }
+        }
     }
 
     /**
@@ -37,9 +198,10 @@ export class VirtualGridDragAndDropController {
      * @param event - the dom event
      * @param column - the column the event started with
      */
-    onColDragStart = (event: any, column): void => {
+    onColDragStart = (event: any, column: IVirtualGridColumn): void => {
         let rect = column.dom.cellTextContainer.getBoundingClientRect();
-        let data = {
+
+        this.colDragData = {
             x: event.clientX,
             y: event.clientY,
             col: column,
@@ -50,7 +212,7 @@ export class VirtualGridDragAndDropController {
         }
 
         let _onMove = (event) => {
-            this.onColDrag(event, data)
+            this.onColDrag(event, this.colDragData)
         }
 
         // cleanup event listeners and elements like the ghost
@@ -58,14 +220,27 @@ export class VirtualGridDragAndDropController {
             document.body.removeEventListener("mousemove", _onMove)
             document.body.removeEventListener("mouseup", _onDragEnd)
 
-            if (this.isGhostAttached) {
-                this.isGhostAttached = false;
+            if (this.isColDragActive) {
+                // remember the suppressSort state to later restore it
+                // otherwise the column would start sorting once the drag is finished
+                // this happens because the mouse down and the mouseup event trigger on the same element
+                // at this point we try to prevent the click on this column from happening
+                let suppressSort = this.colDragData.col.isSuppressSort;
+
+                this.colDragData.col.isSuppressSort = true
+
+                this.isColDragActive = false;
                 this.scrollOffset = 0
 
                 this.dom.virtualGrid.classList.remove("moving")
                 this.dom.ghost.parentNode.removeChild(this.dom.ghost)
 
                 clearInterval(this.scrollInterval)
+
+                // restore the old suppressSort value
+                setTimeout(() => {
+                    this.colDragData.col.isSuppressSort = suppressSort
+                }, 0)
             }
         }
 
@@ -135,7 +310,7 @@ export class VirtualGridDragAndDropController {
     getScrollDirection(offset) {
         let widths = this.domController.calculatePartialWidths()
         let scrollPortWidth = this.domController.scrollPortWidth
-        let isScrollingRight = this.currentCursorX >  widths.left  + scrollPortWidth - 40
+        let isScrollingRight = this.currentCursorX > widths.left + scrollPortWidth - 40
         let isScrollingLeft = this.currentCursorX < widths.left + 40
         let scrollLeft = this.Grid.eventController.scrollLeft
         let isScrolledToTheRight = scrollLeft + scrollPortWidth >= Math.round(widths.center)
@@ -158,8 +333,8 @@ export class VirtualGridDragAndDropController {
      * @param dragData - drag data
      */
     private onColDrag = (event, dragData: IVirtualDragData): void => {
-        if (!this.isGhostAttached && (Math.abs(dragData.x - event.clientX) > 8 || Math.abs(dragData.y - event.clientY) > 8)) {
-            this.isGhostAttached = true;
+        if (!this.isColDragActive && (Math.abs(dragData.x - event.clientX) > 8 || Math.abs(dragData.y - event.clientY) > 8)) {
+            this.isColDragActive = true;
             this.dom.virtualGrid.classList.add("moving")
             this.dom.ghostLabel.textContent = dragData.col.title
             this.ghostWidth = this.Grid.Utils.getTextWidthInPixel(dragData.col.title) + 20
@@ -168,7 +343,7 @@ export class VirtualGridDragAndDropController {
         }
 
         // moving the ghost
-        if (this.isGhostAttached) {
+        if (this.isColDragActive) {
             let top = event.clientY - (this.ghostHeight / 2);
             let left = event.clientX - (this.ghostWidth / 2)
 
