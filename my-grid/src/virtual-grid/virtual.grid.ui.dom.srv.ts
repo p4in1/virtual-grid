@@ -51,38 +51,38 @@ export class VirtualGridUIDomController {
 
             virtualGrid: this.Utils.el("div", ['virtual-grid']),
 
-            headerWrapper: this.Utils.el("div", ['virtual-grid-header-wrapper']),
-            headerCenterScrollPort: this.Utils.el("div", ['virtual-grid-header-wrapper-scroll-port']),
+            headerWrapper: this.Utils.el("div", ['header-wrapper']),
+            headerCenterScrollPort: this.Utils.el("div", ['header-wrapper-scroll-port']),
 
-            bodyWrapper: this.Utils.el("div", ['virtual-grid-body-wrapper']),
-            bodyCenterScrollPort: this.Utils.el("div", ['virtual-grid-body-wrapper-scroll-port']),
+            bodyWrapper: this.Utils.el("div", ['body-wrapper']),
+            bodyCenterScrollPort: this.Utils.el("div", ['body-wrapper-scroll-port']),
 
-            bodyCenter: this.Utils.el("div", ['virtual-grid-body-center']),
-            bodyLeft: this.Utils.el("div", ['virtual-grid-body-left']),
-            bodyRight: this.Utils.el("div", ['virtual-grid-body-right']),
+            bodyCenter: this.Utils.el("div", ['body-center']),
+            bodyLeft: this.Utils.el("div", ['body-left']),
+            bodyRight: this.Utils.el("div", ['body-right']),
 
-            headerCenter: this.Utils.el("div", ['virtual-grid-header-center']),
-            headerLeft: this.Utils.el("div", ['virtual-grid-header-left']),
-            headerRight: this.Utils.el("div", ['virtual-grid-header-right']),
+            headerCenter: this.Utils.el("div", ['header-center']),
+            headerLeft: this.Utils.el("div", ['header-left']),
+            headerRight: this.Utils.el("div", ['header-right']),
 
-            headerLeftResizer: this.Utils.el("div", ['virtual-grid-header-left-resizer']),
-            headerRightResizer: this.Utils.el("div", ['virtual-grid-header-right-resizer']),
+            headerLeftResizer: this.Utils.el("div", ['header-left-resizer']),
+            headerRightResizer: this.Utils.el("div", ['header-right-resizer']),
 
             gridContainer: this.config.element,
             swipeActionElement: this.Utils.el("div"),
 
-            scrollYGuard: this.Utils.el("div", ['virtual-grid-scroll-y-guard']),
-            scrollYLeftSpacer: this.Utils.el("div", ['virtual-grid-scroll-y-left-spacer']),
-            scrollYRightSpacer: this.Utils.el("div", ['virtual-grid-scroll-y-right-spacer']),
-            scrollYCenterSpacer: this.Utils.el("div", ['virtual-grid-scroll-y-center-spacer']),
-            scrollYCenterScrollPort: this.Utils.el("div", ['virtual-grid-scroll-y-center-scroll-port']),
+            scrollYGuard: this.Utils.el("div", ['scroll-y-guard']),
+            scrollYLeftSpacer: this.Utils.el("div", ['scroll-y-left-spacer']),
+            scrollYRightSpacer: this.Utils.el("div", ['scroll-y-right-spacer']),
+            scrollYCenterSpacer: this.Utils.el("div", ['scroll-y-center-spacer']),
+            scrollYCenterScrollPort: this.Utils.el("div", ['scroll-y-center-scroll-port']),
 
-            ghost: this.Utils.el("div", ["virtual-grid-ghost"]),
-            ghostLabel: this.Utils.el("span", ["virtual-grid-ghost-label"]),
+            ghost: this.Utils.el("div", ["ghost"]),
+            ghostLabel: this.Utils.el("span", ["ghost-label"]),
 
-            groupPanel: this.Utils.el("div", ["virtual-grid-group-panel"]),
-            groupPanelPlaceholder: this.Utils.el("span", ["virtual-grid-group-panel-placeholder"]),
-            groupPanelContent: this.Utils.el("div", ["virtual-grid-group-panel-content"]),
+            groupPanel: this.Utils.el("div", ["group-panel"]),
+            groupPanelPlaceholder: this.Utils.el("span", ["group-panel-placeholder"]),
+            groupPanelContent: this.Utils.el("div", ["group-panel-content"]),
 
         };
 
@@ -257,15 +257,15 @@ export class VirtualGridUIDomController {
                 cells: [],
                 left: {
                     cells: [],
-                    element: this.Utils.el("div", ["virtual-grid-row"])
+                    element: this.Utils.el("div", ["row"])
                 },
                 center: {
                     cells: [],
-                    element: this.Utils.el("div", ["virtual-grid-row"])
+                    element: this.Utils.el("div", ["row"])
                 },
                 right: {
                     cells: [],
-                    element: this.Utils.el("div", ["virtual-grid-row"])
+                    element: this.Utils.el("div", ["row"])
                 },
             };
 
@@ -475,8 +475,8 @@ export class VirtualGridUIDomController {
                 checkboxNode: null,
                 avatarNode: null,
                 avatarPlaceholder: null,
-                cellNode: this.Utils.el("div", ["virtual-grid-cell"]),
-                cellContentNode: this.Utils.el("div", ["virtual-grid-cell-content"]),
+                cellNode: this.Utils.el("div", ["cell"]),
+                cellContentNode: this.Utils.el("div", ["cell-content"]),
                 colId: col.id,
                 colModel: col,
                 field: col.field,
@@ -487,33 +487,33 @@ export class VirtualGridUIDomController {
             };
 
             if (col.isHierarchyColumn || col.isRowGroupColumn) {
-                cell.treeNode = this.Utils.el("i", ["virtual-grid-node-icon", "virtual-material-icons", "small"]);
+                cell.treeNode = this.Utils.el("i", ["node-icon", "virtual-material-icons", "small"]);
                 cell.treeNode.addEventListener("click", this.Grid.RowController.toggleNodeListener);
                 cell.cellNode.appendChild(cell.treeNode)
             }
 
             if (this.config.useCheckboxSelection && col.isCheckboxColumn) {
-                cell.checkboxNode = this.Utils.el("div", ["virtual-grid-checkbox"])
-                cell.checkboxIcon = this.Utils.el("i", ["virtual-grid-checkbox-icon", "virtual-material-icons", "small"]);
-                cell.cellNode.classList.add("virtual-grid-checkbox-node")
+                cell.checkboxNode = this.Utils.el("div", ["checkbox"])
+                cell.checkboxIcon = this.Utils.el("i", ["checkbox-icon", "virtual-material-icons", "small"]);
+                cell.cellNode.classList.add("checkbox-node")
                 cell.cellNode.appendChild(cell.checkboxNode)
                 cell.checkboxNode.appendChild(cell.checkboxIcon)
 
             } else if (col.isAvatarColumn) {
 
-                cell.avatarNode = this.Utils.el("div", ["virtual-grid-avatar-icon"]);
-                cell.avatarPlaceholder = this.Utils.el("span", ["virtual-grid-avatar-placeholder"]);
+                cell.avatarNode = this.Utils.el("div", ["avatar-icon"]);
+                cell.avatarPlaceholder = this.Utils.el("span", ["avatar-placeholder"]);
 
                 cell.avatarNode.appendChild(cell.avatarPlaceholder)
 
-                cell.cellNode.classList.add("virtual-grid-avatar-node")
+                cell.cellNode.classList.add("avatar-node")
                 cell.cellNode.appendChild(cell.avatarNode)
             } else if (col.isActionColumn) {
 
-                cell.cellNode.classList.add("virtual-grid-action-node")
+                cell.cellNode.classList.add("action-node")
 
                 for (let action of col.actions) {
-                    let actionTag = this.Utils.el("i", ["virtual-grid-action-icon", "virtual-material-icons"]);
+                    let actionTag = this.Utils.el("i", ["action-icon", "virtual-material-icons"]);
                     actionTag.innerHTML = action.icon
                     actionTag.style.color = action.color
 
@@ -527,13 +527,13 @@ export class VirtualGridUIDomController {
             } else {
 
                 if (col.colType == "boolean") {
-                    cell.cellNode.classList.add("virtual-grid-boolean-node")
+                    cell.cellNode.classList.add("boolean-node")
                 } else {
-                    cell.cellNode.classList.add("virtual-grid-text-node")
+                    cell.cellNode.classList.add("text-node")
                 }
 
                 for (let i = 0; i < col.lineCount; i++) {
-                    let textNode = this.Utils.el("span", ["virtual-grid-cell-text"]);
+                    let textNode = this.Utils.el("span", ["cell-text"]);
                     cell.textNodes.push(textNode)
                     cell.cellContentNode.appendChild(textNode);
                 }

@@ -432,7 +432,7 @@ export class VirtualGridRowController {
         }
 
         if (colType == "boolean") {
-            let cellNode = this.Grid.Utils.el("i", ["virtual-grid-action-icon", "virtual-material-icons"])
+            let cellNode = this.Grid.Utils.el("i", ["action-icon", "virtual-material-icons"])
 
             cell.textNodes[0].innerHTML = ""
             cell.textNodes[0].classList.add("boolean-node");
@@ -508,7 +508,7 @@ export class VirtualGridRowController {
         if (cell.cellStyleGetter != void 0 && typeof (cell.cellStyleGetter) == "function") {
             let styles = cell.cellStyleGetter(cell);
             if (typeof (styles) == "object") {
-                this.Grid.Utils.setStyles(cell.cellNode, styles);
+                this.domController.setStyles(cell.cellNode, styles);
             }
         }
     }

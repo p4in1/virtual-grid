@@ -1,6 +1,6 @@
 @import "vars";
 
-.virtual-grid-ghost {
+.ghost {
     position: absolute;
     display: flex;
     align-items: center;
@@ -31,35 +31,35 @@
     }
 
     &.range-selection {
-        .virtual-grid-row.hover {
+        .row.hover {
             background-color: transparent;
         }
 
-        .virtual-grid-cell.hover {
+        .cell.hover {
             background-color: $color-background-panel;
         }
 
-        .virtual-grid-cell.selected {
+        .cell.selected {
             background-color: $color-accent-extra-light;
         }
     }
 
     &.default-selection {
-        .virtual-grid-row.hover {
+        .row.hover {
             background-color: $color-background-panel;
         }
 
-        .virtual-grid-cell.hover {
+        .cell.hover {
             background-color: transparent;
         }
     }
 
     &.moving {
-        .virtual-grid-cell, .header-cell {
+        .cell, .header-cell {
             transition: transform 150ms;
         }
 
-        .virtual-grid-row.hover {
+        .row.hover {
             background-color: transparent;
         }
     }
@@ -68,20 +68,20 @@
         display: none !important;
     }
 
-    .virtual-grid-header-wrapper-scroll-port, .virtual-grid-body-wrapper-scroll-port {
+    .header-wrapper-scroll-port, .body-wrapper-scroll-port {
         overflow: hidden;
     }
 
-    .virtual-grid-scroll-y-center-scroll-port {
+    .scroll-y-center-scroll-port {
         overflow: hidden;
         overflow-x: scroll;
 
-        .virtual-grid-scroll-y-center-spacer {
+        .scroll-y-center-spacer {
             height: 8px;
         }
     }
 
-    .virtual-grid-header-right, .virtual-grid-body-right {
+    .header-right, .body-right {
         transition: box-shadow 150ms;
         z-index: 1;
 
@@ -90,7 +90,7 @@
         }
     }
 
-    .virtual-grid-header-left, .virtual-grid-body-left {
+    .header-left, .body-left {
         transition: box-shadow 0.15s linear;
         z-index: 1;
 
@@ -99,7 +99,7 @@
         }
     }
 
-    .virtual-grid-group-panel {
+    .group-panel {
         width: 100%;
         display: flex;
         align-items: center;
@@ -108,24 +108,24 @@
         min-height: 40px;
         border-bottom: 1px solid $color-background-panel;
 
-        .virtual-grid-group-panel-placeholder {
+        .group-panel-placeholder {
             font-size: $font-medium;
             color: rgba(0, 0, 0, .87);
             padding-left: $eob-pane-padding;
         }
 
-        .virtual-grid-group-panel-content {
+        .group-panel-content {
             display: flex;
             margin-left: $eob-pane-padding;
 
-            .virtual-grid-group-spacer {
+            .group-spacer {
                 display: inline-flex;
                 align-items: center;
                 margin: 0 $eob-pane-padding / 2;
                 opacity: 0.6;
             }
 
-            .virtual-grid-group {
+            .group {
                 background-color: rgba(0, 0, 0, .08);
                 padding: $eob-pane-padding / 4 $eob-pane-padding / 2;
                 border-radius: $font-small;
@@ -138,7 +138,7 @@
                     opacity: .6;
                 }
 
-                .virtual-grid-group-remove-button {
+                .group-remove-button {
                     margin-left: $eob-pane-padding / 2;
                     border-radius: $eob-pane-padding / 2;
                     display: inline-flex;
@@ -157,21 +157,21 @@
         }
     }
 
-    .virtual-grid-body-wrapper {
+    .body-wrapper {
         overflow: auto;
         display: flex;
 
-        .virtual-grid-body-left {
+        .body-left {
             border-right: 1px solid rgba(0, 0, 0, .1);
             box-sizing: border-box;
         }
 
-        .virtual-grid-body-right {
+        .body-right {
             border-left: 1px solid rgba(0, 0, 0, .1);
             box-sizing: border-box;
         }
 
-        .virtual-grid-body-left, .virtual-grid-body-center, .virtual-grid-body-right {
+        .body-left, .body-center, .body-right {
             overflow-x: hidden;
             overflow-y: auto;
             position: relative;
@@ -179,13 +179,13 @@
             left: 0;
 
             &.scrolling {
-                .virtual-grid-row {
+                .row {
                     background-color: transparent;
                 }
             }
 
             &:not(.scrolling) {
-                .virtual-grid-row {
+                .row {
                     box-sizing: border-box;
                     position: absolute;
                     left: 0;
@@ -195,7 +195,7 @@
                     border-bottom: 1px solid rgba(0, 0, 0, .1);
                     cursor: pointer;
 
-                    .virtual-grid-cell {
+                    .cell {
                         position: absolute;
                         height: 100%;
                         box-sizing: border-box;
@@ -204,13 +204,13 @@
                         white-space: nowrap;
                         color: rgba(0, 0, 0, .87);
 
-                        &.virtual-grid-text-node {
+                        &.text-node {
                             display: flex;
                             flex-direction: row;
                             align-items: center;
                             padding-left: $eob-pane-padding/2;
 
-                            .virtual-grid-node-icon {
+                            .node-icon {
                                 height: 26px;
                                 width: 26px;
                                 min-width: 26px;
@@ -220,23 +220,23 @@
                                 justify-content: center;
                             }
 
-                            .virtual-grid-expanded {
+                            .expanded {
                                 margin-left: 0;
                                 cursor: pointer;
                             }
 
-                            .virtual-grid-empty {
+                            .empty {
                                 background-image: none;
                                 float: left;
                                 flex-shrink: 0;
                             }
 
-                            .virtual-grid-cell-content {
+                            .cell-content {
                                 display: flex;
                                 flex-direction: column;
                                 overflow: hidden;
 
-                                .virtual-grid-cell-text {
+                                .cell-text {
 
                                     &:first-child {
                                         font-size: $font-big;
@@ -254,30 +254,30 @@
                             }
                         }
 
-                        &.virtual-grid-boolean-node {
+                        &.boolean-node {
                             display: flex;
                             align-items: center;
                             justify-content: center;
                         }
 
-                        &.virtual-grid-checkbox-node {
+                        &.checkbox-node {
                             display: flex;
                             align-items: center;
                             justify-content: center;
 
-                            .virtual-grid-checkbox {
+                            .checkbox {
                                 width: 16px;
                                 height: 16px;
                                 border: 1px solid rgba(0, 0, 0, .2);
                             }
                         }
 
-                        &.virtual-grid-avatar-node {
+                        &.avatar-node {
                             display: flex;
                             align-items: center;
                             justify-content: center;
 
-                            .virtual-grid-avatar-icon {
+                            .avatar-icon {
                                 height: 40px;
                                 width: 40px;
                                 color: white;
@@ -294,13 +294,13 @@
                             }
                         }
 
-                        &.virtual-grid-action-node {
+                        &.action-node {
                             display: flex;
                             flex-direction: row;
                             align-items: center;
                             justify-content: center;
 
-                            .virtual-grid-action-icon {
+                            .action-icon {
                                 cursor: pointer;
                                 padding: $eob-pane-padding/2;
                             }
@@ -310,7 +310,7 @@
                     &.not-selectable {
                         opacity: 0.7;
 
-                        .virtual-grid-checkbox {
+                        .checkbox {
                             opacity: 0.6;
                         }
                     }
@@ -323,12 +323,12 @@
         }
     }
 
-    .virtual-grid-header-wrapper {
+    .header-wrapper {
         width: 100%;
         display: flex;
         background-color: rgba(0, 0, 0, 0.08);
 
-        .virtual-grid-header-left-resizer {
+        .header-left-resizer {
             cursor: col-resize;
             position: absolute;
             height: 100%;
@@ -337,7 +337,7 @@
             z-index: 1;
         }
 
-        .virtual-grid-header-right-resizer {
+        .header-right-resizer {
             cursor: col-resize;
             position: absolute;
             height: 100%;
@@ -346,7 +346,7 @@
             z-index: 1;
         }
 
-        .virtual-grid-header-left, .virtual-grid-header-center, .virtual-grid-header-right {
+        .header-left, .header-center, .header-right {
             flex-shrink: 0;
             display: flex;
             position: relative;
@@ -447,7 +447,7 @@
         }
     }
 
-    .virtual-grid-scroll-y-guard {
+    .scroll-y-guard {
         min-height: 8px;
         width: 100%;
         background-color: rgba(0, 0, 0, 0.08);

@@ -49,7 +49,7 @@ export class VirtualGridDragAndDropController {
     }
 
     _removeGroup = (event): void => {
-        let groupElement: HTMLElement = event.target.closest(".virtual-grid-group")
+        let groupElement: HTMLElement = event.target.closest(".group")
         if (groupElement) {
             let colId = groupElement.getAttribute("col-id")
             let col = this.Grid.columns.find(x => x.id == colId)
@@ -59,12 +59,12 @@ export class VirtualGridDragAndDropController {
 
     onGroupPanelMouseEnter = (): void => {
         if (this.isColDragActive && !this.colDragData.col.isRowGrouped) {
-            let element = this.Grid.Utils.el("div", ["virtual-grid-group", "inactive"], {"col-id": this.colDragData.col.id})
+            let element = this.Grid.Utils.el("div", ["group", "inactive"], {"col-id": this.colDragData.col.id})
             let group: IVirtualColumnRowGroup = {
                 index: this.groups.length,
                 col: this.colDragData.col,
                 element,
-                removeButton: this.Grid.Utils.el("i", ["virtual-grid-group-remove-button", "virtual-material-icons", "small"]),
+                removeButton: this.Grid.Utils.el("i", ["group-remove-button", "virtual-material-icons", "small"]),
                 label: this.colDragData.col.title,
                 isActive: false
             }
@@ -186,7 +186,7 @@ export class VirtualGridDragAndDropController {
             this.dom.groupPanelContent.appendChild(this.groups[i].element)
 
             if (this.groups[i + 1] != void 0) {
-                let spacer = this.Grid.Utils.el("i", ["virtual-grid-group-spacer", "virtual-material-icons", "small"])
+                let spacer = this.Grid.Utils.el("i", ["group-spacer", "virtual-material-icons", "small"])
                 spacer.textContent = "trending_flat"
                 this.dom.groupPanelContent.appendChild(spacer)
             }

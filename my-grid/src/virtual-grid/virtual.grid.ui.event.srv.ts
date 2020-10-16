@@ -548,7 +548,7 @@ export class VirtualGridUIEventController {
      * @return {VirtualGridRow}
      */
     public getRowByEvent(event: any): IVirtualGridRow {
-        const rowElement: HTMLElement = event.target.closest(".virtual-grid-row");
+        const rowElement: HTMLElement = event.target.closest(".row");
         const index: any = rowElement.getAttribute("number");
         return this.Grid.rows[index];
     }

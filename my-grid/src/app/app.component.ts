@@ -1,5 +1,4 @@
 import {Component, OnInit, ViewEncapsulation} from '@angular/core';
-import {VirtualGrid} from "../virtual-grid/virtual.grid.service";
 
 @Component({
     selector: 'app-root',

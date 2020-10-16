@@ -113,14 +113,6 @@ export class VirtualGridUtils {
         return node;
     }
 
-    public setStyles(el: HTMLElement, styles: any) {
-        for (let i in styles) {
-            if (el.style[i] != void 0) {
-                el.style[i] = `${styles[i]}px`
-            }
-        }
-    }
-
     /**
      * flatten the recursive structure of the tree and transform it to a list
      * @param rows - recursive tree structure or just a plain list
