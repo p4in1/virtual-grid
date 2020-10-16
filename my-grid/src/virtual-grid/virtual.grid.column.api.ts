@@ -24,17 +24,27 @@ export class VirtualGridColumnApi implements IVirtualGridColumnApi {
         })
     }
 
+    /**
+     * showing a column that has nevver been seen starts with 200px in width
+     * otherwise we start with its width
+     */
     show = () => {
-        this._toggleVisibility(true, 200)
+        // set the width the column should now get
+        let width = this.col.width == void 0 ? 200 : this.col.width
+
+        // reset the width of the column to 0 to ensure the update function
+        // works properly
+        this.col.width = 0
+        this._toggleVisibility(true, width)
     }
 
     hide = () => {
-        this._toggleVisibility(false, -200)
+        this._toggleVisibility(false, -1 * this.col.width)
     }
 
     private _toggleVisibility(isVisible, width) {
         this.col.isVisible = isVisible
-        this.Grid.eventController.updateCellWidth(this.col.currentIndex, width)
+        this.Grid.eventController.updateCellWidth(this.col.currentIndex, width, true)
         this.Grid.eventController.updateGridWidth();
         this.Grid.domController.calculateScrollGuard()
     }

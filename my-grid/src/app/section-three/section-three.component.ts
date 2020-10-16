@@ -25,11 +25,11 @@ export class SectionThreeComponent implements OnInit, AfterViewInit {
 
             let items = []
 
-            // for (let i = 0; i < 100; i++) {
+            for (let i = 0; i < 33; i++) {
                 data.rows.forEach((item) => {
                     items.push(item)
                 })
-            // }
+            }
 
             let config: IVirtualGridConfig = {
                 rows: items,

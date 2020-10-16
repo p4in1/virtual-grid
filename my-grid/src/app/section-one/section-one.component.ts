@@ -21,12 +21,16 @@ export class SectionOneComponent implements OnInit {
                 rows: data.rows,
                 columns: data.columns,
                 element: this.grid.nativeElement,
+                showHeader: true,
                 selectionMethod: "range"
             }
 
             data.columns[0].pinned = "left"
             data.columns[1].pinned = "left"
             data.columns[1].type = "multiLine"
+
+            data.columns[2].pinned = "right"
+            data.columns[3].pinned = "right"
 
             this.gridInstance = new VirtualGrid(config)
         });

@@ -400,7 +400,6 @@ export class VirtualGridRowController {
             this._renderCustomStyles(cell)
             this._renderTreeNode(cell)
         }
-
     }
 
     private _renderContent(cell: IRenderedCell) {

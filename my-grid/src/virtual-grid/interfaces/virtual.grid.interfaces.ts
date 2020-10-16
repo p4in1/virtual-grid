@@ -456,6 +456,7 @@ export interface IRenderedCell {
     cellContentNode: HTMLElement
     avatarNode: HTMLElement
     avatarPlaceholder: HTMLElement
+
     colId: string
     field: string
     fieldPath: string[]

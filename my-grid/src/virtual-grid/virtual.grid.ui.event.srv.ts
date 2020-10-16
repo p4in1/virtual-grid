@@ -208,20 +208,17 @@ export class VirtualGridUIEventController {
 
         const _resize = (event: any): void => {
 
-            requestAnimationFrame(() => {
+            let diff: number = -(currentX - event.screenX);
 
-                let diff: number = -(currentX - event.screenX);
+            if (diff == 0) {
+                return;
+            }
 
-                if (diff == 0) {
-                    return;
-                }
+            currentX += diff
 
-                currentX += diff
-
-                this.updateCellWidth(col.currentIndex, diff)
-                this.updateGridWidth()
-                this.domController.calculateScrollGuard()
-            })
+            this.updateCellWidth(col.currentIndex, diff)
+            this.updateGridWidth()
+            this.domController.calculateScrollGuard()
         }
 
         const _unbind = (): void => {
@@ -260,8 +257,9 @@ export class VirtualGridUIEventController {
      * the calculation starts periodically every 16ms caused by the use of a requestAnimationFrame
      * @param {number} start - the index to start calculating from
      * @param {number} diff - the difference in width for the given column from the start parameter
+     * @param {boolean} isVisibilityChange - indicates that the visibility of a column has changed
      */
-    public updateCellWidth: (start?: number, diff?: number) => void = (start?: number, diff?: number): void => {
+    public updateCellWidth = (start?: number, diff?: number, isVisibilityChange?: boolean): void => {
 
         let startColumn = this.Grid.columns[start];
         let nextColumn = this.Grid.columns[start + 1]
@@ -272,17 +270,27 @@ export class VirtualGridUIEventController {
         let autosizableCols: IVirtualGridColumn[];
         let diffPerColumn: number
 
-        if (diff < 0 && startColumn.isVisible && startColumn.width + diff <= startColumn.minWidth && !isRightPinResizing) {
-            diff = 0
-        }
-
         let centerColumns = this.Grid.columns.filter(x => x.pinned == "center")
+
+        // correct the difference in case the resizable column is at its minimum
+        // we need to do this because this is just a workaround for a much bigger problem when
+        // you want to resize smaller than you can
+        if (diff < 0 && !isRightPinResizing) {
+            if (isVisibilityChange != true && startColumn.width + diff <= startColumn.minWidth) {
+                diff = 0
+            }
+        } else if (diff > 0 && isRightPinResizing) {
+            if (isVisibilityChange != true && nextColumn.width - diff <= nextColumn.minWidth) {
+                diff = 0
+            }
+        }
 
         if (start != void 0) {
             let startCol = isRightPinResizing ? [nextColumn] : [startColumn]
             let startDiff = isRightPinResizing ? -1 * diff : diff
             let colDiff = isRightPinResizing ? diff : -1 * diff
             let isGrowing = isRightPinResizing ? diff > 0 : diff < 0
+
 
             let columns = isRightPinResizing || isLeftPinResizing ? centerColumns : centerColumns.filter(x => x.currentIndex > start)
 
@@ -357,12 +365,8 @@ export class VirtualGridUIEventController {
     private _adjustCellWidth(columns: IVirtualGridColumn[], diffPerColumn: number) {
         for (let currentColumn of columns) {
 
-            let width: number;
-
-            if (!currentColumn.isVisible) {
-                currentColumn.width = 0;
-            } else if (currentColumn.isAutoResize && !currentColumn.isSuppressResize) {
-                width = currentColumn.width + diffPerColumn;
+            if (currentColumn.isVisible && currentColumn.isAutoResize && !currentColumn.isSuppressResize) {
+                let width: number = currentColumn.width + diffPerColumn;
 
                 if (width <= currentColumn.minWidth) {
                     width = currentColumn.minWidth;
@@ -374,12 +378,14 @@ export class VirtualGridUIEventController {
                 currentColumn.width = width;
             }
 
-            this.domController.setStyles(currentColumn.dom.cell, {"width": `${Math.floor(currentColumn.width)}px`})
+            let _width = currentColumn.isVisible ? currentColumn.width : 0
+
+            this.domController.setStyles(currentColumn.dom.cell, {"width": `${Math.floor(_width)}px`})
 
             for (const row of this.domController.renderedRows) {
                 let styles = {}
                 let cell = row.cells[currentColumn.currentIndex].cellNode
-                styles["width"] = `${Math.floor(currentColumn.width)}px`
+                styles["width"] = `${Math.floor(_width)}px`
 
                 if (currentColumn.isHierarchyColumn && this.Grid.rows[row.index] != void 0) {
                     styles["padding-left"] = `${this.Grid.rows[row.index].level * 16}px`
@@ -398,6 +404,7 @@ export class VirtualGridUIEventController {
 
         let left = 0;
         let side = "left"
+
         for (let i = 0; i < this.Grid.columns.length; i++) {
             let currentColumn = this.Grid.columns[i]
 
@@ -408,7 +415,9 @@ export class VirtualGridUIEventController {
 
             currentColumn.left = left;
 
-            left += currentColumn.width
+            if (currentColumn.isVisible) {
+                left += currentColumn.width
+            }
 
             this.domController.setStyles(currentColumn.dom.cell, {"transform": `translateX(${Math.floor(currentColumn.left)}px)`})
 
@@ -560,6 +569,6 @@ export class VirtualGridUIEventController {
      * @returns {Array} - an array
      */
     private getAutoSizableColumns(colsToBeResized: IVirtualGridColumn[], isGrowing: boolean): IVirtualGridColumn[] {
-        return colsToBeResized.filter((col) => col.pinned === "center" && ((!isGrowing && col.isAutoResize && col.canShrink) || (isGrowing && col.isAutoResize)))
+        return colsToBeResized.filter((col) => col.isVisible && col.pinned === "center" && ((!isGrowing && col.isAutoResize && col.canShrink) || (isGrowing && col.isAutoResize)))
     }
 }

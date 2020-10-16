@@ -371,6 +371,11 @@ export class VirtualGridColumnController {
         // this is needed because the tree column will grow with each increase in depth by 16px
         // this has to be added onto the column size
         for (const col of this.Grid.originalColumns) {
+
+            if (!col.isVisible) {
+                continue
+            }
+
             if (col.width !== void 0) {
                 availableWidth -= col.width
             } else {
@@ -382,6 +387,11 @@ export class VirtualGridColumnController {
             // there are columns without a defined width so we even the available space out down to the minimum of 40px
             for (let i = 0; i < this.Grid.originalColumns.length; i++) {
                 let col = this.Grid.originalColumns[i];
+
+                if (!col.isVisible) {
+                    continue
+                }
+
                 if (col.width === void 0) {
                     const width: number = Math.floor((availableWidth) / upsizedColumns);
 

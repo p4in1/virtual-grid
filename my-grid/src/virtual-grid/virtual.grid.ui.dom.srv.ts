@@ -314,21 +314,19 @@ export class VirtualGridUIDomController {
         let scrollPortWidth = this.bodyWrapperWidth - (widths.right + widths.left + scrollbarWidth)
         let scrollPortTolerance = 8;
 
-        this.Utils.setStyles(this.dom.scrollYLeftSpacer, {"width": widths.left});
-        this.Utils.setStyles(this.dom.scrollYCenterScrollPort, {"width": scrollPortWidth});
-        this.Utils.setStyles(this.dom.scrollYRightSpacer, {"width": widths.right});
-        this.Utils.setStyles(this.dom.scrollYCenterSpacer, {"width": widths.center})
+        this.setStyles(this.dom.scrollYLeftSpacer, {"width": `${widths.left}px`})
+        this.setStyles(this.dom.scrollYCenterScrollPort, {"width": `${scrollPortWidth}px`})
+        this.setStyles(this.dom.scrollYRightSpacer, {"width": `${widths.right}px`})
+        this.setStyles(this.dom.scrollYCenterSpacer, {"width": `${widths.center}px`})
 
         // we use a tolerance to not show the scrollbar in case it it less than 4 pixel bigger
         // this ensures that calculation do not trigger the scrollbar to show when we are off by a few pixel
         if (widths.center - scrollPortTolerance > scrollPortWidth) {
             this.isHorizontalScrolling = true;
-
-            this.Utils.setStyles(this.dom.scrollYGuard, {"height": 8, "min-height": 8, "max-height": 8})
+            this.setStyles(this.dom.scrollYGuard, {"height": "8px", "min-height": "8px", "max-height": "8px"})
         } else {
             this.isHorizontalScrolling = false;
-
-            this.Utils.setStyles(this.dom.scrollYGuard, {"height": 0, "min-height": 0, "max-height": 0})
+            this.setStyles(this.dom.scrollYGuard, {"height": "0px", "min-height": "0px", "max-height": "0px"})
         }
 
         this.scrollPortWidth = scrollPortWidth
@@ -367,9 +365,22 @@ export class VirtualGridUIDomController {
         let right = 0
 
         for (const col of this.Grid.originalColumns) {
-            col.pinned === "left" ? left += col.width : null
-            col.pinned === "center" ? center += col.width : null
-            col.pinned === "right" ? right += col.width : null
+
+            if (col.width == void 0 || !col.isVisible) {
+                continue
+            }
+
+            if (col.pinned === "left") {
+                left += col.width
+            }
+
+            if (col.pinned === "center") {
+                center += col.width
+            }
+
+            if (col.pinned === "right") {
+                right += col.width
+            }
         }
 
         return {left, center, right}

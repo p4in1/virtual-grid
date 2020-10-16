@@ -135,17 +135,17 @@ export class VirtualGridDragAndDropController {
 
         for (let key of keys) {
             let rowNode: any = {isRowGroup: true}
-
+            let childKey = this.Grid.ConfigController.childNodesKey
             rowNode.value = key
-            rowNode[this.Grid.ConfigController.childNodesKey] = []
+            rowNode[childKey] = []
 
             rows.push(rowNode)
 
             if (Object.keys(treePart[key].rowGroups).length > 0) {
-                rowNode[this.Grid.ConfigController.childNodesKey] = this._createGroupRows(treePart[key].rowGroups)
+                rowNode[childKey] = this._createGroupRows(treePart[key].rowGroups)
             } else {
                 for (let _row of treePart[key].children) {
-                    rowNode[this.Grid.ConfigController.childNodesKey].push(_row.rowData)
+                    rowNode[childKey].push(_row.rowData)
                 }
             }
         }
