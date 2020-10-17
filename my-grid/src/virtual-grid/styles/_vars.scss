@@ -56,7 +56,7 @@ $color-rock-blue: desaturate($color-accent-light, 40%);
 $color-accent-desaturate: desaturate($color-accent-light, 80%);
 $form-button-color: rgba($color-accent-desaturate, .6);
 //selection color in client
-$color-accent-medium-light:rgba($color-accent-light, .30);
+$color-accent-medium-light: rgba($color-accent-light, .30);
 $color-accent-extra-light: rgba($color-accent-light, .15);
 // ... some more color defs
 $color-accent-gray: darken($color-background-panel, 3%);
@@ -96,7 +96,7 @@ $color-border-nav: $color-nav-elements;
 
 /* FONT */
 // font sizes
-$font-small: 12px;
+$font-small: 12.5px;
 $font-medium: 14px;
 $font-big: 16px;
 

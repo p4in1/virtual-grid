@@ -48,6 +48,34 @@ export class VirtualGridDragAndDropController {
         this.dom = this.domController.dom
     }
 
+    _addGroup(col, isActive = false) {
+        let classes = isActive ? ["group"] : ["group", "inactive"]
+        let element = this.Grid.Utils.el("div", classes, {"col-id": col.id})
+
+        let group: IVirtualColumnRowGroup = {
+            col,
+            element,
+            removeButton: this.Grid.Utils.el("i", ["group-remove-button", "virtual-material-icons", "small"]),
+            label: col.title,
+            isActive: isActive
+        }
+
+        element.textContent = group.label
+        element.appendChild(group.removeButton)
+
+        group.removeButton.addEventListener("click", this._removeGroup)
+        group.removeButton.textContent = "clear"
+
+        this.groups.push(group)
+
+        col.isRowGrouped = true
+        col.rowGroup = group
+
+        this.createGroupElements()
+
+        return group
+    }
+
     _removeGroup = (event): void => {
         let groupElement: HTMLElement = event.target.closest(".group")
         if (groupElement) {
@@ -59,28 +87,7 @@ export class VirtualGridDragAndDropController {
 
     onGroupPanelMouseEnter = (): void => {
         if (this.isColDragActive && !this.colDragData.col.isRowGrouped) {
-            let element = this.Grid.Utils.el("div", ["group", "inactive"], {"col-id": this.colDragData.col.id})
-            let group: IVirtualColumnRowGroup = {
-                index: this.groups.length,
-                col: this.colDragData.col,
-                element,
-                removeButton: this.Grid.Utils.el("i", ["group-remove-button", "virtual-material-icons", "small"]),
-                label: this.colDragData.col.title,
-                isActive: false
-            }
-
-            element.textContent = group.label
-            element.appendChild(group.removeButton)
-
-            group.removeButton.addEventListener("click", this._removeGroup)
-            group.removeButton.textContent = "clear"
-
-            this.groups.push(group)
-
-            this.colDragData.col.isRowGrouped = true
-            this.colDragData.col.rowGroup = group
-
-            this.createGroupElements()
+            this._addGroup(this.colDragData.col)
         }
     }
 

@@ -267,8 +267,6 @@ export class VirtualGridUIEventController {
         let isLeftPinResizing = start != void 0 && startColumn.pinned === "left"
         let isRightPinResizing = start != void 0 && nextColumn.pinned === "right"
 
-        let autosizableCols: IVirtualGridColumn[];
-        let diffPerColumn: number
 
         let centerColumns = this.Grid.columns.filter(x => x.pinned == "center")
 
@@ -290,19 +288,14 @@ export class VirtualGridUIEventController {
             let startDiff = isRightPinResizing ? -1 * diff : diff
             let colDiff = isRightPinResizing ? diff : -1 * diff
             let isGrowing = isRightPinResizing ? diff > 0 : diff < 0
-
-
             let columns = isRightPinResizing || isLeftPinResizing ? centerColumns : centerColumns.filter(x => x.currentIndex > start)
+            let widths = this.domController.calculatePartialWidths()
+            let diffToClose = this.domController.isHorizontalScrolling ? widths.center - this.domController.scrollPortWidth : 0
+            let autosizableCols: IVirtualGridColumn[] = this.getAutoSizableColumns(columns, isGrowing);
+            let diffPerColumn: number = autosizableCols.length > 0 ? (colDiff - diffToClose) / autosizableCols.length : 0
 
             this.adjustCell(startCol, startDiff);
-
-            if (!this.domController.isHorizontalScrolling) {
-
-                autosizableCols = this.getAutoSizableColumns(columns, isGrowing);
-                diffPerColumn = autosizableCols.length > 0 ? colDiff / autosizableCols.length : 0
-
-                this.adjustCell(autosizableCols, diffPerColumn);
-            }
+            this.adjustCell(autosizableCols, diffPerColumn);
 
         } else {
             let isVerticalScrolling: boolean = this.Grid.ColumnController.isVerticalScrolling;
@@ -312,8 +305,9 @@ export class VirtualGridUIEventController {
             let remaining = this.domController.bodyWrapperWidth - width.left - width.right - scrollbarWidth
 
             diff = width.center - remaining
-            autosizableCols = this.getAutoSizableColumns(centerColumns, diff < 0);
-            diffPerColumn = autosizableCols.length > 0 ? diff / autosizableCols.length : 0
+
+            let autosizableCols: IVirtualGridColumn[] = this.getAutoSizableColumns(centerColumns, diff < 0);
+            let diffPerColumn: number = autosizableCols.length > 0 ? diff / autosizableCols.length : 0
 
             this.adjustCell(autosizableCols, -1 * diffPerColumn);
         }

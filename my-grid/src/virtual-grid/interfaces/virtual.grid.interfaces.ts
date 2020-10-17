@@ -359,6 +359,11 @@ export interface IVirtualGridColumnApi {
     move(index: number): void
 
     /**
+     * creates row groups with this column
+     */
+    setRowGroup(): void
+
+    /**
      * removes the grouping of this column
      */
     removeRowGroup(): void
@@ -534,7 +539,7 @@ export interface IVirtualCellDom {
     cellContent: HTMLElement
     cellTextContainer: HTMLElement
     cellFilterContainer: HTMLElement
-    cellFilterAdvancedButton:HTMLElement
+    cellFilterAdvancedButton: HTMLElement
 }
 
 export interface IVirtualColumnFilter {
@@ -549,7 +554,6 @@ export interface IVirtualColumnAction {
 }
 
 export interface IVirtualColumnRowGroup {
-    index: number
     label: string
     element: HTMLElement
     removeButton: HTMLElement

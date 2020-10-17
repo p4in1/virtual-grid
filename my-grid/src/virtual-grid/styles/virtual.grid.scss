@@ -237,13 +237,6 @@
                                 overflow: hidden;
 
                                 .cell-text {
-
-                                    &:first-child {
-                                        font-size: $font-big;
-                                        position: relative;
-                                        top: 1px;
-                                    }
-
                                     overflow: hidden;
                                     text-overflow: ellipsis;
                                     white-space: nowrap;

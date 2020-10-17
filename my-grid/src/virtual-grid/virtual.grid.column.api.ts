@@ -6,18 +6,29 @@ export class VirtualGridColumnApi implements IVirtualGridColumnApi {
 
     }
 
+    /**
+     * pins the column at the given area
+     * @param area
+     */
     pin = (area: string = "center") => {
         this._addMovingClass(() => {
             this.Grid.DnDController.pinColumn(this.col, area)
         })
     }
 
+    /**
+     * unpins the column
+     */
     unpin = () => {
         this._addMovingClass(() => {
             this.Grid.DnDController.pinColumn(this.col, "center")
         })
     }
 
+    /**
+     * moves the column to the given index
+     * @param index
+     */
     move = (index) => {
         this._addMovingClass(() => {
             this.Grid.DnDController.moveColumn(this.col.currentIndex, index)
@@ -30,7 +41,7 @@ export class VirtualGridColumnApi implements IVirtualGridColumnApi {
      */
     show = () => {
         // set the width the column should now get
-        let width = this.col.width == void 0 ? 200 : this.col.width
+        let width = !this.col.width ? 200 : this.col.width
 
         // reset the width of the column to 0 to ensure the update function
         // works properly
@@ -38,15 +49,19 @@ export class VirtualGridColumnApi implements IVirtualGridColumnApi {
         this._toggleVisibility(true, width)
     }
 
+    /**
+     * hides the column
+     */
     hide = () => {
         this._toggleVisibility(false, -1 * this.col.width)
     }
 
-    private _toggleVisibility(isVisible, width) {
-        this.col.isVisible = isVisible
-        this.Grid.eventController.updateCellWidth(this.col.currentIndex, width, true)
-        this.Grid.eventController.updateGridWidth();
-        this.Grid.domController.calculateScrollGuard()
+    setRowGroup = () => {
+        if (!this.col.isRowGrouped) {
+            this.Grid.DnDController._addGroup(this.col, true)
+            this.Grid.DnDController.applyGrouping()
+        }
+
     }
 
     removeRowGroup = () => {
@@ -55,15 +70,23 @@ export class VirtualGridColumnApi implements IVirtualGridColumnApi {
                 let group = this.Grid.DnDController.groups[i]
                 if (group.col.id == this.col.id) {
                     this.Grid.DnDController.groups.splice(i, 1)
+                    this.col.isRowGrouped = false
+                    this.Grid.DnDController.createGroupElements()
+
+                    if (group.isActive) {
+                        this.Grid.DnDController.applyGrouping()
+                    }
                     break;
                 }
             }
-
-            this.col.isRowGrouped = false
-
-            this.Grid.DnDController.createGroupElements()
-            this.Grid.DnDController.applyGrouping()
         }
+    }
+
+    private _toggleVisibility(isVisible, width) {
+        this.col.isVisible = isVisible
+        this.Grid.eventController.updateCellWidth(this.col.currentIndex, width, true)
+        this.Grid.eventController.updateGridWidth();
+        this.Grid.domController.calculateScrollGuard()
     }
 
     private _addMovingClass(func) {
