@@ -14,18 +14,14 @@ import {VirtualGridUIDomController} from "./virtual.grid.ui.dom.srv";
  */
 export class VirtualGridColumnController {
     public isVerticalScrolling: boolean = false;
-    public scrollbarWidth: number = 17;
+    public scrollbarWidth: number = this.getScrollbarWidth();
 
     private sortConfig: any = {};
     private gPadding: number = 16;
 
-    public sortedColumns: IVirtualGridColumn[];
+    public sortedColumns: IVirtualGridColumn[] = [];
 
     constructor(protected Grid: IVirtualGrid, private config: VirtualGridConfigController, private domController: VirtualGridUIDomController) {
-
-        this.sortedColumns = [];
-
-        this.scrollbarWidth = this.getScrollbarWidth()
     }
 
     setCurrentColumnIndex() {
@@ -300,7 +296,6 @@ export class VirtualGridColumnController {
             }
         }
     }
-
 
     /**
      * creates column models ... *duh*

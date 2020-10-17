@@ -211,6 +211,7 @@ export interface IVirtualGridColumnConfig {
     suppressDragging?: boolean
     suppressPinning?: boolean
 
+    isRowGrouped?: boolean
     pinned?: string
     avatarConfig?: IVirtualAvatar
     actions?: IVirtualColumnAction[]
@@ -414,7 +415,7 @@ export interface IVirtualGridColumn {
     isAutoResize?: boolean
 
     isPinned: boolean
-    isGrouped: boolean
+    isColGrouped: boolean
     isRowGrouped: boolean
 
     isIconColumn?: boolean
@@ -604,6 +605,7 @@ export interface IVirtualColDefConfig {
     isShowFilter: boolean
     isPinned: boolean
     isVisible: boolean
+    isRowGrouped: boolean
 
     pinned: string
 

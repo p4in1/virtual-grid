@@ -329,6 +329,7 @@ export class VirtualGridApi {
     public setGridContent() {
         this.Grid.domController.resetRenderedRows();
         this.Grid.RowController.buildRows();
+
         this.refreshGrid(true);
     }
 

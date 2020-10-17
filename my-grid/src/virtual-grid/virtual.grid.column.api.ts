@@ -57,11 +57,11 @@ export class VirtualGridColumnApi implements IVirtualGridColumnApi {
     }
 
     setRowGroup = () => {
-        if (!this.col.isRowGrouped) {
+        let rowGroup = this.Grid.DnDController.groups.find(x => x.col.id == this.col.id)
+        if (!this.col.isRowGrouped || !rowGroup) {
             this.Grid.DnDController._addGroup(this.col, true)
             this.Grid.DnDController.applyGrouping()
         }
-
     }
 
     removeRowGroup = () => {

@@ -28,7 +28,7 @@ export class VirtualGridColumn implements IVirtualGridColumn {
     rowGroup: IVirtualColumnRowGroup
 
     isRowGrouped: boolean = false
-    isGrouped: boolean = false
+    isColGrouped: boolean = false
     isPinned: boolean = false;
 
     isFilterPresent: boolean = false;
@@ -110,7 +110,6 @@ export class VirtualGridColumn implements IVirtualGridColumn {
             content: []
         }
 
-
         this.colDef = colDef;
 
         this.cellRenderer = typeof (configColDef.cellRenderer) == "function" ? configColDef.cellRenderer : null;
@@ -141,6 +140,7 @@ export class VirtualGridColumn implements IVirtualGridColumn {
         this.pinned = configColDef.pinned;
         this.isPinned = configColDef.isPinned;
         this.isVisible = configColDef.isVisible
+        this.isRowGrouped = configColDef.isRowGrouped
 
         this.isShowFilter = configColDef.isShowFilter;
         this.isAutoResize = !configColDef.isSuppressResize;

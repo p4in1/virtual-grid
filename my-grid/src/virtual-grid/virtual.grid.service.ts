@@ -58,6 +58,7 @@ export class VirtualGrid implements IVirtualGrid {
         this.domController = new VirtualGridUIDomController(this, this.ConfigController);
         this.eventController = new VirtualGridUIEventController(this, this.ConfigController, this.domController);
 
+
         log.push(`dom + event controller --> ${+new Date() - s}`)
         s = +new Date()
 
@@ -103,6 +104,7 @@ export class VirtualGrid implements IVirtualGrid {
                 this.domController.calculateScrollGuard()
                 this.eventController.adjustCell(this.originalColumns, 0)
                 this.eventController.bindGlobalOnResize()
+                this.DnDController.setColGroups()
             });
 
             this.api.setGridContent();

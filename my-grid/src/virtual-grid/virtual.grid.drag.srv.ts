@@ -48,6 +48,14 @@ export class VirtualGridDragAndDropController {
         this.dom = this.domController.dom
     }
 
+    setColGroups() {
+        for (let col of this.Grid.columns) {
+            if (col.isRowGrouped) {
+                col.api.setRowGroup()
+            }
+        }
+    }
+
     _addGroup(col, isActive = false) {
         let classes = isActive ? ["group"] : ["group", "inactive"]
         let element = this.Grid.Utils.el("div", classes, {"col-id": col.id})

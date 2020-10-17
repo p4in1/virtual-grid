@@ -128,6 +128,7 @@ export class VirtualGridConfigController {
                 isHierarchyColumn: col.isHierarchyColumn,
                 isSystemColumn: col.isSystemColumn,
 
+                isRowGrouped: col.isRowGrouped,
                 isAutosize: !col.suppressResize,
                 isVisible: col.isVisible == void 0 ? true : col.isVisible,
 

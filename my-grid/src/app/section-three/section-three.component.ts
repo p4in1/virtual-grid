@@ -46,7 +46,8 @@ export class SectionThreeComponent implements OnInit, AfterViewInit {
                     {
                         field: "data.user.userFirstName",
                         title: "Vorname",
-                        type: "text"
+                        type: "text",
+                        isRowGrouped: true
                     },
                     {
                         field: "data.user.userLastName",
