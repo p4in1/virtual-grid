@@ -405,6 +405,7 @@ export class VirtualGridUIDomController {
 
         dom.cellResizer = this.Utils.el("div", ["header-cell-resizer"]);
         dom.cellFilter = this.Utils.el("input", ["header-filter-input"]) as HTMLInputElement
+        dom.cellFilterAdvancedButton = this.Utils.el("i", ["header-filter-advanced-button", "virtual-material-icons", "small"])
 
         dom.cellTrueFilter = this.Utils.el("div", ["header-filter-bool-button"]) as HTMLDivElement
         dom.cellFalseFilter = this.Utils.el("div", ["header-filter-bool-button"]) as HTMLDivElement
@@ -436,6 +437,9 @@ export class VirtualGridUIDomController {
                 dom.cellFilterContainer.classList.add("bool-filter-container")
             } else {
                 dom.cellFilterContainer.appendChild(dom.cellFilter)
+                dom.cellFilterContainer.appendChild(dom.cellFilterAdvancedButton)
+
+                dom.cellFilterAdvancedButton.textContent = "filter_list"
             }
 
             dom.cellContent.appendChild(dom.cellFilterContainer)

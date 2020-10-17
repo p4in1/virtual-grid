@@ -373,6 +373,7 @@ export class VirtualGridColumnController {
         for (const col of this.Grid.originalColumns) {
 
             if (!col.isVisible) {
+                col.width = col.width == void 0 ? 0 : col.width
                 continue
             }
 

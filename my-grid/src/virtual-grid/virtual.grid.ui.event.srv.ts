@@ -475,7 +475,7 @@ export class VirtualGridUIEventController {
 
             const headerCell: HTMLElement = column.dom.cellTextContainer;
             const filterField: HTMLInputElement = column.dom.cellFilter
-
+            const filterAdvanced: HTMLElement = column.dom.cellFilterAdvancedButton
 
             headerCell.addEventListener("click", (event: any) => {
                 if (!column.isSuppressSort) {
@@ -502,6 +502,10 @@ export class VirtualGridUIEventController {
                 } else {
                     filterField.addEventListener("input", () => {
                         this.Grid.FilterController.setTextFilter(column, filterField.value)
+                    })
+
+                    filterAdvanced.addEventListener("click", (event) => {
+                        this.Grid.FilterController.showAdvancedFilter(event, column)
                     })
                 }
             }

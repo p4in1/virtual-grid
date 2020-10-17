@@ -379,6 +379,7 @@ export interface IVirtualGridColumn {
         cellText: HTMLElement
         cellResizer: HTMLElement
         cellFilter: HTMLInputElement
+        cellFilterAdvancedButton: HTMLElement
         cellTrueFilter: HTMLDivElement;
         cellFalseFilter: HTMLDivElement;
         cellSortArrow: HTMLElement
@@ -533,6 +534,7 @@ export interface IVirtualCellDom {
     cellContent: HTMLElement
     cellTextContainer: HTMLElement
     cellFilterContainer: HTMLElement
+    cellFilterAdvancedButton:HTMLElement
 }
 
 export interface IVirtualColumnFilter {

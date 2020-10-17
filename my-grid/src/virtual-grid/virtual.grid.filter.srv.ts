@@ -41,6 +41,10 @@ export class VirtualGridFilterController {
         this.Grid.api.setFilter()
     }
 
+    showAdvancedFilter = (event, column): void => {
+
+    }
+
     setBoolFilter = (col: IVirtualGridColumn, value: boolean): void => {
         let currentValue = col.filter.value
         let filter = value === true ? col.dom.cellTrueFilter : col.dom.cellFalseFilter

@@ -91,7 +91,14 @@ export class VirtualGridDragAndDropController {
     }
 
     onGroupPanelMouseUp = (): void => {
-        if (this.isColDragActive) {
+        if (this.isColDragActive && this.colDragData.col.rowGroup != void 0) {
+
+            let group = this.groups.find(x => x.col.id == this.colDragData.col.id)
+
+            if (group.isActive) {
+                return
+            }
+
             this.colDragData.col.rowGroup.element.classList.remove("inactive")
             this.colDragData.col.rowGroup.isActive = true
             this.applyGrouping()
@@ -115,9 +122,11 @@ export class VirtualGridDragAndDropController {
 
             rows = this._createGroupRows(groupTree)
 
-        } else {
+        } else if (groupColumn.isVisible) {
             groupColumn.api.hide()
             rows = this.Grid.ConfigController.originalRows
+        } else {
+            return;
         }
 
         console.log("grouping took --> ", +new Date - s)
@@ -262,6 +271,10 @@ export class VirtualGridDragAndDropController {
         let left = 0;
 
         for (let _col of this.Grid.columns) {
+            if (!_col.isVisible) {
+                continue
+            }
+
             let right = _col.width + left
             let middle = right - (_col.width / 2)
             let isSameColumn = data.col.id == _col.id
@@ -333,6 +346,7 @@ export class VirtualGridDragAndDropController {
      * @param dragData - drag data
      */
     private onColDrag = (event, dragData: IVirtualDragData): void => {
+
         if (!this.isColDragActive && (Math.abs(dragData.x - event.clientX) > 8 || Math.abs(dragData.y - event.clientY) > 8)) {
             this.isColDragActive = true;
             this.dom.virtualGrid.classList.add("moving")
@@ -355,7 +369,6 @@ export class VirtualGridDragAndDropController {
             })
 
             let isOutOfBounds = top + this.ghostHeight < dragData.rect.top;
-
             if (!isOutOfBounds) {
 
                 this.currentCursorX = event.clientX - dragData.offset
@@ -478,6 +491,10 @@ export class VirtualGridDragAndDropController {
         let left = 0;
 
         for (let col of this.Grid.columns) {
+            if (!col.isVisible) {
+                continue
+            }
+
             if (col.id == column.id) {
                 break;
             }

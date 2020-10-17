@@ -10,7 +10,6 @@ import {
 } from "./interfaces/virtual.grid.interfaces";
 
 import {VirtualGridColumnApi} from "./virtual.grid.column.api";
-import {config} from "rxjs";
 
 export class VirtualGridColumn implements IVirtualGridColumn {
 
@@ -43,7 +42,7 @@ export class VirtualGridColumn implements IVirtualGridColumn {
     isActionColumn: boolean = false;
     isAvatarColumn: boolean = false;
     isSystemColumn: boolean = false;
-    isRowGroupColumn:boolean = false;
+    isRowGroupColumn: boolean = false;
 
     canShrink: boolean = false;
 
@@ -83,7 +82,8 @@ export class VirtualGridColumn implements IVirtualGridColumn {
         cellSortArrow: null,
         cellContent: null,
         cellTextContainer: null,
-        cellFilterContainer: null
+        cellFilterContainer: null,
+        cellFilterAdvancedButton: null
     };
 
     filter: IVirtualColumnFilter
