@@ -1,5 +1,5 @@
-<div class="section-container">
-    <app-section-one></app-section-one>
-    <app-section-two></app-section-two>
-    <app-section-three></app-section-three>
+<div class="section-container" *ngIf="isReady">
+    <app-section-one [data]="data"></app-section-one>
+    <app-section-two [data]="data"></app-section-two>
+    <app-section-three [data]="data"></app-section-three>
 </div>

@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewEncapsulation} from '@angular/core';
+import {Component, ViewEncapsulation} from '@angular/core';
 
 @Component({
     selector: 'app-root',
@@ -8,4 +8,12 @@ import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 })
 export class AppComponent {
     title = 'my-grid';
+    data
+    isReady
+    constructor() {
+        fetch('assets/data.json').then(response => response.json()).then((data) => {
+            this.data = data
+            this.isReady = true
+        });
+    }
 }

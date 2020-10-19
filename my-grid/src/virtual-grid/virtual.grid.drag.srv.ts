@@ -43,9 +43,19 @@ export class VirtualGridDragAndDropController {
 
     groups: IVirtualColumnRowGroup[] = []
 
+    groupingDebounce
+
     constructor(private Grid: IVirtualGrid) {
         this.domController = this.Grid.domController
         this.dom = this.domController.dom
+    }
+
+    clearGrouping() {
+        for (let col of this.Grid.columns) {
+            if (col.isRowGrouped) {
+                col.api.removeRowGroup()
+            }
+        }
     }
 
     setColGroups() {
@@ -110,7 +120,7 @@ export class VirtualGridDragAndDropController {
 
             let group = this.groups.find(x => x.col.id == this.colDragData.col.id)
 
-            if (group.isActive) {
+            if (!group || group.isActive) {
                 return
             }
 
@@ -121,6 +131,7 @@ export class VirtualGridDragAndDropController {
     }
 
     applyGrouping() {
+
         let s = +new Date()
         let rows
         let groupColumn = this.Grid.columns.find(x => x.isRowGroupColumn)

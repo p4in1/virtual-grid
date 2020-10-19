@@ -194,8 +194,8 @@ export class VirtualGridColumnController {
     public applySorting(): void {
         let s = +new Date()
 
-        let isHierarchy = this.Grid.columns.filter(x => x.isHierarchyColumn).length > 0
-        if (isHierarchy) {
+        let hieararchyColumn = this.Grid.columns.find(x => x.isHierarchyColumn)
+        if (hieararchyColumn && hieararchyColumn.isVisible) {
             let roots: IVirtualGridRow[] = [];
 
             for (let row of this.Grid.rows) {

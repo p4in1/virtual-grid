@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, Input, ViewChild} from '@angular/core';
 import {VirtualGrid} from "../../virtual-grid/virtual.grid.service";
 import {IVirtualGridConfig} from "../../virtual-grid/interfaces/virtual.grid.interfaces";
 
@@ -9,6 +9,7 @@ import {IVirtualGridConfig} from "../../virtual-grid/interfaces/virtual.grid.int
 })
 export class SectionTwoComponent implements AfterViewInit {
     @ViewChild("grid") grid: ElementRef
+    @Input("data") data: any
 
     gridInstance
 
@@ -17,116 +18,111 @@ export class SectionTwoComponent implements AfterViewInit {
 
     ngAfterViewInit() {
 
-        //
-        // this.gridInstance = new VirtualGrid(config)
+        let data = this.data
 
+        let map: any = {}
 
-        fetch('assets/data.json').then(response => response.json()).then((data) => {
+        let tree = []
 
-            let map: any = {}
+        for (let item of data.rows) {
+            let user = item.data.user
+            let groups = user.groups
 
-            let tree = []
-
-            for (let item of data.rows) {
-                let user = item.data.user
-                let groups = user.groups
-
-                for (let g of groups) {
-                    if (map[g._id] == void 0) {
-                        map[g._id] = g
-                    }
+            for (let g of groups) {
+                if (map[g._id] == void 0) {
+                    map[g._id] = g
                 }
             }
+        }
 
-            for (let item in map) {
-                let group = map[item]
+        for (let item in map) {
+            let group = map[item]
 
-                if (!group.parent) {
-                    tree.push(group)
-                }
-
-                if (group.parent && map[group.parent]) {
-                    if (map[group.parent].children == void 0) {
-                        map[group.parent].children = []
-                    }
-
-                    map[group.parent].children.push(group)
-                }
+            if (!group.parent) {
+                tree.push(group)
             }
 
-            for (let item in map) {
-                let group = map[item]
-                if (group.parent && group.children == void 0) {
-                    group.isLeaf = true
-                    group.children = []
-                    group.title = [group.title, group.type]
+            if (group.parent && map[group.parent]) {
+                if (map[group.parent].children == void 0) {
+                    map[group.parent].children = []
+                }
+
+                map[group.parent].children.push(group)
+            }
+        }
+
+        for (let item in map) {
+            let group = map[item]
+            if (group.parent && group.children == void 0) {
+                group.isLeaf = true
+                group.children = []
+                group.title = [group.title, group.type]
+            }
+        }
+
+        for (let item of data.rows) {
+            let user = item.data.user
+            let groups = user.groups
+
+            for (let g of groups) {
+                if (map[g._id].isLeaf) {
+                    map[g._id].children.push({
+                        title: [user.userFirstName, user.userLastName],
+                        ...user
+                    })
                 }
             }
+        }
 
-            for (let item of data.rows) {
-                let user = item.data.user
-                let groups = user.groups
+        let config: IVirtualGridConfig = {
+            rows: tree,
+            columns: [
+                {
+                    type: "avatar",
+                    avatarConfig: {
+                        url: "data.user.avatarURL",
+                        placeholderAgg: ["userFirstName", "userLastName"],
+                        placeholderBgColor: "var(--color-primary)",
+                        hideEmptyPlaceholder: true
+                    },
+                },
+                {
+                    field: "title",
+                    title: "Gruppenstruktur",
+                    isHierarchyColumn: true,
+                    type: "multiLine",
+                    minWidth: 200
+                },
+                {
+                    field: "email",
+                    title: "Email",
+                    showFilter: false
+                },
+                {
+                    field: "phoneNumber",
+                    title: "Telefonnummer",
+                    showFilter: false
+                },
+                {
+                    type: "boolean",
+                    field: "adminProperties.riskAssessment.deadlineDateSet",
+                    title: "Auszahlung gefordert",
 
-                for (let g of groups) {
-                    if (map[g._id].isLeaf) {
-                        map[g._id].children.push({
-                            title: [user.userFirstName, user.userLastName],
-                            ...user
-                        })
-                    }
+                },
+                {
+                    type: "date",
+                    field: "adminProperties.riskAssessment.deadlineDateSet",
+                    title: "Forderungs Datum",
                 }
-            }
+            ],
+            element: this.grid.nativeElement,
+            showHeader: true,
+            showColumnFilter: true,
+            deselectWhenCollapse: true,
+            useCheckboxSelection: true,
+            selectionMethod: "multi"
+        }
 
-            let config: IVirtualGridConfig = {
-                rows: tree,
-                columns: [
-                    {
-                        type: "avatar",
-                        avatarConfig: {
-                            url: "data.user.avatarURL",
-                            placeholderAgg: ["userFirstName", "userLastName"],
-                            placeholderBgColor: "var(--color-primary)",
-                            hideEmptyPlaceholder: true
-                        },
-                    },
-                    {
-                        field: "title",
-                        title: "Gruppenstruktur",
-                        isHierarchyColumn: true,
-                        type: "multiLine",
-                        minWidth: 200
-                    },
-                    {
-                        field: "email",
-                        title: "Email",
-                        showFilter: false
-                    },
-                    {
-                        field: "phoneNumber",
-                        title: "Telefonnummer",
-                        showFilter: false
-                    },
-                    {
-                        type: "boolean",
-                        field: "adminProperties.riskAssessment.deadlineDateSet",
-                        title: "Auszahlung gefordert",
-
-                    },
-                    {
-                        type: "date",
-                        field: "adminProperties.riskAssessment.deadlineDateSet",
-                        title: "Forderungs Datum",
-                    }
-                ],
-                element: this.grid.nativeElement,
-                showHeader: true,
-                showColumnFilter: true,
-                deselectWhenCollapse: true,
-                useCheckboxSelection: true,
-                selectionMethod: "multi"
-            }
-
-            this.gridInstance = new VirtualGrid(config)
-        })
+        this.gridInstance = new VirtualGrid(config)
     }
 }

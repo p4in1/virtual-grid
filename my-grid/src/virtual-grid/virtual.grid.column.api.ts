@@ -56,6 +56,9 @@ export class VirtualGridColumnApi implements IVirtualGridColumnApi {
         this._toggleVisibility(false, -1 * this.col.width)
     }
 
+    /**
+     * adds this column to the row grouping
+     */
     setRowGroup = () => {
         let rowGroup = this.Grid.DnDController.groups.find(x => x.col.id == this.col.id)
         if (!this.col.isRowGrouped || !rowGroup) {
@@ -64,6 +67,9 @@ export class VirtualGridColumnApi implements IVirtualGridColumnApi {
         }
     }
 
+    /**
+     * removes this column to the row grouping
+     */
     removeRowGroup = () => {
         if (this.col.isRowGrouped) {
             for (let i = 0; i < this.Grid.DnDController.groups.length; i++) {

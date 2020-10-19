@@ -2,13 +2,14 @@
  * api controller
  * everything related to the api of a virtual grid instance goes here
  */
-import {IRenderedRow, IVirtualGrid, IVirtualGridRow} from "./interfaces/virtual.grid.interfaces";
+import {IVirtualGrid, IVirtualGridRow} from "./interfaces/virtual.grid.interfaces";
 import {VirtualGridConfigController} from "./virtual.grid.config.srv";
 
 export class VirtualGridApi {
     private debounceTimeout: any = null;
 
     scrollPosTopBackup: number = 0;
+    updateDebounce
 
     constructor(protected Grid: IVirtualGrid, private config: VirtualGridConfigController) {
     }
@@ -75,7 +76,6 @@ export class VirtualGridApi {
      * @param {boolean} isRowGrouping
      */
     public updateGridRows = (rows: any[], resetRowConfig?: boolean, isRowGrouping?): void => {
-
         if (!isRowGrouping) {
             this.Grid.ConfigController.originalRows = rows
         }
@@ -93,7 +93,6 @@ export class VirtualGridApi {
         this.Grid.FilterController.resetFilter()
         // refreshing the visual projection
         this.Grid.api.refreshGrid(true, true);
-
     };
 
     setConfig = (config): void => {
@@ -113,6 +112,15 @@ export class VirtualGridApi {
 
         for (let col of config.sort) {
             this.Grid.ColumnController.sortColumn(columns[col.index], config.sort.length > 1, col.dir)
+        }
+
+        if (config.groups != void 0) {
+            this.Grid.DnDController.clearGrouping()
+
+            for (let col of config.groups) {
+                let column = columns.find(x => x.field == col.field)
+                column.api.setRowGroup()
+            }
         }
 
         this.refreshGrid(true, true)
@@ -141,6 +149,10 @@ export class VirtualGridApi {
             columns: []
         }
 
+        let groups = this.Grid.DnDController.groups.map((group) => {
+            return {"index": group.col.index, field: group.col.field}
+        })
+
         for (let index in this.Grid.FilterController.currentFilter.columns) {
             let col = this.Grid.FilterController.currentFilter.columns[index]
             if (col.value !== "" || col.content.length > 0) {
@@ -148,7 +160,7 @@ export class VirtualGridApi {
             }
         }
 
-        return {scrollTop, colWidths, sort, filter}
+        return {scrollTop, colWidths, sort, filter, groups}
     }
 
     /**

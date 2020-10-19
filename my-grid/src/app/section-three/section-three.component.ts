@@ -1,5 +1,5 @@
-import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {IVirtualGridConfig} from "../../virtual-grid/interfaces/virtual.grid.interfaces";
+import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {IVirtualGrid, IVirtualGridConfig} from "../../virtual-grid/interfaces/virtual.grid.interfaces";
 import {VirtualGrid} from "../../virtual-grid/virtual.grid.service";
 
 @Component({
@@ -7,81 +7,103 @@ import {VirtualGrid} from "../../virtual-grid/virtual.grid.service";
     templateUrl: './section-three.component.html',
     styleUrls: ['./section-three.component.scss']
 })
-export class SectionThreeComponent implements OnInit, AfterViewInit {
-    gridInstance
-
+export class SectionThreeComponent implements AfterViewInit {
+    gridInstance: IVirtualGrid
+    @Input("data") data: any
     @ViewChild("grid") grid: ElementRef
+    lastNames
 
     constructor() {
+        window.onbeforeunload = () => {
+            localStorage.setItem("virtual-grid-config", JSON.stringify(this.gridInstance.api.getConfig()))
+        }
     }
 
-    ngOnInit(): void {
+    getRandomLastName() {
+        let first = this.lastNames[Math.floor(Math.random() * this.lastNames.length)];
+        let second = this.lastNames[Math.floor(Math.random() * this.lastNames.length)];
+
+        return first + " - " + second
     }
 
     ngAfterViewInit() {
 
+        this.lastNames = [];
 
-        fetch('assets/data.json').then(response => response.json()).then((data) => {
-
-            let items = []
-
-            for (let i = 0; i < 33; i++) {
-                data.rows.forEach((item) => {
-                    items.push(item)
-                })
-            }
-
-            let config: IVirtualGridConfig = {
-                rows: items,
-                columns: [
-                    {
-                        type: "avatar",
-                        avatarConfig: {
-                            url: "data.user.avatarURL",
-                            placeholderAgg: ["data.user.userFirstName", "data.user.userLastName"],
-                            placeholderBgColor: "var(--color-primary)",
-                            hideEmptyPlaceholder: true
-                        },
-                    },
-                    {
-                        field: "data.user.userFirstName",
-                        title: "Vorname",
-                        type: "text",
-                        isRowGrouped: true
-                    },
-                    {
-                        field: "data.user.userLastName",
-                        title: "Nachname"
-                    },
-                    {
-                        field: "data.user.email",
-                        title: "Email"
-                    },
-                    {
-                        field: "data.user.phoneNumber",
-                        title: "Telefonnummer"
-                    },
-                    {
-                        type: "boolean",
-                        field: "data.user.adminProperties.riskAssessment.deadlineDateSet",
-                        title: "Auszahlung gefordert"
-                    },
-                    {
-                        type: "date",
-                        field: "data.user.adminProperties.riskAssessment.deadlineDateSet",
-                        title: "Forderungs Datum"
-                    }
-                ],
-                element: this.grid.nativeElement,
-                showHeader: true,
-                showGroupPanel: true,
-                selectionMethod: "multi"
-            }
-
-            this.gridInstance = new VirtualGrid(config)
-
-            window["grid"] = this.gridInstance
+        this.data.rows.forEach((item) => {
+            this.lastNames.push(item.data.user.userLastName)
         })
+
+        let data = this.data
+
+        let items = []
+
+        for (let i = 0; i < 30; i++) {
+            data.rows.forEach((item) => {
+                let test = {...item}
+
+                test.lastName = this.getRandomLastName()
+                items.push(test)
+            })
+        }
+
+        let config: IVirtualGridConfig = {
+            rows: items,
+            columns: [
+                {
+                    type: "avatar",
+                    avatarConfig: {
+                        url: "data.user.avatarURL",
+                        placeholderAgg: ["data.user.userFirstName", "data.user.userLastName"],
+                        placeholderBgColor: "var(--color-primary)",
+                        hideEmptyPlaceholder: true
+                    },
+                },
+                {
+                    field: "data.user.userFirstName",
+                    title: "Vorname",
+                    type: "text",
+                    isRowGrouped: true
+                },
+                {
+                    field: "lastName",
+                    title: "Nachname"
+                },
+                {
+                    field: "data.user.email",
+                    title: "Email"
+                },
+                {
+                    field: "data.user.phoneNumber",
+                    title: "Telefonnummer"
+                },
+                {
+                    type: "boolean",
+                    field: "data.user.adminProperties.riskAssessment.deadlineDateSet",
+                    title: "Auszahlung gefordert"
+                },
+                {
+                    type: "date",
+                    field: "data.user.adminProperties.riskAssessment.deadlineDateSet",
+                    title: "Forderungs Datum"
+                }
+            ],
+            element: this.grid.nativeElement,
+            showHeader: true,
+            showGroupPanel: true,
+            selectionMethod: "multi",
+            onGridReady(Grid: IVirtualGrid) {
+                let config = JSON.parse(localStorage.getItem("virtual-grid-config"))
+                if (config) {
+                    Grid.api.setConfig(config)
+                }
+            }
+        }
+
+        this.gridInstance = new VirtualGrid(config)
+
+
+        window["grid"] = this.gridInstance
 
     }
 }
