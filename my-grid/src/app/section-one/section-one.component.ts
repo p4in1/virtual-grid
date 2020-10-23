@@ -23,6 +23,7 @@ export class SectionOneComponent implements AfterViewInit {
             columns: data.columns,
             element: this.grid.nativeElement,
             showHeader: true,
+            showGroupPanel: true,
             selectionMethod: "range"
         }
 

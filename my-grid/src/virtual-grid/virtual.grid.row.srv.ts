@@ -365,7 +365,7 @@ export class VirtualGridRowController {
             currentObject = currentObject[value]
         }
 
-        return typeof currentObject == "string" ? currentObject.trim() : currentObject
+        return typeof currentObject == "string" ? currentObject : currentObject
     }
 
     /**

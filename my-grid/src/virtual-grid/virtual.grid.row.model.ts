@@ -89,7 +89,7 @@ export class VirtualGridRow implements IVirtualGridRow {
         } else {
             if (col.colType == "multiLine") {
                 // replacing multiple spaces with a single space in case an entry has multiple spaces
-                cellValue = Array.isArray(cellData) ? cellData.join(" ") : cellData != void 0 ? cellData.toString() : ""
+                cellValue = Array.isArray(cellData) ? cellData.join(" ") : cellData != void 0 ? cellData : ""
             } else if (col.colType == "date") {
                 cellValue = this.Grid.Utils.parseDate(cellData)
             } else {
@@ -97,7 +97,7 @@ export class VirtualGridRow implements IVirtualGridRow {
             }
         }
 
-        return cellValue.toString();
+        return cellValue.toString().trim();
     }
 
     // private renderRow() {

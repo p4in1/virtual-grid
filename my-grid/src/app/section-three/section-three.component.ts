@@ -38,7 +38,7 @@ export class SectionThreeComponent implements AfterViewInit {
 
         let items = []
 
-        for (let i = 0; i < 30; i++) {
+        for (let i = 0; i < 300; i++) {
             data.rows.forEach((item) => {
                 let test = {...item}
 
@@ -63,7 +63,6 @@ export class SectionThreeComponent implements AfterViewInit {
                     field: "data.user.userFirstName",
                     title: "Vorname",
                     type: "text",
-                    isRowGrouped: true
                 },
                 {
                     field: "lastName",
@@ -92,12 +91,12 @@ export class SectionThreeComponent implements AfterViewInit {
             showHeader: true,
             showGroupPanel: true,
             selectionMethod: "multi",
-            onGridReady(Grid: IVirtualGrid) {
-                let config = JSON.parse(localStorage.getItem("virtual-grid-config"))
-                if (config) {
-                    Grid.api.setConfig(config)
-                }
-            }
+            // onGridReady(Grid: IVirtualGrid) {
+            //     let config = JSON.parse(localStorage.getItem("virtual-grid-config"))
+            //     if (config) {
+            //         Grid.api.setConfig(config)
+            //     }
+            // }
         }
 
         this.gridInstance = new VirtualGrid(config)

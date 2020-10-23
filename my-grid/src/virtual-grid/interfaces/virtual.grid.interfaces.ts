@@ -7,6 +7,8 @@ import {VirtualGridUtils} from "../virtual.grid.utils";
 import {VirtualGridDragAndDropController} from "../virtual.grid.drag.srv";
 import {VirtualGridUIDomController} from "../virtual.grid.ui.dom.srv";
 import {VirtualGridUIEventController} from "../virtual.grid.ui.event.srv";
+import {VirtualGridSortController} from "../virtual.grid.sort.srv";
+import {WorkerService} from "../worker/worker.srv";
 
 export interface IVirtualGridConfig {
 
@@ -234,10 +236,11 @@ export interface IVirtualGrid {
     RowController: VirtualGridRowController
     ConfigController: VirtualGridConfigController
     FilterController: VirtualGridFilterController
-
+    SortController: VirtualGridSortController
 
     domController: VirtualGridUIDomController
     eventController: VirtualGridUIEventController
+    WorkerController: WorkerService
 
     rows: IVirtualGridRow[]
     originalColumns: IVirtualGridColumn[]

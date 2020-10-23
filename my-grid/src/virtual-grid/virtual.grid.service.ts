@@ -13,6 +13,8 @@ import {
 import {VirtualGridDragAndDropController} from "./virtual.grid.drag.srv";
 import {VirtualGridUIDomController} from "./virtual.grid.ui.dom.srv";
 import {VirtualGridUIEventController} from "./virtual.grid.ui.event.srv";
+import {VirtualGridSortController} from "./virtual.grid.sort.srv";
+import {WorkerService} from "./worker/worker.srv";
 
 export class VirtualGrid implements IVirtualGrid {
     /**
@@ -25,10 +27,12 @@ export class VirtualGrid implements IVirtualGrid {
     Utils: VirtualGridUtils;
     ConfigController: VirtualGridConfigController
     FilterController: VirtualGridFilterController
+    SortController: VirtualGridSortController
     DnDController: VirtualGridDragAndDropController
 
     domController: VirtualGridUIDomController;
     eventController: VirtualGridUIEventController;
+    WorkerController: WorkerService;
 
     rows: IVirtualGridRow[] = [];
     originalColumns: IVirtualGridColumn[] = [];
@@ -83,6 +87,7 @@ export class VirtualGrid implements IVirtualGrid {
         s = +new Date()
 
         this.FilterController = new VirtualGridFilterController(this, this.ConfigController)
+        this.SortController = new VirtualGridSortController(this, this.ConfigController)
         this.DnDController = new VirtualGridDragAndDropController(this)
 
         log.push(`filter + dnd controller --> ${+new Date() - s}`)
@@ -105,6 +110,8 @@ export class VirtualGrid implements IVirtualGrid {
                 this.eventController.adjustCell(this.originalColumns, 0)
                 this.eventController.bindGlobalOnResize()
                 this.DnDController.setColGroups()
+
+                this.WorkerController = new WorkerService(this)
             });
 
             this.api.setGridContent();
@@ -119,6 +126,6 @@ export class VirtualGrid implements IVirtualGrid {
             this.initDone = true;
         }
 
-        console.log(log, `grid ready after --> ${gStart - s} with `,this.rows.length , " rows")
+        console.log(log, `grid ready after --> ${gStart - s} with `, this.rows.length, " rows")
     }
 }

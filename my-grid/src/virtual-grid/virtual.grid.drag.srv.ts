@@ -193,7 +193,7 @@ export class VirtualGridDragAndDropController {
 
         for (let i = 0; i < this.groups.length; i++) {
             let currentGroup = this.groups[i]
-            let value = row.getCellValue(currentGroup.col).trim()
+            let value = row.getCellValue(currentGroup.col)
 
             if (currentNode[value] == void 0) {
                 currentNode[value] = {
@@ -202,7 +202,7 @@ export class VirtualGridDragAndDropController {
                 }
             }
 
-            currentNode[value].children.push(row)
+            currentNode[value].children[currentNode[value].children.length] = row
 
             if (i !== this.groups.length - 1) {
                 currentNode = currentNode[value].rowGroups

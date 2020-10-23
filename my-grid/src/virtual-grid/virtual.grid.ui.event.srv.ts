@@ -469,11 +469,10 @@ export class VirtualGridUIEventController {
 
             const headerCell: HTMLElement = column.dom.cellTextContainer;
             const filterField: HTMLInputElement = column.dom.cellFilter
-            const filterAdvanced: HTMLElement = column.dom.cellFilterAdvancedButton
 
             headerCell.addEventListener("click", (event: any) => {
                 if (!column.isSuppressSort) {
-                    this.Grid.ColumnController.sortColumn(column, event.shiftKey)
+                    this.Grid.SortController.sortColumn(column, event.shiftKey)
                 }
             })
 
@@ -498,9 +497,9 @@ export class VirtualGridUIEventController {
                         this.Grid.FilterController.setTextFilter(column, filterField.value)
                     })
 
-                    filterAdvanced.addEventListener("click", (event) => {
-                        this.Grid.FilterController.showAdvancedFilter(event, column)
-                    })
+                    // filterAdvanced.addEventListener("click", (event) => {
+                    //     this.Grid.FilterController.showAdvancedFilter(event, column)
+                    // })
                 }
             }
 
