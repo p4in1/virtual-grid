@@ -31,10 +31,12 @@ export class VirtualGridSelectionController {
     onCellMouseDown = (event: any, cell: IRenderedCell): void => {
 
         if (event.buttons != 1) {
-            let colFirst = this.rangeSelection.start.col.currentIndex
-            let colLast = this.rangeSelection.end.col.currentIndex
-            let rowFirst = this.rangeSelection.start.row.index
-            let rowLast = this.rangeSelection.end.row.index
+            let rangeStart = this.rangeSelection.start
+            let rangeEnd = this.rangeSelection.end
+            let colFirst = rangeStart.col.currentIndex
+            let colLast = rangeEnd.col.currentIndex
+            let rowFirst = rangeStart.row.index
+            let rowLast = rangeEnd.row.index
 
             let minColIndex = Math.min(colFirst, colLast)
             let maxColIndex = Math.max(colFirst, colLast)
