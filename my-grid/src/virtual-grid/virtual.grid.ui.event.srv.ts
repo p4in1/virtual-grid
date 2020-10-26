@@ -86,100 +86,11 @@ export class VirtualGridUIEventController {
         this.config.onRowMouseLeave({row, event, api: this.Grid.api});
     };
 
-    private onCellMouseEnter = (event: any, cell: IRenderedCell): void => {
-
-        if (this.Grid.ConfigController.selectionMethod != "range") {
-            return
-        }
-
-        if (this.isRangeSelectActive) {
-            this.handleRangeSelect(cell)
-            return
-        }
-
-        this.Grid.Utils.toggleClass("hover", cell.cellNode, true)
-    }
-
     private onCellRightClick = (event: any, cell: IRenderedCell): void => {
         if (!this.config.suppressContextmenu) {
             this.Grid.ContextmenuController.showMenu(cell.rowModel, cell.colModel, event)
         }
     }
-
-
-    private _clearRangeSelection = (): void => {
-        for (let selectedRow of this.rangeSelect.selection) {
-            for (let cell of selectedRow) {
-                cell.cellNode.classList.remove("selected")
-            }
-        }
-
-        this.rangeSelect.selection = []
-    }
-
-    private handleRangeSelect = (cell: IRenderedCell): void => {
-
-        this._clearRangeSelection()
-
-        let minColIndex = Math.min(this.rangeSelect.start.col.currentIndex, cell.colModel.currentIndex)
-        let maxColIndex = Math.max(this.rangeSelect.start.col.currentIndex, cell.colModel.currentIndex)
-        let minRowIndex = Math.min(this.rangeSelect.start.row.index, cell.rowModel.index)
-        let maxRowIndex = Math.max(this.rangeSelect.start.row.index, cell.rowModel.index)
-
-        for (let i = minRowIndex; i <= maxRowIndex; i++) {
-            let _row = []
-            for (let j = minColIndex; j <= maxColIndex; j++) {
-                let cell = this.Grid.domController.renderedRows[i].cells[j]
-
-                cell.cellNode.classList.add("selected")
-
-                _row.push(cell)
-            }
-
-            this.rangeSelect.selection.push(_row)
-        }
-    }
-
-    private onCellMouseLeave = (event: any, cell: IRenderedCell): void => {
-        if (this.Grid.ConfigController.selectionMethod != "range") {
-            return
-        }
-
-        this.Grid.Utils.toggleClass("hover", cell.cellNode, false)
-    }
-
-    rangeSelect: any = {
-        start: {},
-        selection: []
-    }
-    isRangeSelectActive: boolean = false
-
-    private onCellMouseDown = (event: any, cell: IRenderedCell): void => {
-        if (this.Grid.ConfigController.selectionMethod != "range") {
-            return
-        }
-
-        this._clearRangeSelection()
-
-        this.isRangeSelectActive = true
-        this.rangeSelect = {
-            start: {
-                row: cell.rowModel,
-                col: cell.colModel
-            },
-            selection: []
-        }
-
-        const _unbind = (): void => {
-
-            this.isRangeSelectActive = false;
-
-            window.removeEventListener("mouseup", _unbind)
-        }
-
-        window.addEventListener("mouseup", _unbind);
-    }
-
 
     /**
      * catch the scroll event of the scroll guard and apply it to the body and the header
@@ -460,13 +371,13 @@ export class VirtualGridUIEventController {
     private bindCellEvents(renderedRow: IRenderedRow) {
         for (let cell of renderedRow.cells) {
             cell.cellNode.addEventListener("mouseenter", (event) => {
-                this.onCellMouseEnter(event, cell)
+                this.Grid.SelectionController.onCellMouseEnter(event, cell)
             })
             cell.cellNode.addEventListener("mouseleave", (event) => {
-                this.onCellMouseLeave(event, cell)
+                this.Grid.SelectionController.onCellMouseLeave(event, cell)
             })
             cell.cellNode.addEventListener("mousedown", (event) => {
-                this.onCellMouseDown(event, cell)
+                this.Grid.SelectionController.onCellMouseDown(event, cell)
             })
             cell.cellNode.addEventListener("contextmenu", (event) => {
                 this.onCellRightClick(event, cell)

@@ -8,6 +8,8 @@ import {VirtualGridDragAndDropController} from "../virtual.grid.drag.srv";
 import {VirtualGridUIDomController} from "../virtual.grid.ui.dom.srv";
 import {VirtualGridUIEventController} from "../virtual.grid.ui.event.srv";
 import {VirtualGridContextmenuController} from "../virtual.grid.contextmenu.srv";
+import {VirtualGridContextMenu} from "../virtual.grid.contextmenu.model";
+import {VirtualGridSelectionController} from "../virtual.grid.selection.srv";
 
 export interface IVirtualGridConfig {
 
@@ -238,6 +240,7 @@ export interface IVirtualGrid {
     DnDController: VirtualGridDragAndDropController
     ColumnController: VirtualGridColumnController
     ContextmenuController: VirtualGridContextmenuController
+    SelectionController: VirtualGridSelectionController
 
     RowController: VirtualGridRowController
     ConfigController: VirtualGridConfigController
@@ -640,4 +643,17 @@ export interface IVirtualColDefConfig {
     cellStyleGetter(): void
 
     cellValueGetter(): void
+}
+
+export interface IVirtualGridContextmenuEntry {
+    label?: string
+    index?: number
+    icon?: string
+    subMenu?: IVirtualGridContextmenuEntry[]
+    isDivider?: boolean
+    element?: HTMLElement
+
+    subMenuInstance?: VirtualGridContextMenu
+
+    action?(row, col): void
 }

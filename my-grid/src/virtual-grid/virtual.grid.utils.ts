@@ -202,4 +202,48 @@ export class VirtualGridUtils {
         setClass ? element.classList.add(elementClass) : element.classList.remove(elementClass)
     }
 
+    copyToClipboard(text) {
+
+        let textArea: any = document.createElement("textarea");
+
+        // Place in top-left corner of screen regardless of scroll position.
+        textArea.style.position = 'absolute';
+        textArea.style.top = "-2000px";
+        textArea.style.left = "-2000px";
+
+        // Ensure it has a small width and height. Setting to 1px / 1em
+        // doesn't work as this gives a negative w/h on some browsers.
+        textArea.style.width = '2em';
+        textArea.style.height = '2em';
+
+        // We don't need padding, reducing the size if it does flash render.
+        textArea.style.padding = "0px";
+
+        // Clean up any borders.
+        textArea.style.border = 'none';
+        textArea.style.outline = 'none';
+        textArea.style.boxShadow = 'none';
+
+        // Avoid flash of white box if rendered for any reason.
+        textArea.style.background = 'transparent';
+
+        textArea.value = text;
+
+        document.body.appendChild(textArea);
+
+        setTimeout(() => {
+            textArea.focus();
+            textArea.select();
+            textArea.setSelectionRange(0, 99999);
+            try {
+                let successful = document.execCommand('copy');
+                let msg = successful ? 'successful' : 'unsuccessful';
+                console.log('Fallback: Copying text command was ' + msg);
+            } catch (err) {
+                console.error('Fallback: Oops, unable to copy', err);
+            }
+
+            document.body.removeChild(textArea);
+        })
+    }
 }
