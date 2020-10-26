@@ -18,6 +18,7 @@ export class VirtualGridConfigController {
     suppressDragging: boolean = false
     suppressPinning: boolean = false
     suppressMoving: boolean = false
+    suppressContextmenu:boolean = false;
 
     showHeader: boolean = false
     showGroupPanel: boolean = false
@@ -54,7 +55,7 @@ export class VirtualGridConfigController {
         this.suppressAutoSize = config.suppressAutoSize
         this.suppressDragging = config.suppressDragging
         this.suppressPinning = config.suppressPinning
-
+        this.suppressContextmenu = config.suppressContextmenu
         this.showHeader = config.showHeader
         this.showColumnFilter = config.showColumnFilter
         this.showGroupPanel = config.showHeader && config.showGroupPanel

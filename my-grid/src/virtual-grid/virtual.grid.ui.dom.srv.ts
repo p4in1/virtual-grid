@@ -77,49 +77,40 @@ export class VirtualGridUIDomController {
             scrollYCenterSpacer: this.Utils.el("div", ['scroll-y-center-spacer']),
             scrollYCenterScrollPort: this.Utils.el("div", ['scroll-y-center-scroll-port']),
 
-            ghost: this.Utils.el("div", ["ghost"]),
+            ghost: this.Utils.el("div", ["virtual-grid-ghost"]),
             ghostLabel: this.Utils.el("span", ["ghost-label"]),
 
             groupPanel: this.Utils.el("div", ["group-panel"]),
             groupPanelPlaceholder: this.Utils.el("span", ["group-panel-placeholder"]),
             groupPanelContent: this.Utils.el("div", ["group-panel-content"]),
 
+            contextmenu: this.Utils.el("div", ["virtual-grid-context-menu"]),
+            contextmenuBackdrop: this.Utils.el("div", ["virtual-grid-context-menu-backdrop"]),
         };
 
         // add the grid to the given dom node
-        this.dom.gridContainer.appendChild(this.dom.virtualGrid)
-
+        this.dom.gridContainer.append(this.dom.virtualGrid)
         // add the main parts of the grid
-        this.dom.virtualGrid.appendChild(this.dom.groupPanel)
-        this.dom.virtualGrid.appendChild(this.dom.headerWrapper);
-        this.dom.virtualGrid.appendChild(this.dom.bodyWrapper);
-        this.dom.virtualGrid.appendChild(this.dom.scrollYGuard)
+        this.dom.virtualGrid.append(this.dom.groupPanel, this.dom.headerWrapper, this.dom.bodyWrapper, this.dom.scrollYGuard)
 
-        this.dom.groupPanel.appendChild(this.dom.groupPanelPlaceholder)
-        this.dom.groupPanel.appendChild(this.dom.groupPanelContent)
+        this.dom.groupPanel.append(this.dom.groupPanelPlaceholder, this.dom.groupPanelContent)
 
-        this.dom.headerLeft.appendChild(this.dom.headerLeftResizer)
-        this.dom.headerRight.appendChild(this.dom.headerRightResizer)
+        this.dom.headerLeft.append(this.dom.headerLeftResizer)
+        this.dom.headerRight.append(this.dom.headerRightResizer)
 
-        this.dom.scrollYCenterScrollPort.appendChild(this.dom.scrollYCenterSpacer)
+        this.dom.scrollYCenterScrollPort.append(this.dom.scrollYCenterSpacer)
 
-        this.dom.scrollYGuard.appendChild(this.dom.scrollYLeftSpacer)
-        this.dom.scrollYGuard.appendChild(this.dom.scrollYCenterScrollPort)
-        this.dom.scrollYGuard.appendChild(this.dom.scrollYRightSpacer)
+        this.dom.scrollYGuard.append(this.dom.scrollYLeftSpacer, this.dom.scrollYCenterScrollPort, this.dom.scrollYRightSpacer)
 
-        this.dom.headerCenterScrollPort.appendChild(this.dom.headerCenter)
+        this.dom.headerCenterScrollPort.append(this.dom.headerCenter)
 
-        this.dom.headerWrapper.appendChild(this.dom.headerLeft);
-        this.dom.headerWrapper.appendChild(this.dom.headerCenterScrollPort);
-        this.dom.headerWrapper.appendChild(this.dom.headerRight);
+        this.dom.headerWrapper.append(this.dom.headerLeft, this.dom.headerCenterScrollPort, this.dom.headerRight);
 
-        this.dom.bodyCenterScrollPort.appendChild(this.dom.bodyCenter)
+        this.dom.bodyCenterScrollPort.append(this.dom.bodyCenter)
 
-        this.dom.bodyWrapper.appendChild(this.dom.bodyLeft);
-        this.dom.bodyWrapper.appendChild(this.dom.bodyCenterScrollPort);
-        this.dom.bodyWrapper.appendChild(this.dom.bodyRight);
+        this.dom.bodyWrapper.append(this.dom.bodyLeft, this.dom.bodyCenterScrollPort, this.dom.bodyRight);
 
-        this.dom.ghost.appendChild(this.dom.ghostLabel)
+        this.dom.ghost.append(this.dom.ghostLabel)
 
         this.setGridDefaults()
         this.styleUpdater()
@@ -235,15 +226,15 @@ export class VirtualGridUIDomController {
             let column = this.Grid.originalColumns[i]
 
             if (column.pinned === "left") {
-                headerLeftFragment.appendChild(this.createColumn(i))
+                headerLeftFragment.append(this.createColumn(i))
             }
 
             if (column.pinned === "center") {
-                headerCenterFragment.appendChild(this.createColumn(i))
+                headerCenterFragment.append(this.createColumn(i))
             }
 
             if (column.pinned === "right") {
-                headerRightFragment.appendChild(this.createColumn(i))
+                headerRightFragment.append(this.createColumn(i))
             }
 
         }
@@ -269,22 +260,22 @@ export class VirtualGridUIDomController {
                 },
             };
 
-            bodyLeftFragment.appendChild(this.createRow(renderedRow.left, this.Grid.columns.filter(x => x.pinned == "left")));
-            bodyCenterFragment.appendChild(this.createRow(renderedRow.center, this.Grid.columns.filter(x => x.pinned == "center")));
-            bodyRightFragment.appendChild(this.createRow(renderedRow.right, this.Grid.columns.filter(x => x.pinned == "right")));
+            bodyLeftFragment.append(this.createRow(renderedRow.left, this.Grid.columns.filter(x => x.pinned == "left")));
+            bodyCenterFragment.append(this.createRow(renderedRow.center, this.Grid.columns.filter(x => x.pinned == "center")));
+            bodyRightFragment.append(this.createRow(renderedRow.right, this.Grid.columns.filter(x => x.pinned == "right")));
 
             renderedRow.cells = renderedRow.left.cells.concat(renderedRow.center.cells).concat(renderedRow.right.cells)
 
             this.renderedRows.push(renderedRow);
         }
 
-        this.dom.headerLeft.appendChild(headerLeftFragment);
-        this.dom.headerCenter.appendChild(headerCenterFragment);
-        this.dom.headerRight.appendChild(headerRightFragment);
+        this.dom.headerLeft.append(headerLeftFragment);
+        this.dom.headerCenter.append(headerCenterFragment);
+        this.dom.headerRight.append(headerRightFragment);
 
-        this.dom.bodyLeft.appendChild(bodyLeftFragment);
-        this.dom.bodyCenter.appendChild(bodyCenterFragment);
-        this.dom.bodyRight.appendChild(bodyRightFragment);
+        this.dom.bodyLeft.append(bodyLeftFragment);
+        this.dom.bodyCenter.append(bodyCenterFragment);
+        this.dom.bodyRight.append(bodyRightFragment);
 
         if (this.Grid.columns.filter(x => x.pinned == "left").length === 0) {
             this.dom.headerLeft.classList.add("hidden")
@@ -414,8 +405,7 @@ export class VirtualGridUIDomController {
         dom.cellTextContainer = this.Utils.el("div", ["header-cell-text-container"])
         dom.cellFilterContainer = this.Utils.el("div", ["header-cell-filter-container"])
 
-        dom.cellTextContainer.appendChild(dom.cellText);
-        dom.cellTextContainer.appendChild(dom.cellSortArrow);
+        dom.cellTextContainer.append(dom.cellText, dom.cellSortArrow);
 
         let trueFilterIcon = this.Utils.el("i", ["filter-button", "virtual-material-icons"])
         let falseFilterIcon = this.Utils.el("i", ["filter-button", "virtual-material-icons"])
@@ -423,30 +413,28 @@ export class VirtualGridUIDomController {
         trueFilterIcon.innerHTML = "done"
         falseFilterIcon.innerHTML = "clear"
 
-        dom.cellTrueFilter.appendChild(trueFilterIcon)
-        dom.cellFalseFilter.appendChild(falseFilterIcon)
+        dom.cellTrueFilter.append(trueFilterIcon)
+        dom.cellFalseFilter.append(falseFilterIcon)
 
-        cell.appendChild(dom.cellContent)
+        cell.append(dom.cellContent)
 
-        dom.cellContent.appendChild(dom.cellTextContainer)
+        dom.cellContent.append(dom.cellTextContainer)
 
         if (column.isShowFilter) {
             if (column.colType === "boolean") {
-                dom.cellFilterContainer.appendChild(dom.cellTrueFilter)
-                dom.cellFilterContainer.appendChild(dom.cellFalseFilter)
+                dom.cellFilterContainer.append(dom.cellTrueFilter, dom.cellFalseFilter)
                 dom.cellFilterContainer.classList.add("bool-filter-container")
             } else {
-                dom.cellFilterContainer.appendChild(dom.cellFilter)
-                dom.cellFilterContainer.appendChild(dom.cellFilterAdvancedButton)
+                dom.cellFilterContainer.append(dom.cellFilter, dom.cellFilterAdvancedButton)
 
                 dom.cellFilterAdvancedButton.textContent = "filter_list"
             }
 
-            dom.cellContent.appendChild(dom.cellFilterContainer)
+            dom.cellContent.append(dom.cellFilterContainer)
         }
 
         if (!column.isSuppressResize && nextColumn && column.pinned == nextColumn.pinned) {
-            dom.cell.appendChild(column.dom.cellResizer);
+            dom.cell.append(column.dom.cellResizer);
         }
 
         if (column.width > column.minWidth) {
@@ -493,25 +481,25 @@ export class VirtualGridUIDomController {
             if (col.isHierarchyColumn || col.isRowGroupColumn) {
                 cell.treeNode = this.Utils.el("i", ["node-icon", "virtual-material-icons", "small"]);
                 cell.treeNode.addEventListener("click", this.Grid.RowController.toggleNodeListener);
-                cell.cellNode.appendChild(cell.treeNode)
+                cell.cellNode.append(cell.treeNode)
             }
 
             if (this.config.useCheckboxSelection && col.isCheckboxColumn) {
                 cell.checkboxNode = this.Utils.el("div", ["checkbox"])
                 cell.checkboxIcon = this.Utils.el("i", ["checkbox-icon", "virtual-material-icons", "small"]);
                 cell.cellNode.classList.add("checkbox-node")
-                cell.cellNode.appendChild(cell.checkboxNode)
-                cell.checkboxNode.appendChild(cell.checkboxIcon)
+                cell.cellNode.append(cell.checkboxNode)
+                cell.checkboxNode.append(cell.checkboxIcon)
 
             } else if (col.isAvatarColumn) {
 
                 cell.avatarNode = this.Utils.el("div", ["avatar-icon"]);
                 cell.avatarPlaceholder = this.Utils.el("span", ["avatar-placeholder"]);
 
-                cell.avatarNode.appendChild(cell.avatarPlaceholder)
+                cell.avatarNode.append(cell.avatarPlaceholder)
 
                 cell.cellNode.classList.add("avatar-node")
-                cell.cellNode.appendChild(cell.avatarNode)
+                cell.cellNode.append(cell.avatarNode)
             } else if (col.isActionColumn) {
 
                 cell.cellNode.classList.add("action-node")
@@ -525,7 +513,7 @@ export class VirtualGridUIDomController {
                         this.Grid.RowController.executeAction(e, action)
                     });
 
-                    cell.cellNode.appendChild(actionTag);
+                    cell.cellNode.append(actionTag);
                 }
 
             } else {
@@ -539,14 +527,14 @@ export class VirtualGridUIDomController {
                 for (let i = 0; i < col.lineCount; i++) {
                     let textNode = this.Utils.el("span", ["cell-text"]);
                     cell.textNodes.push(textNode)
-                    cell.cellContentNode.appendChild(textNode);
+                    cell.cellContentNode.append(textNode);
                 }
 
-                cell.cellNode.appendChild(cell.cellContentNode)
+                cell.cellNode.append(cell.cellContentNode)
             }
 
             row.cells.push(cell);
-            row.element.appendChild(cell.cellNode);
+            row.element.append(cell.cellNode);
         }
     }
 

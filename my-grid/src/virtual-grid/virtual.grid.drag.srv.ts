@@ -79,7 +79,7 @@ export class VirtualGridDragAndDropController {
         }
 
         element.textContent = group.label
-        element.appendChild(group.removeButton)
+        element.append(group.removeButton)
 
         group.removeButton.addEventListener("click", this._removeGroup)
         group.removeButton.textContent = "clear"
@@ -218,12 +218,12 @@ export class VirtualGridDragAndDropController {
         this.dom.groupPanelContent.innerHTML = ""
 
         for (let i = 0; i < this.groups.length; i++) {
-            this.dom.groupPanelContent.appendChild(this.groups[i].element)
+            this.dom.groupPanelContent.append(this.groups[i].element)
 
             if (this.groups[i + 1] != void 0) {
                 let spacer = this.Grid.Utils.el("i", ["group-spacer", "virtual-material-icons", "small"])
                 spacer.textContent = "trending_flat"
-                this.dom.groupPanelContent.appendChild(spacer)
+                this.dom.groupPanelContent.append(spacer)
             }
         }
     }
@@ -379,7 +379,7 @@ export class VirtualGridDragAndDropController {
             this.dom.ghostLabel.textContent = dragData.col.title
             this.ghostWidth = this.Grid.Utils.getTextWidthInPixel(dragData.col.title) + 20
 
-            document.body.appendChild(this.dom.ghost)
+            document.body.append(this.dom.ghost)
         }
 
         // moving the ghost
@@ -458,12 +458,12 @@ export class VirtualGridDragAndDropController {
 
         column.dom.cell.parentNode.removeChild(column.dom.cell)
 
-        headerElement.appendChild(column.dom.cell)
+        headerElement.append(column.dom.cell)
 
         for (let row of this.domController.renderedRows) {
             let cell = row.cells[column.currentIndex].cellNode
             cell.parentNode.removeChild(cell)
-            row[area].element.appendChild(cell)
+            row[area].element.append(cell)
         }
 
         column.pinned = area

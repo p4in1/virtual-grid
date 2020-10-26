@@ -194,8 +194,8 @@ export class VirtualGridColumnController {
     public applySorting(): void {
         let s = +new Date()
 
-        let hieararchyColumn = this.Grid.columns.find(x => x.isHierarchyColumn)
-        if (hieararchyColumn && hieararchyColumn.isVisible) {
+        let hierarchyColumn = this.Grid.columns.find(x => x.isHierarchyColumn)
+        if (hierarchyColumn && hierarchyColumn.isVisible) {
             let roots: IVirtualGridRow[] = [];
 
             for (let row of this.Grid.rows) {
@@ -324,9 +324,9 @@ export class VirtualGridColumnController {
         outer.style.width = "200px";
         outer.style.height = "150px";
         outer.style.overflow = "hidden";
-        outer.appendChild(inner);
+        outer.append(inner);
 
-        this.domController.dom.virtualGrid.appendChild(outer);
+        this.domController.dom.virtualGrid.append(outer);
         const w1 = inner.offsetWidth;
         outer.style.overflow = 'scroll';
         let w2 = inner.offsetWidth;

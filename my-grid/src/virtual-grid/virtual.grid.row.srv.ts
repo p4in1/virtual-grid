@@ -436,7 +436,7 @@ export class VirtualGridRowController {
 
             cell.textNodes[0].innerHTML = ""
             cell.textNodes[0].classList.add("boolean-node");
-            cell.textNodes[0].appendChild(cellNode);
+            cell.textNodes[0].append(cellNode);
 
             let val = cellData === true || cellData === "true" ? true : cellData === false || cellData === "false" ? false : !!cellData
 

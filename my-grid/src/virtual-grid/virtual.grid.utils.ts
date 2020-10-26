@@ -10,7 +10,7 @@ export class VirtualGridUtils {
     constructor() {
         const textWidthInspector: HTMLElement = document.createElement("span");
 
-        document.body.appendChild(textWidthInspector);
+        document.body.append(textWidthInspector);
 
         const PRINT_CHARS = [
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
@@ -38,8 +38,8 @@ export class VirtualGridUtils {
             head = document.head || document.getElementsByTagName('head')[0],
             style = document.createElement('style');
 
-        style.appendChild(document.createTextNode(css));
-        head.appendChild(style);
+        style.append(document.createTextNode(css));
+        head.append(style);
 
         textWidthInspector.remove();
 

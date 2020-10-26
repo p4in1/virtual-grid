@@ -100,6 +100,13 @@ export class VirtualGridUIEventController {
         this.Grid.Utils.toggleClass("hover", cell.cellNode, true)
     }
 
+    private onCellRightClick = (event: any, cell: IRenderedCell): void => {
+        if (!this.config.suppressContextmenu) {
+            this.Grid.ContextmenuController.showMenu(cell.rowModel, cell.colModel, event)
+        }
+    }
+
+
     private _clearRangeSelection = (): void => {
         for (let selectedRow of this.rangeSelect.selection) {
             for (let cell of selectedRow) {
@@ -460,6 +467,9 @@ export class VirtualGridUIEventController {
             })
             cell.cellNode.addEventListener("mousedown", (event) => {
                 this.onCellMouseDown(event, cell)
+            })
+            cell.cellNode.addEventListener("contextmenu", (event) => {
+                this.onCellRightClick(event, cell)
             })
         }
     }

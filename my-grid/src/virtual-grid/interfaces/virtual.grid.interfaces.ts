@@ -7,6 +7,7 @@ import {VirtualGridUtils} from "../virtual.grid.utils";
 import {VirtualGridDragAndDropController} from "../virtual.grid.drag.srv";
 import {VirtualGridUIDomController} from "../virtual.grid.ui.dom.srv";
 import {VirtualGridUIEventController} from "../virtual.grid.ui.event.srv";
+import {VirtualGridContextmenuController} from "../virtual.grid.contextmenu.srv";
 
 export interface IVirtualGridConfig {
 
@@ -124,6 +125,12 @@ export interface IVirtualGridConfig {
     suppressPinning?: boolean
 
     /**
+     * suppresses the build in contextmenu
+     * @default false
+     */
+    suppressContextmenu?: boolean
+
+    /**
      * callback before a node is expanded
      * this gives you the opportunity to load the children async and attach them to the grid using the api
      * @param row - the row to expand
@@ -230,6 +237,7 @@ export interface IVirtualGrid {
 
     DnDController: VirtualGridDragAndDropController
     ColumnController: VirtualGridColumnController
+    ContextmenuController: VirtualGridContextmenuController
 
     RowController: VirtualGridRowController
     ConfigController: VirtualGridConfigController
@@ -527,6 +535,9 @@ export interface IVirtualGridDom {
     groupPanel: HTMLElement
     groupPanelPlaceholder: HTMLSpanElement
     groupPanelContent: HTMLElement
+
+    contextmenu: HTMLElement
+    contextmenuBackdrop: HTMLElement
 }
 
 export interface IVirtualCellDom {

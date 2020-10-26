@@ -13,6 +13,7 @@ import {
 import {VirtualGridDragAndDropController} from "./virtual.grid.drag.srv";
 import {VirtualGridUIDomController} from "./virtual.grid.ui.dom.srv";
 import {VirtualGridUIEventController} from "./virtual.grid.ui.event.srv";
+import {VirtualGridContextmenuController} from "./virtual.grid.contextmenu.srv";
 
 export class VirtualGrid implements IVirtualGrid {
     /**
@@ -24,6 +25,7 @@ export class VirtualGrid implements IVirtualGrid {
     RowController: VirtualGridRowController;
     Utils: VirtualGridUtils;
     ConfigController: VirtualGridConfigController
+    ContextmenuController: VirtualGridContextmenuController
     FilterController: VirtualGridFilterController
     DnDController: VirtualGridDragAndDropController
 
@@ -45,7 +47,7 @@ export class VirtualGrid implements IVirtualGrid {
 
         let s = +new Date()
         this.ConfigController = new VirtualGridConfigController(this, config)
-
+        this.ContextmenuController = new VirtualGridContextmenuController(this)
         log.push(`config took --> ${+new Date() - s}`)
         s = +new Date()
 
@@ -119,6 +121,6 @@ export class VirtualGrid implements IVirtualGrid {
             this.initDone = true;
         }
 
-        console.log(log, `grid ready after --> ${gStart - s} with `,this.rows.length , " rows")
+        console.log(log, `grid ready after --> ${gStart - s} with `, this.rows.length, " rows")
     }
 }

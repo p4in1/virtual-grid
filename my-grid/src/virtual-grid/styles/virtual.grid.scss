@@ -1,6 +1,6 @@
 @import "vars";
 
-.ghost {
+.virtual-grid-ghost {
     position: absolute;
     display: flex;
     align-items: center;
@@ -10,6 +10,68 @@
     justify-content: center;
     box-shadow: 0 0 4px 4px rgba(0, 0, 0, 0.2);
     pointer-events: none;
+}
+
+.virtual-grid-context-menu, .virtual-grid-submenu {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    z-index: 5;
+    box-shadow: 0 0 4px 4px rgba(0, 0, 0, 0.2);
+
+    .contextmenu-entry {
+        height: 48px;
+        min-height: 48px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        padding-left: $eob-pane-padding / 2;
+        cursor: pointer;
+        box-sizing: border-box;
+        justify-content: space-between;
+
+        * {
+            user-select: none;
+        }
+
+        .contextmenu-entry-content {
+            display: flex;
+            align-items: center;
+            font-size: $font-medium;
+        }
+
+        .contextmenu-entry-icon {
+            padding-right: $eob-pane-padding / 2;
+            width: 16px;
+            max-width: 16px;
+        }
+
+        &:hover {
+            background-color: $color-background-panel;
+        }
+    }
+
+    //scrollbar
+    &::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    /* Track */
+    &::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.08);
+    }
+
+    /* Handle */
+    &::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, .3);
+    }
+
+    /* Handle on hover */
+    &::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, .5);
+    }
 }
 
 .virtual-grid {
@@ -465,35 +527,6 @@
         width: 100%;
         background-color: rgba(0, 0, 0, 0.08);
         display: flex;
-    }
-
-    .virtual-material-icons {
-        font-family: 'Virtual Material Icons', sans-serif;
-        font-weight: normal;
-        font-style: normal;
-        font-size: 24px; /* Preferred icon size */
-        display: inline-block;
-        line-height: 1;
-        text-transform: none;
-        letter-spacing: normal;
-        word-wrap: normal;
-        white-space: nowrap;
-        direction: ltr;
-
-        /* Support for all WebKit browsers. */
-        -webkit-font-smoothing: antialiased;
-        /* Support for Safari and Chrome. */
-        text-rendering: optimizeLegibility;
-
-        /* Support for Firefox. */
-        -moz-osx-font-smoothing: grayscale;
-
-        /* Support for IE. */
-        font-feature-settings: 'liga';
-
-        &.small {
-            font-size: $font-big;
-        }
     }
 
     //scrollbar
