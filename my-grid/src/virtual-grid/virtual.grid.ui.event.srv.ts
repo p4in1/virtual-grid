@@ -31,7 +31,7 @@ export class VirtualGridUIEventController {
         const ctrlSelection = event.ctrlKey || this.Grid.ConfigController.useCheckboxSelection
 
         if (row.isSelectable && this.Grid.ConfigController.selectionMethod != "range") {
-            this.Grid.api.select(row, ctrlSelection, event.shiftKey);
+            this.Grid.SelectionController.select(row, ctrlSelection, event.shiftKey);
         }
 
         this.config.onRowClick({row, event, api: this.Grid.api});
@@ -45,7 +45,7 @@ export class VirtualGridUIEventController {
         const row: IVirtualGridRow = this.getRowByEvent(event);
 
         if (!this.Grid.ConfigController.useCheckboxSelection && this.Grid.ConfigController.selectionMethod != "range" && row.isSelectable) {
-            this.Grid.api.select(row);
+            this.Grid.SelectionController.select(row);
         }
 
         this.config.onRowDoubleClick({row, event, api: this.Grid.api});

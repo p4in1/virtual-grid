@@ -9,7 +9,6 @@ export class VirtualGridApi {
     private debounceTimeout: any = null;
 
     scrollPosTopBackup: number = 0;
-    updateDebounce
 
     constructor(protected Grid: IVirtualGrid, private config: VirtualGridConfigController) {
     }
@@ -197,7 +196,7 @@ export class VirtualGridApi {
      * @returns {Array}
      */
     public getSelectedRows = (): IVirtualGridRow[] => {
-        return this.Grid == void 0 ? [] : this.Grid.RowController.selectedRows;
+        return this.Grid == void 0 ? [] : this.Grid.SelectionController.getSelection()
     };
 
     /**
@@ -353,58 +352,7 @@ export class VirtualGridApi {
      * @param {boolean} useShift - boolean if the shift key is used
      */
     public select = (row: IVirtualGridRow, useCtrl: boolean = false, useShift: boolean = false): void => {
-        // the row is already selected
-        if (row.isSelected) {
-            if (!useCtrl && !useShift) {
-                this.deselectAll();
-                this.selectRow(row);
-            } else if (useCtrl && !useShift) {
-                this.deselectRow(row);
-                this.Grid.RowController.renderRows();
-            }
-
-            return;
-        }
-
-        // in this case we deselect all other selected rows
-        if ((!useCtrl && !useShift) || this.config.selectionMethod !== "multi") {
-            this.deselectAll();
-        }
-
-        if (useShift) {
-            let selectedRows = this.Grid.RowController.selectedRows
-            if (selectedRows.length > 0) {
-                const lastSelectedIndex: number = selectedRows[selectedRows.length - 1].index;
-                const currentIndex: number = row.index;
-
-                const min: number = Math.min(lastSelectedIndex, currentIndex);
-                const max: number = Math.max(lastSelectedIndex, currentIndex);
-
-                for (let i: number = min; i <= max; i++) {
-                    let row = this.Grid.rows[i]
-                    if (row.isSelectable && !row.isSelected) {
-                        this.selectRow(row);
-                    }
-                }
-            } else {
-                this.selectRow(row);
-            }
-        } else {
-            this.selectRow(row);
-        }
-
-        this.Grid.RowController.renderRows();
-    };
-
-    /**
-     * select the row with the given index
-     * @param {string} index - the index of the row to select
-     */
-    public selectIndex = (index: number): void => {
-        const row: IVirtualGridRow | null = this.getRowByIndex(index);
-        if (row != void 0) {
-            this.select(row);
-        }
+        this.Grid.SelectionController.select(row, useCtrl, useShift)
     };
 
     /**
@@ -412,49 +360,21 @@ export class VirtualGridApi {
      * @param row
      */
     public deselectRow(row: IVirtualGridRow): void {
-
-        row.isSelected = false;
-
-        for (const i in this.Grid.RowController.selectedRows) {
-            if (this.Grid.RowController.selectedRows[i].index == row.index) {
-                this.Grid.RowController.selectedRows.splice(Number(i), 1);
-                break;
-            }
-        }
-
-        this.Grid.RowController.toggleSelectionClasses(row, false);
+        this.Grid.SelectionController.deselectRow(row)
     }
 
     /**
      * deselect all rows
      */
-    public deselectAll = (): void => {
-
-        for (let row of this.Grid.RowController.selectedRows) {
-            this.Grid.RowController.toggleSelectionClasses(row, false);
-        }
-
-        for (const i in this.Grid.rows) {
-            this.Grid.rows[i].isSelected = false;
-        }
-
-        this.Grid.RowController.selectedRows = [];
+    deselectAll = (): void => {
+        this.Grid.SelectionController.deselectAll()
     };
-
 
     /**
      * select a single row
      * @param row
      */
     public selectRow(row: IVirtualGridRow): void {
-
-        if (!row.isSelectable) {
-            return;
-        }
-
-        row.isSelected = true;
-
-        this.Grid.RowController.selectedRows.push(row);
-        this.Grid.RowController.toggleSelectionClasses(row);
+        this.Grid.SelectionController.selectRow(row)
     }
 }

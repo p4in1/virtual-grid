@@ -28,7 +28,113 @@ export class VirtualGridSelectionController {
         }
     }
 
+    /**
+     * select one or multiple rows according to ctrl and shift key
+     *
+     * @param row - the clicked row
+     * @param {boolean} useCtrl - boolean if the ctrl key is used
+     * @param {boolean} useShift - boolean if the shift key is used
+     */
+    public select = (row: IVirtualGridRow, useCtrl: boolean = false, useShift: boolean = false): void => {
+        // the row is already selected
+        if (row.isSelected) {
+            if (!useCtrl && !useShift) {
+                this.deselectAll();
+                this.selectRow(row);
+            } else if (useCtrl && !useShift) {
+                this.deselectRow(row);
+                this.Grid.RowController.renderRows();
+            }
+
+            return;
+        }
+
+        // in this case we deselect all other selected rows
+        if ((!useCtrl && !useShift) || this.config.selectionMethod !== "multi") {
+            this.deselectAll();
+        }
+
+        if (useShift) {
+            if (this.selectedRows.length > 0) {
+                const lastSelectedIndex: number = this.selectedRows[this.selectedRows.length - 1].index;
+                const currentIndex: number = row.index;
+
+                const min: number = Math.min(lastSelectedIndex, currentIndex);
+                const max: number = Math.max(lastSelectedIndex, currentIndex);
+
+                for (let i: number = min; i <= max; i++) {
+                    let row = this.Grid.rows[i]
+                    if (row.isSelectable && !row.isSelected) {
+                        this.selectRow(row);
+                    }
+                }
+            } else {
+                this.selectRow(row);
+            }
+        } else {
+            this.selectRow(row);
+        }
+
+        this.Grid.RowController.renderRows();
+    };
+
+
+    /**
+     * deselect a single row
+     * @param row
+     */
+    public deselectRow(row: IVirtualGridRow): void {
+
+        row.isSelected = false;
+
+        for (const i in this.selectedRows) {
+            if (this.selectedRows[i].index == row.index) {
+                this.selectedRows.splice(Number(i), 1);
+                break;
+            }
+        }
+
+        this.Grid.RowController.toggleSelectionClasses(row, false);
+    }
+
+    /**
+     * deselect all rows
+     */
+    public deselectAll = (): void => {
+
+        for (let row of this.selectedRows) {
+            this.Grid.RowController.toggleSelectionClasses(row, false);
+        }
+
+        for (const row of this.Grid.rows) {
+            row.isSelected = false;
+        }
+
+        this.selectedRows = [];
+    };
+
+    /**
+     * select a single row
+     * @param row
+     */
+    public selectRow(row: IVirtualGridRow): void {
+
+        if (!row.isSelectable) {
+            return;
+        }
+
+        row.isSelected = true;
+
+        this.selectedRows.push(row);
+        this.Grid.RowController.toggleSelectionClasses(row);
+    }
+
     onCellMouseDown = (event: any, cell: IRenderedCell): void => {
+
+        if (this.Grid.ConfigController.selectionMethod != "range") {
+            return
+        }
+
 
         if (event.buttons != 1) {
             let rangeStart = this.rangeSelection.start
@@ -48,10 +154,6 @@ export class VirtualGridSelectionController {
             if (currentCol >= minColIndex && currentCol <= maxColIndex && currentRow >= minRowIndex && currentRow <= maxRowIndex) {
                 return;
             }
-        }
-
-        if (this.Grid.ConfigController.selectionMethod != "range") {
-            return
         }
 
         this._clearRangeSelection()

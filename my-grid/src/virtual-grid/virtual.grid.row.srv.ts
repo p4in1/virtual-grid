@@ -14,8 +14,6 @@ import {VirtualGridUIDomController} from "./virtual.grid.ui.dom.srv";
  */
 export class VirtualGridRowController {
 
-    selectedRows: IVirtualGridRow[] = [];
-
     constructor(protected Grid: IVirtualGrid, private config: VirtualGridConfigController, private domController: VirtualGridUIDomController) {
     }
 
@@ -23,7 +21,7 @@ export class VirtualGridRowController {
      * processes the grid data and creates the grid rows from scratch
      */
     public buildRows = (): void => {
-        this.selectedRows = [];
+        this.Grid.SelectionController.selectedRows = [];
         // flatten the recursive structure
         this.Grid.rows = this.Grid.Utils.flatten(this.Grid.rows);
         this.setRowIndexes();
@@ -564,7 +562,7 @@ export class VirtualGridRowController {
             let row: IVirtualGridRow = new VirtualGridRow(this.Grid, node, nodeLevel, parent);
 
             if (row.isSelected) {
-                this.selectedRows.push(row);
+                this.Grid.SelectionController.selectedRows.push(row);
             }
 
             if (node[this.config.childNodesKey]) {

@@ -53,64 +53,80 @@ export class VirtualGridContextmenuController {
 
     exportAsCsv = () => {
         let selection = this.Grid.SelectionController.getSelection()
+
+        let exportData = []
+
         if (this.config.selectionMethod == "range") {
-            let rows = []
-            for (let row of this._getPreformattedRows(selection)) {
-                let _row = []
-                row.forEach((cell) => {
-                    _row.push(cell.value)
-                })
-
-                rows.push(_row)
+            exportData = selection.range
+        } else {
+            for (let row of selection) {
+                exportData.push(row.renderedRow.cells)
             }
-
-            let csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
-            let encodedUri = encodeURI(csvContent);
-            let link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "export.csv");
-            document.body.appendChild(link); // Required for FF
-
-            link.click();
-
-            document.body.removeChild(link)
         }
+
+        let rows = []
+        for (let row of this._getPreformattedRows(exportData)) {
+            let _row = []
+            row.forEach((cell) => {
+                _row.push(cell.value)
+            })
+
+            rows.push(_row)
+        }
+
+        let csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
+        let encodedUri = encodeURI(csvContent);
+        let link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "export.csv");
+        document.body.appendChild(link); // Required for FF
+
+        link.click();
+
+        document.body.removeChild(link)
     }
 
     copySelectionToClipboard = () => {
         let selection = this.Grid.SelectionController.getSelection()
+        let exportData = []
+
         if (this.config.selectionMethod == "range") {
-            let lines = ""
-
-
-            for (let row of this._getPreformattedRows(selection)) {
-
-                let line = ""
-
-                row.forEach((cell) => {
-                    line += cell.value
-
-                    let diff = cell.idealLength - cell.value.length
-
-                    for (let i = 0; i < diff; i++) {
-                        line += " "
-                    }
-                })
-
-                line += "\r\n"
-
-                lines += line
+            exportData = selection.range
+        } else {
+            for (let row of selection) {
+                exportData.push(row.renderedRow.cells)
             }
-
-            this.Grid.Utils.copyToClipboard(lines)
         }
+
+        let lines = ""
+
+        for (let row of this._getPreformattedRows(exportData)) {
+
+            let line = ""
+
+            row.forEach((cell) => {
+                line += cell.value
+
+                let diff = cell.idealLength - cell.value.length
+
+                for (let i = 0; i < diff; i++) {
+                    line += " "
+                }
+            })
+
+            line += "\r\n"
+
+            lines += line
+        }
+
+        this.Grid.Utils.copyToClipboard(lines)
     }
 
-    _getPreformattedRows(selection) {
+    _getPreformattedRows(exportData) {
         let preFormatting = []
         let colLength = {}
 
-        let firstRow = selection.range[0]
+        let firstRow = exportData[0]
         let preFormattedColHeader = []
 
         firstRow.forEach((cell, index) => {
@@ -124,7 +140,7 @@ export class VirtualGridContextmenuController {
 
         preFormatting.push(preFormattedColHeader)
 
-        for (let row of selection.range) {
+        for (let row of exportData) {
             let preFormattedRow = []
 
             row.forEach((cell, index) => {

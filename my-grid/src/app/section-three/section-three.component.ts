@@ -91,7 +91,7 @@ export class SectionThreeComponent implements AfterViewInit {
             element: this.grid.nativeElement,
             showHeader: true,
             showGroupPanel: true,
-            selectionMethod: "range",
+            selectionMethod: "multi",
             onGridReady(Grid: IVirtualGrid) {
                 let config = JSON.parse(localStorage.getItem("virtual-grid-config"))
                 if (config) {
