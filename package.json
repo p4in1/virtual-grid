@@ -1,6 +1,6 @@
 {
   "name": "@p4in1/virtual-grid",
-  "version": "0.0.43",
+  "version": "0.0.44",
   "description": "This is a grid component that is extremely fast and can manage up to 500k rows",
   "main": "dist/virtual.grid.min.js",
   "module": "dist/virtual.grid.min.js",
@@ -44,5 +44,5 @@
   "bugs": {
     "url": "https://github.com/p4in1/virtual-grid/issues"
   },
-  "homepage": "https://github.com/p4in1/virtual-grid#readme"
+  "homepage": "http://virtual-grid.com"
 }
