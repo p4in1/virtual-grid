@@ -195,6 +195,7 @@
                 align-items: center;
                 cursor: pointer;
                 font-size: $font-medium;
+                color: rgba(0, 0, 0, .87);
 
                 &.inactive {
                     opacity: .6;
@@ -302,6 +303,7 @@
                                     overflow: hidden;
                                     text-overflow: ellipsis;
                                     white-space: nowrap;
+                                    text-align: left;
 
                                     font-size: $font-medium;
                                     width: 100%;
@@ -414,6 +416,8 @@
                 text-overflow: ellipsis;
                 white-space: nowrap;
                 user-select: none;
+                color: rgba(0, 0, 0, 0.87);
+                text-align: left;
 
                 .header-cell-content {
                     display: flex;
