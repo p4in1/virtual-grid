@@ -1,4 +1,5 @@
 import {
+    IRenderedCell,
     IVirtualGrid,
     IVirtualGridColumn, IVirtualGridConfig, IVirtualGridContextmenuEntry,
     IVirtualGridRow,
@@ -129,13 +130,17 @@ export class VirtualGridContextmenuController {
         let firstRow = exportData[0]
         let preFormattedColHeader = []
 
-        firstRow.forEach((cell, index) => {
+        firstRow.forEach((cell: IRenderedCell) => {
+
+            if (!cell.colModel.isVisible || cell.colModel.colType == "avatar") {
+                return;
+            }
 
             let value = cell.colModel.title
-
-            colLength[index] = 0
-            colLength[index] = colLength[index] <= value.length ? value.length + 2 : colLength[index]
-            preFormattedColHeader.push({value, idealLength: 0})
+            let colId = cell.colModel.id
+            colLength[colId] = 0
+            colLength[colId] = colLength[colId] <= value.length ? value.length + 2 : colLength[colId]
+            preFormattedColHeader.push({value, idealLength: 0, colId})
         })
 
         preFormatting.push(preFormattedColHeader)
@@ -143,11 +148,17 @@ export class VirtualGridContextmenuController {
         for (let row of exportData) {
             let preFormattedRow = []
 
-            row.forEach((cell, index) => {
-                let value = cell.rowModel.getCellValue(cell.colModel)
+            row.forEach((cell: IRenderedCell) => {
 
-                colLength[index] = colLength[index] <= value.length ? value.length + 2 : colLength[index]
-                preFormattedRow.push({value, idealLength: 0})
+                if (!cell.colModel.isVisible || cell.colModel.colType == "avatar") {
+                    return;
+                }
+
+                let value = cell.rowModel.getCellValue(cell.colModel)
+                let colId = cell.colModel.id
+
+                colLength[colId] = colLength[colId] <= value.length ? value.length + 2 : colLength[colId]
+                preFormattedRow.push({value, idealLength: 0, colId})
             })
 
             preFormatting.push(preFormattedRow)
@@ -155,8 +166,8 @@ export class VirtualGridContextmenuController {
 
         for (let row of preFormatting) {
 
-            row.forEach((cell, index) => {
-                cell.idealLength = colLength[index]
+            row.forEach((cell: any) => {
+                cell.idealLength = colLength[cell.colId]
             })
         }
 

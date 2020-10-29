@@ -407,6 +407,13 @@ export class VirtualGridRowController {
             return
         }
 
+        // in case this is a rowGroup we clear it in case there was more than one row of data
+        if (cell.rowModel.isRowGroup) {
+            for (let i = 0; i < cell.textNodes.length; i++) {
+                cell.textNodes[i].innerHTML = ""
+            }
+        }
+
         let cellData = this.getCellData(cell.rowModel.rowData, cell.fieldPath);
 
         if (typeof (cell.cellRenderer) == "function") {
@@ -462,6 +469,10 @@ export class VirtualGridRowController {
             cell.avatarNode.style["background-image"] = ""
             cell.avatarNode.style["background-color"] = "transparent"
 
+            if (cell.rowModel.isRowGroup) {
+                return
+            }
+
             if (avatarURL != "" && avatarURL != void 0) {
                 cell.avatarPlaceholder.innerText = ""
                 cell.avatarNode.style["background-image"] = `url(${avatarURL})`
@@ -485,11 +496,13 @@ export class VirtualGridRowController {
     private _renderTreeNode(cell: IRenderedCell) {
         if (cell.colModel.isHierarchyColumn) {
             cell.cellNode.style["padding-left"] = `${16 * cell.rowModel.level}px`;
-
+            cell.treeChildCountNode.innerText = ""
             if (cell.treeNode != void 0) {
                 const children: IVirtualGridRow[] = cell.rowModel.children;
 
                 if (children != void 0 && children.length > 0) {
+                    cell.treeChildCountNode.innerText = `(${children.length})`
+
                     if (cell.rowModel.isExpanded && !cell.rowModel.isLoading) {
                         cell.treeNode.innerHTML = "remove"
                     } else {

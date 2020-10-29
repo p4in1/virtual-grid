@@ -99,7 +99,6 @@ export class VirtualGridConfigController {
         if (this.showGroupPanel) {
             config.columns.unshift({
                 isGroupColumn: true,
-                pinned: "left",
                 suppressMoving: true,
                 isSystemColumn: true,
                 isHierarchyColumn: true,

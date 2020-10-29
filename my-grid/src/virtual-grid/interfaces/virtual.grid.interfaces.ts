@@ -468,6 +468,7 @@ export interface IVirtualGridColumn {
 export interface IRenderedCell {
     textNodes: HTMLElement[]
     treeNode: HTMLElement
+    treeChildCountNode: HTMLElement
     checkboxNode: HTMLElement
     checkboxIcon: HTMLElement
     cellNode: HTMLElement

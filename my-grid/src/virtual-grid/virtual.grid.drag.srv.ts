@@ -195,6 +195,10 @@ export class VirtualGridDragAndDropController {
             let currentGroup = this.groups[i]
             let value = row.getCellValue(currentGroup.col).trim()
 
+            if (value === "") {
+                value = "[Empty]"
+            }
+
             if (currentNode[value] == void 0) {
                 currentNode[value] = {
                     children: [],

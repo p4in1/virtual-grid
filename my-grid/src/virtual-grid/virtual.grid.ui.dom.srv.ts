@@ -464,6 +464,7 @@ export class VirtualGridUIDomController {
             const cell: IRenderedCell = <IRenderedCell>{
                 textNodes: [],
                 treeNode: null,
+                treeChildCountNode: null,
                 checkboxNode: null,
                 avatarNode: null,
                 avatarPlaceholder: null,
@@ -480,6 +481,7 @@ export class VirtualGridUIDomController {
 
             if (col.isHierarchyColumn || col.isRowGroupColumn) {
                 cell.treeNode = this.Utils.el("i", ["node-icon", "virtual-material-icons", "small"]);
+                cell.treeChildCountNode = this.Utils.el("span", ["node-child-count"]);
                 cell.treeNode.addEventListener("click", this.Grid.RowController.toggleNodeListener);
                 cell.cellNode.append(cell.treeNode)
             }
@@ -531,6 +533,10 @@ export class VirtualGridUIDomController {
                 }
 
                 cell.cellNode.append(cell.cellContentNode)
+            }
+
+            if(col.isRowGroupColumn){
+                cell.cellNode.append(cell.treeChildCountNode)
             }
 
             row.cells.push(cell);
