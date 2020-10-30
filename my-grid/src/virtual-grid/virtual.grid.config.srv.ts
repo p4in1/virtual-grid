@@ -18,7 +18,7 @@ export class VirtualGridConfigController {
     suppressDragging: boolean = false
     suppressPinning: boolean = false
     suppressMoving: boolean = false
-    suppressContextmenu:boolean = false;
+    suppressContextmenu: boolean = false;
 
     showHeader: boolean = false
     showGroupPanel: boolean = false
@@ -26,8 +26,6 @@ export class VirtualGridConfigController {
 
     selectionMethod: string
     element: HTMLElement;
-    autoSizeColumns: boolean = false;
-    headerValueGetter: Function
     childNodesKey: string
 
     externalFilter: Function
@@ -40,6 +38,8 @@ export class VirtualGridConfigController {
     onRowRightClick: Function
 
     onNodeExpandAsync: Function;
+
+    headerValueGetter: Function
 
     expandNodesByDefault = false;
     useCheckboxSelection = false;
@@ -62,7 +62,6 @@ export class VirtualGridConfigController {
 
         this.element = config.element
         this.selectionMethod = config.selectionMethod == void 0 ? "single" : config.selectionMethod
-        this.autoSizeColumns = config.autoSizeColumns
         this.headerValueGetter = config.headerValueGetter
         this.childNodesKey = config.childNodesKey != void 0 && config.childNodesKey !== '' ? config.childNodesKey : 'children';
 
@@ -129,15 +128,17 @@ export class VirtualGridConfigController {
                 isSystemColumn: col.isSystemColumn,
 
                 isRowGrouped: col.isRowGrouped,
-                isAutosize: !col.suppressResize,
                 isVisible: col.isVisible == void 0 ? true : col.isVisible,
 
                 isSuppressSort: col.suppressSorting || this.suppressSorting,
                 isSuppressResize: col.suppressResize || this.suppressResize,
-                isSuppressAutoSize: col.suppressAutoSize || this.suppressAutoSize,
                 isSuppressDragging: col.suppressDragging || this.suppressDragging,
                 isSuppressPinning: col.suppressPinning || this.suppressPinning,
                 isSuppressMoving: col.suppressMoving || this.suppressMoving,
+
+                cellRenderer: col.cellRenderer,
+                cellValueFormatter: col.cellValueFormatter,
+                cellValueGetter: col.cellValueGetter,
 
                 pinned: col.pinned && ["left", "right"].includes(col.pinned) ? col.pinned : "center",
 
@@ -146,8 +147,6 @@ export class VirtualGridConfigController {
 
                 width: col.width,
                 minWidth: col.minWidth,
-
-                valueFormat: col.valueFormat
             }
 
             colDef.isPinned = colDef.pinned == "left" || colDef.pinned == "right";
@@ -212,8 +211,6 @@ export class VirtualGridConfigController {
     setMinimumProperties(colDef) {
         colDef.isSuppressSort = true;
         colDef.isSuppressFilter = true;
-        colDef.isAutosize = false;
-        colDef.isSuppressAutoSize = true;
         colDef.isSuppressResize = true;
         colDef.isShowFilter = false
     }

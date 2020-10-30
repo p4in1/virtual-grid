@@ -132,12 +132,13 @@ export class VirtualGridContextmenuController {
 
         firstRow.forEach((cell: IRenderedCell) => {
 
-            if (!cell.colModel.isVisible || cell.colModel.colType == "avatar") {
+            let colModel = cell.colModel
+            if (!colModel.isVisible || colModel.colType == "avatar" || colModel.colType == "action") {
                 return;
             }
 
-            let value = cell.colModel.title
-            let colId = cell.colModel.id
+            let value = colModel.title
+            let colId = colModel.id
             colLength[colId] = 0
             colLength[colId] = colLength[colId] <= value.length ? value.length + 2 : colLength[colId]
             preFormattedColHeader.push({value, idealLength: 0, colId})
@@ -149,13 +150,13 @@ export class VirtualGridContextmenuController {
             let preFormattedRow = []
 
             row.forEach((cell: IRenderedCell) => {
-
-                if (!cell.colModel.isVisible || cell.colModel.colType == "avatar") {
+                let colModel = cell.colModel
+                if (!colModel.isVisible || colModel.colType == "avatar" || colModel.colType == "action") {
                     return;
                 }
 
-                let value = cell.rowModel.getCellValue(cell.colModel)
-                let colId = cell.colModel.id
+                let value = cell.rowModel.getCellValue(colModel)
+                let colId = colModel.id
 
                 colLength[colId] = colLength[colId] <= value.length ? value.length + 2 : colLength[colId]
                 preFormattedRow.push({value, idealLength: 0, colId})

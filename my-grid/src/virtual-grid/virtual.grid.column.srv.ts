@@ -17,7 +17,6 @@ export class VirtualGridColumnController {
     public scrollbarWidth: number = this.getScrollbarWidth();
 
     private sortConfig: any = {};
-    private gPadding: number = 16;
 
     public sortedColumns: IVirtualGridColumn[] = [];
 
@@ -350,11 +349,6 @@ export class VirtualGridColumnController {
             this.isVerticalScrolling = true;
         }
 
-        if (this.config.autoSizeColumns) {
-            this.autoSizeColumn();
-            return
-        }
-
         let availableWidth: number = this.domController.dom.virtualGrid.clientWidth;
         let upsizedColumns: number = 0; // we count the columns without a predefined width
 
@@ -397,52 +391,6 @@ export class VirtualGridColumnController {
             }
         }
     }
-
-    /**
-     * calculates the cell content's width according toi the approximation of the text in pixel
-     * using the text width inspection
-     * @param col - the column
-     * @param row - the row
-     */
-    private getCellContentWidth(col: any, row: IVirtualGridRow): number {
-        let cellWidth: number = 0;
-
-        cellWidth += row.rowData[col.field] != void 0 ? this.Grid.Utils.getTextWidthInPixel(row.rowData[col.field]) : 0;
-        cellWidth += this.gPadding;
-
-        return cellWidth;
-    }
-
-    /**
-     * autosize the columns
-     */
-    autoSizeColumn() {
-        // now we calculate the approx. width of the columns by their contents
-        for (const row of this.Grid.rows) {
-
-            for (let i = 0; i < this.Grid.originalColumns.length; i++) {
-                let col = this.Grid.originalColumns[i];
-                if (col.isSuppressAutoSize) {
-                    continue;
-                }
-
-                if (col.width == void 0) {
-                    col.width = 0;
-                }
-
-                let cellWidth: number = 0;
-
-                cellWidth = this.getCellContentWidth(col, row);
-
-                if (cellWidth > col.maxWidth) {
-                    col.width = col.maxWidth;
-                } else if (col.width < cellWidth) {
-                    col.width = Math.floor(cellWidth);
-                }
-            }
-        }
-    }
-
 
     /**
      * resets the indexes of the grid rows to the initial value

@@ -428,6 +428,8 @@ export class VirtualGridUIEventController {
             if (!column.isSuppressResize && Number(column.index) < this.Grid.originalColumns.length - 1) {
                 column.dom.cellResizer.addEventListener("mousedown", event => this.onResize(column, event))
             }
+
+            column.dom.cellResizer.addEventListener("dblclick", column.api.sizeToFit)
         }
 
         // header resizer for left and right pin viewport
@@ -488,6 +490,6 @@ export class VirtualGridUIEventController {
      * @returns {Array} - an array
      */
     private getAutoSizableColumns(colsToBeResized: IVirtualGridColumn[], isGrowing: boolean): IVirtualGridColumn[] {
-        return colsToBeResized.filter((col) => col.isVisible && col.pinned === "center" && ((!isGrowing && col.isAutoResize && col.canShrink) || (isGrowing && col.isAutoResize)))
+        return colsToBeResized.filter((col) => col.isVisible && col.pinned === "center" && ((!isGrowing && col.canShrink) || isGrowing))
     }
 }

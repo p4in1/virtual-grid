@@ -407,34 +407,12 @@ export class VirtualGridRowController {
             return
         }
 
-        // in case this is a rowGroup we clear it in case there was more than one row of data
-        if (cell.rowModel.isRowGroup) {
-            for (let i = 0; i < cell.textNodes.length; i++) {
-                cell.textNodes[i].innerHTML = ""
-            }
-        }
-
-        let cellData = this.getCellData(cell.rowModel.rowData, cell.fieldPath);
-
         if (typeof (cell.cellRenderer) == "function") {
             cell.textNodes[0].innerHTML = cell.cellRenderer(cell);
             return
         }
 
-        if (typeof (cell.cellValueGetter) == "function") {
-            let value = cell.cellValueGetter(cell, cellData)
-            cell.textNodes[0].textContent = this._formatValue(cell, value)
-            return
-        }
-
-        if (Array.isArray(cellData)) {
-
-            for (let i = 0; i < cell.textNodes.length; i++) {
-                cell.textNodes[i].innerHTML = cellData[i] == void 0 ? "" : cellData[i].toString().trim()
-            }
-
-            return
-        }
+        let cellValue: any = cell.rowModel.getCellValue(cell.colModel, false) //this.getCellData(cell.rowModel.rowData, cell.fieldPath);
 
         if (colType == "boolean") {
             let cellNode = this.Grid.Utils.el("i", ["action-icon", "virtual-material-icons"])
@@ -443,13 +421,16 @@ export class VirtualGridRowController {
             cell.textNodes[0].classList.add("boolean-node");
             cell.textNodes[0].append(cellNode);
 
-            let val = cellData === true || cellData === "true" ? true : cellData === false || cellData === "false" ? false : !!cellData
-
+            let val = cellValue === true || cellValue === "true" ? true : cellValue === false || cellValue === "false" ? false : !!cellValue
 
             cellNode.innerHTML = val === true ? "done" : ""
 
         } else {
-            cell.textNodes[0].textContent = this._formatValue(cell, cellData);
+            cellValue = !Array.isArray(cellValue) ? [cellValue] : cellValue
+
+            for (let i = 0; i < cell.textNodes.length; i++) {
+                cell.textNodes[i].innerHTML = cellValue[i] == void 0 ? "" : cellValue[i].toString().trim()
+            }
         }
     }
 
@@ -520,22 +501,6 @@ export class VirtualGridRowController {
             let styles = cell.cellStyleGetter(cell);
             if (typeof (styles) == "object") {
                 this.domController.setStyles(cell.cellNode, styles);
-            }
-        }
-    }
-
-    private _formatValue(cell: IRenderedCell, cellData: any) {
-        if (cell.colModel.valueFormat == void 0) {
-            return cellData
-        } else {
-            switch (cell.colModel.valueFormat) {
-                case "currency":
-
-                    if (cellData == void 0 || cellData === "") {
-                        cellData = 0
-                    }
-
-                    return `${cellData.toFixed(2).replace(".", ",")} €`
             }
         }
     }

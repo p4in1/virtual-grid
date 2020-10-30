@@ -73,8 +73,9 @@ export class VirtualGridRow implements IVirtualGridRow {
      * 4. data type of the column   -> this is the lowest priority but the highest probability and we interpret the datatype which should not be problematic
      *
      * @param col
+     * @param stringify
      */
-    public getCellValue = (col: IVirtualGridColumn): string => {
+    public getCellValue = (col: IVirtualGridColumn, stringify: boolean = true): string => {
         let cellData: any = this.Grid.RowController.getCellData(this.rowData, col.fieldPath);
         let cellValue: string;
         let cell: any = {
@@ -87,17 +88,13 @@ export class VirtualGridRow implements IVirtualGridRow {
         } else if (typeof cell.colModel.cellValueGetter === "function") {
             cellValue = cell.colModel.cellValueGetter(cell, cellData)
         } else {
-            if (col.colType == "multiLine") {
-                // replacing multiple spaces with a single space in case an entry has multiple spaces
-                cellValue = Array.isArray(cellData) ? cellData.join(" ") : cellData != void 0 ? cellData.toString() : ""
-            } else if (col.colType == "date") {
-                cellValue = this.Grid.Utils.parseDate(cellData)
-            } else {
-                cellValue = cellData
-            }
+            cellValue = cellData
+        }
+        if (typeof cell.colModel.cellValueFormatter == "function") {
+            cellValue = cell.colModel.cellValueFormatter(cell, cellData)
         }
 
-        return cellValue.toString();
+        return stringify ? Array.isArray(cellValue) ? cellData.join(" ") : cellValue.toString() : cellValue
     }
 
     // private renderRow() {

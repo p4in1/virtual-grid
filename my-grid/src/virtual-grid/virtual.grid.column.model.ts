@@ -47,7 +47,6 @@ export class VirtualGridColumn implements IVirtualGridColumn {
     canShrink: boolean = false;
 
     isSuppressResize: boolean = false;
-    isSuppressAutoSize: boolean = false;
     isSuppressFilter: boolean = false;
     isSuppressSort: boolean = false;
     isSuppressDragging: boolean = false;
@@ -58,8 +57,6 @@ export class VirtualGridColumn implements IVirtualGridColumn {
 
     title: string = "";
 
-    valueFormat: string;
-
     left: number;
     width: number;
     minWidth: number;
@@ -68,6 +65,7 @@ export class VirtualGridColumn implements IVirtualGridColumn {
     cellRenderer: Function;
     cellStyleGetter: Function;
     cellValueGetter: Function;
+    cellValueFormatter:Function
 
     colType: string
     colDef: any;
@@ -103,7 +101,6 @@ export class VirtualGridColumn implements IVirtualGridColumn {
         this.currentIndex = index;
 
         this.title = configColDef.title;
-        this.valueFormat = configColDef.valueFormat
 
         this.filter = {
             value: "",
@@ -115,6 +112,7 @@ export class VirtualGridColumn implements IVirtualGridColumn {
         this.cellRenderer = typeof (configColDef.cellRenderer) == "function" ? configColDef.cellRenderer : null;
         this.cellStyleGetter = typeof (configColDef.cellStyleGetter) == "function" ? configColDef.cellStyleGetter : null;
         this.cellValueGetter = typeof (configColDef.cellValueGetter) == "function" ? configColDef.cellValueGetter : null;
+        this.cellValueFormatter = typeof (configColDef.cellValueFormatter) == "function" ? configColDef.cellValueFormatter : null;
 
         this.width = configColDef.width;
         this.minWidth = configColDef.minWidth == void 0 ? 80 : configColDef.minWidth;
@@ -145,7 +143,6 @@ export class VirtualGridColumn implements IVirtualGridColumn {
         this.isShowFilter = configColDef.isShowFilter;
         this.isAutoResize = !configColDef.isSuppressResize;
         this.isSuppressResize = configColDef.isSuppressResize;
-        this.isSuppressAutoSize = configColDef.isSuppressAutoSize;
         this.isSuppressDragging = configColDef.isSuppressDragging;
         this.isSuppressPinning = configColDef.isSuppressPinning;
         this.isSuppressMoving = configColDef.isSuppressMoving

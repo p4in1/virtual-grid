@@ -12,11 +12,14 @@ export class VirtualGridUtils {
 
         document.body.append(textWidthInspector);
 
+        textWidthInspector.style.fontSize = "14px"
+        textWidthInspector.style.fontFamily = "'Roboto', sans-serif"
+
         const PRINT_CHARS = [
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
             'v', 'w', 'x', 'y', 'z', 'ä', 'ö', 'ü',
             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
-            'V', 'W', 'X', 'Y', 'Z', 'Ä', 'Ö', 'Ü', 'ß',
+            'V', 'W', 'X', 'Y', 'Z', 'Ä', 'Ö', 'Ü', 'ß', " ",
             '!', '"', '§', '$', '%', '&', '/', '\\', '(', ')', '[', ']', '{', '}', '=', '?',
             '.', ':', '-', '_', ',', ';', '#', '\'', '+', '*', '~', '<', '>', '|', '@', '€',
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
@@ -32,14 +35,6 @@ export class VirtualGridUtils {
 
             this.CHAR_WIDTH_MAP[char] = charWidth;
         }
-
-        // generate a generic css stylesheet for the layout of the grid and add it to the documents head
-        const css = '',
-            head = document.head || document.getElementsByTagName('head')[0],
-            style = document.createElement('style');
-
-        style.append(document.createTextNode(css));
-        head.append(style);
 
         textWidthInspector.remove();
 

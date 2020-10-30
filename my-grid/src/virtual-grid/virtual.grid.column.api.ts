@@ -1,4 +1,8 @@
-import {IVirtualGrid, IVirtualGridColumn, IVirtualGridColumnApi} from "./interfaces/virtual.grid.interfaces";
+import {
+    IVirtualGrid,
+    IVirtualGridColumn,
+    IVirtualGridColumnApi,
+} from "./interfaces/virtual.grid.interfaces";
 
 export class VirtualGridColumnApi implements IVirtualGridColumnApi {
 
@@ -88,8 +92,28 @@ export class VirtualGridColumnApi implements IVirtualGridColumnApi {
         }
     }
 
+    sizeToFit = () => {
+        let col = this.col
+        let cellWidth: number = 0;
+        for (const row of this.Grid.rows) {
+            let value = row.getCellValue(col)
+            let _width: number = this.Grid.Utils.getTextWidthInPixel(value)
+
+            cellWidth = _width < cellWidth ? cellWidth : _width
+        }
+
+        cellWidth = col.maxWidth && cellWidth > col.maxWidth ? col.maxWidth : col.width < cellWidth ? Math.floor(cellWidth) : cellWidth
+
+        let width = col.width == void 0 ? cellWidth : cellWidth - col.width
+        this._updateCellWidth(width)
+    }
+
     private _toggleVisibility(isVisible, width) {
         this.col.isVisible = isVisible
+        this._updateCellWidth(width)
+    }
+
+    private _updateCellWidth(width) {
         this.Grid.eventController.updateCellWidth(this.col.currentIndex, width, true)
         this.Grid.eventController.updateGridWidth();
         this.Grid.domController.calculateScrollGuard()

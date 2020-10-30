@@ -67,12 +67,6 @@ export interface IVirtualGridConfig {
     useCheckboxSelection?: boolean
 
     /**
-     * defines if the column shrinks or grows automatically
-     * @default false
-     */
-    autoSizeColumns?: boolean
-
-    /**
      * deselects nodes when the parent has been collapsed
      * @default false
      */
@@ -226,11 +220,14 @@ export interface IVirtualGridColumnConfig {
     actions?: IVirtualColumnAction[]
     width?: number
     minWidth?: number
-    valueFormat?: string
 
     isHierarchyColumn?: boolean
 
-    cellValueGetter?(cell: IRenderedCell, value: any): void
+    cellRenderer?(cell: IRenderedCell, value: any): HTMLElement
+
+    cellValueGetter?(cell: IRenderedCell, value: any): any
+
+    cellValueFormatter?(cell: IRenderedCell, value: any): any
 }
 
 export interface IVirtualGrid {
@@ -342,7 +339,7 @@ export interface IVirtualGridRow {
      */
     updateRowData(rowData: any): void
 
-    getCellValue(col: IVirtualGridColumn): string
+    getCellValue(col: IVirtualGridColumn, stringify?: boolean): string
 }
 
 export interface IVirtualGridColumnApi {
@@ -380,6 +377,11 @@ export interface IVirtualGridColumnApi {
      */
     removeRowGroup(): void
 
+    /**
+     * shrinks or grows the column to the size fitting for the content
+     */
+    sizeToFit(): void
+
     show(): void
 
     hide(): void
@@ -410,15 +412,16 @@ export interface IVirtualGridColumn {
 
     colDef: any
     title: string
-    valueFormat: string
 
     pinned: string
 
     field?: string
     fieldPath?: string[]
+
     cellRenderer?: Function
     cellStyleGetter?: Function
     cellValueGetter?: Function
+    cellValueFormatter?: Function
 
     isVisible?: boolean
     isFilterPresent: boolean
@@ -444,7 +447,6 @@ export interface IVirtualGridColumn {
     colType: string
 
     isSuppressResize?: boolean
-    isSuppressAutoSize?: boolean
     isSuppressFilter?: boolean
     isSuppressSort?: boolean
     isSuppressDragging?: boolean
@@ -607,7 +609,6 @@ export interface IVirtualColDefConfig {
     type: string
 
     title: string
-    valueFormat: string
 
     isAvatarColumn: boolean
     isActionColumn: boolean
@@ -616,7 +617,6 @@ export interface IVirtualColDefConfig {
     isHierarchyColumn: boolean
     isSystemColumn: boolean
 
-    isAutosize: boolean
     isShowFilter: boolean
     isPinned: boolean
     isVisible: boolean
@@ -626,7 +626,6 @@ export interface IVirtualColDefConfig {
 
     isSuppressPinning: boolean
     isSuppressDragging: boolean
-    isSuppressAutoSize: boolean
     isSuppressResize: boolean
     isSuppressSort: boolean
     isSuppressFilter: boolean
@@ -644,6 +643,8 @@ export interface IVirtualColDefConfig {
     cellStyleGetter(): void
 
     cellValueGetter(): void
+
+    cellValueFormatter(): void
 }
 
 export interface IVirtualGridContextmenuEntry {

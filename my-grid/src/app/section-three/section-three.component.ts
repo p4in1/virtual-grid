@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
-import {IVirtualGrid, IVirtualGridConfig} from "../../virtual-grid/interfaces/virtual.grid.interfaces";
+import {IRenderedCell, IVirtualGrid, IVirtualGridConfig} from "../../virtual-grid/interfaces/virtual.grid.interfaces";
 import {VirtualGrid} from "../../virtual-grid/virtual.grid.service";
 
 @Component({
@@ -85,7 +85,11 @@ export class SectionThreeComponent implements AfterViewInit {
                 {
                     type: "date",
                     field: "data.user.adminProperties.riskAssessment.deadlineDateSet",
-                    title: "Forderungs Datum"
+                    title: "Forderungs Datum",
+                    cellValueFormatter(cell: IRenderedCell, value: any): any {
+                        let date = new Date(value)
+                        return value === "" ? "" : `${date.getFullYear()} / ${date.getMonth() + 1} / ${date.getDate()}`
+                    }
                 }
             ],
             element: this.grid.nativeElement,
