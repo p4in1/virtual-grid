@@ -19,6 +19,7 @@ export class VirtualGridConfigController {
     suppressPinning: boolean = false
     suppressMoving: boolean = false
     suppressContextmenu: boolean = false;
+    suppressContextmenuDefault: boolean = false;
 
     showHeader: boolean = false
     showGroupPanel: boolean = false
@@ -37,6 +38,7 @@ export class VirtualGridConfigController {
     onRowDoubleClick: Function
     onRowRightClick: Function
 
+    getContextMenuEntries: Function;
     onNodeExpandAsync: Function;
 
     headerValueGetter: Function
@@ -56,6 +58,8 @@ export class VirtualGridConfigController {
         this.suppressDragging = config.suppressDragging
         this.suppressPinning = config.suppressPinning
         this.suppressContextmenu = config.suppressContextmenu
+        this.suppressContextmenuDefault = config.suppressContextmenuDefault
+
         this.showHeader = config.showHeader
         this.showColumnFilter = config.showColumnFilter
         this.showGroupPanel = config.showHeader && config.showGroupPanel
@@ -71,6 +75,8 @@ export class VirtualGridConfigController {
         this.onRowMouseLeave = typeof config.onRowMouseLeave == "function" ? config.onRowMouseLeave : this._noop
         this.onRowDoubleClick = typeof config.onRowDoubleClick == "function" ? config.onRowDoubleClick : this._noop
         this.onRowRightClick = typeof config.onRowRightClick == "function" ? config.onRowRightClick : this._noop
+
+        this.getContextMenuEntries = typeof config.getContextMenuEntries == "function" ? config.getContextMenuEntries : this._noop
 
         this.onNodeExpandAsync = config.onNodeExpandAsync;
 

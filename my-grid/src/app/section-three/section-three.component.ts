@@ -1,5 +1,10 @@
 import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
-import {IRenderedCell, IVirtualGrid, IVirtualGridConfig} from "../../virtual-grid/interfaces/virtual.grid.interfaces";
+import {
+    IRenderedCell,
+    IVirtualGrid, IVirtualGridColumn,
+    IVirtualGridConfig, IVirtualGridContextmenuEntry,
+    IVirtualGridRow
+} from "../../virtual-grid/interfaces/virtual.grid.interfaces";
 import {VirtualGrid} from "../../virtual-grid/virtual.grid.service";
 
 @Component({
@@ -96,6 +101,26 @@ export class SectionThreeComponent implements AfterViewInit {
             showHeader: true,
             showGroupPanel: true,
             selectionMethod: "multi",
+            suppressContextmenu: false,
+            suppressContextmenuDefault: false,
+            getContextMenuEntries(row: IVirtualGridRow, col: IVirtualGridColumn): IVirtualGridContextmenuEntry[] {
+                let entries: IVirtualGridContextmenuEntry[] = []
+
+                entries.push(
+                    {
+                        label: "Custom entry", icon: "favorite", action(row, col) {
+                            console.log("custom entry action")
+                        }
+                    }, {
+                        isDivider: true
+                    }, {
+                        label: "Secondary action", icon: "fingerprint", action(row, col) {
+                            console.log("I need fingerprints")
+                        }
+                    })
+
+                return entries
+            },
             onGridReady(Grid: IVirtualGrid) {
                 let config = JSON.parse(localStorage.getItem("virtual-grid-config"))
                 if (config) {

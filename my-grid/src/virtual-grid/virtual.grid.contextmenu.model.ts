@@ -101,7 +101,7 @@ export class VirtualGridContextMenu {
 
         let left = event.clientX
         let top = event.clientY
-        let height = entries.length * 48
+        let height = (entries.filter(x => x.isDivider) * 1) + (entries.filter(x => !x.isDivider) * 48)
         let width = currentWidth + 48
 
         if (left + width > windowRect.width) {

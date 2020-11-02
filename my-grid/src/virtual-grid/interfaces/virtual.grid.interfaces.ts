@@ -125,6 +125,10 @@ export interface IVirtualGridConfig {
      * @default false
      */
     suppressContextmenu?: boolean
+    /**
+     * this overrides the default and does not add the export and copy to clipboard actions
+     */
+    suppressContextmenuDefault?: boolean
 
     /**
      * callback before a node is expanded
@@ -191,6 +195,14 @@ export interface IVirtualGridConfig {
      * @param api - grid api
      */
     onRowClick?(row: IVirtualGridRow, event: any, api: VirtualGridApi): void
+
+    /**
+     * a callback where the user can set the contextmenu entries for specific rows and columns
+     * once the user right clicks a row / cell
+     * @param row
+     * @param col
+     */
+    getContextMenuEntries?(row: IVirtualGridRow, col: IVirtualGridColumn): IVirtualGridContextmenuEntry[]
 
     /**
      * grid ready callback

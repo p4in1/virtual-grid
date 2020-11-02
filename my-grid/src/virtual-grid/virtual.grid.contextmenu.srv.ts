@@ -1,16 +1,18 @@
 import {
     IRenderedCell,
     IVirtualGrid,
-    IVirtualGridColumn, IVirtualGridConfig, IVirtualGridContextmenuEntry,
+    IVirtualGridColumn,
+    IVirtualGridContextmenuEntry,
     IVirtualGridRow,
 } from "./interfaces/virtual.grid.interfaces";
 import {VirtualGridContextMenu} from "./virtual.grid.contextmenu.model";
+import {VirtualGridConfigController} from "./virtual.grid.config.srv";
 
 export class VirtualGridContextmenuController {
 
     contextmenu: VirtualGridContextMenu
 
-    constructor(private Grid: IVirtualGrid, private config: IVirtualGridConfig) {
+    constructor(private Grid: IVirtualGrid, private config: VirtualGridConfigController) {
 
     }
 
@@ -23,7 +25,7 @@ export class VirtualGridContextmenuController {
         event.stopPropagation()
         event.stopImmediatePropagation()
 
-        let entries = this.getEntries()
+        let entries = this.getEntries(row, col)
         this.Grid.domController.dom.contextmenu.innerHTML = ""
         this.contextmenu = new VirtualGridContextMenu(this.Grid, this.Grid.domController.dom.contextmenu, entries, row, col, event)
 
@@ -36,20 +38,32 @@ export class VirtualGridContextmenuController {
         document.body.addEventListener("click", _clickHandler)
     }
 
-    getEntries(): IVirtualGridContextmenuEntry[] {
-        return [{
-            icon: "content_copy",
-            label: "Copy to clipboard",
-            action: () => {
-                this.copySelectionToClipboard()
-            }
-        }, {
-            icon: "get_app",
-            label: "Export as CSV",
-            action: () => {
-                this.exportAsCsv()
-            }
-        }]
+    getEntries(row: IVirtualGridRow, col: IVirtualGridColumn): IVirtualGridContextmenuEntry[] {
+
+        let entries: IVirtualGridContextmenuEntry[] = []
+
+        if (!this.config.suppressContextmenuDefault) {
+            entries = [{
+                icon: "content_copy",
+                label: "Copy to clipboard",
+                action: () => {
+                    this.copySelectionToClipboard()
+                }
+            }, {
+                icon: "get_app",
+                label: "Export as CSV",
+                action: () => {
+                    this.exportAsCsv()
+                }
+            }]
+        }
+
+        let userEntries = this.config.getContextMenuEntries(row, col)
+        if (userEntries && Array.isArray(userEntries)) {
+            entries = entries.concat(userEntries)
+        }
+
+        return entries
     }
 
     exportAsCsv = () => {

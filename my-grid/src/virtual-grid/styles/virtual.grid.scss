@@ -28,6 +28,10 @@
     font-family: "Roboto", sans-serif;
     font-size: 14px;
 
+    .contextmenu-divider {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    }
+
     .contextmenu-entry {
         height: 48px;
         min-height: 48px;
@@ -96,6 +100,7 @@
     flex-direction: column;
     background-color: $color-background-grid;
     font-family: "Roboto", sans-serif;
+
     * {
         user-select: none;
     }

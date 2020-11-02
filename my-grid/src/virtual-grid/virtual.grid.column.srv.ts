@@ -14,7 +14,7 @@ import {VirtualGridUIDomController} from "./virtual.grid.ui.dom.srv";
  */
 export class VirtualGridColumnController {
     public isVerticalScrolling: boolean = false;
-    public scrollbarWidth: number = this.getScrollbarWidth();
+    public scrollbarWidth: number = this.Grid.domController.getScrollbarWidth();
 
     private sortConfig: any = {};
 
@@ -212,6 +212,10 @@ export class VirtualGridColumnController {
 
         console.log("sorting took -->", +new Date() - s)
 
+        this.Grid.rows.forEach((row, index) => {
+            row.index = index
+        })
+
         this.Grid.api.refreshGrid(false, true);
     }
 
@@ -310,31 +314,6 @@ export class VirtualGridColumnController {
         return columns
     }
 
-    private getScrollbarWidth() {
-        const inner = document.createElement('p');
-        inner.style.width = "100%";
-        inner.style.height = "200px";
-
-        let outer = document.createElement('div');
-        outer.style.position = "absolute";
-        outer.style.top = "0px";
-        outer.style.left = "0px";
-        outer.style.visibility = "hidden";
-        outer.style.width = "200px";
-        outer.style.height = "150px";
-        outer.style.overflow = "hidden";
-        outer.append(inner);
-
-        this.domController.dom.virtualGrid.append(outer);
-        const w1 = inner.offsetWidth;
-        outer.style.overflow = 'scroll';
-        let w2 = inner.offsetWidth;
-        if (w1 == w2) w2 = outer.clientWidth;
-
-        this.domController.dom.virtualGrid.removeChild(outer);
-
-        return (w1 - w2);
-    }
 
     /**
      * this only calculates the width of each column but does not alter the css value of the header cell

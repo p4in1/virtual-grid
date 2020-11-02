@@ -39,6 +39,7 @@ export class VirtualGridRowController {
             }
         }
     };
+
     /**
      * sets the cumulative count of children per node
      * @param {Array<IVirtualGridRow>} rows
