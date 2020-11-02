@@ -157,6 +157,7 @@ export class VirtualGridDragAndDropController {
 
         console.log("grouping took --> ", +new Date - s)
 
+        this.Grid.SelectionController.clearRangeSelection()
         this.Grid.api.updateGridRows(rows, false, true)
     }
 

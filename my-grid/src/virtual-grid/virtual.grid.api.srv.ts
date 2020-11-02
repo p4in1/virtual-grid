@@ -55,6 +55,10 @@ export class VirtualGridApi {
 
         this.Grid.RowController.calculateRowPosition(completeRefresh);
 
+        if (completeRefresh) {
+            this.Grid.SelectionController.clearRangeSelection()
+        }
+
         this.Grid.RowController.toggleRenderedRowVisibility();
 
         this.Grid.RowController.renderRows();
@@ -195,7 +199,7 @@ export class VirtualGridApi {
      * return the selected rows
      * @returns {Array}
      */
-    public getSelectedRows = (): IVirtualGridRow[] => {
+    public getSelectedRows = (): any => {
         return this.Grid == void 0 ? [] : this.Grid.SelectionController.getSelection()
     };
 

@@ -27,7 +27,7 @@ export class VirtualGridSelectionController {
 
     }
 
-    getSelection() {
+    getSelection(): any {
         if (this.config.selectionMethod == "range") {
             return this.rangeSelection
         } else {
@@ -144,10 +144,21 @@ export class VirtualGridSelectionController {
 
         if (event.buttons != 1) {
 
-            let indexes = this.getRangeIndexes()
+            let rangeStart = this.rangeSelection.start
+            let rangeEnd = this.rangeSelection.end
+            let colFirst = rangeStart.col.currentIndex
+            let colLast = rangeEnd.col.currentIndex
+            let rowFirst = rangeStart.row.index
+            let rowLast = rangeEnd.row.index
+
+            let minCol = Math.min(colFirst, colLast)
+            let maxCol = Math.max(colFirst, colLast)
+            let minRow = Math.min(rowFirst, rowLast)
+            let maxRow = Math.max(rowFirst, rowLast)
+
             let currentCol = cell.colModel.currentIndex
             let currentRow = cell.rowModel.index
-            if (currentCol >= indexes.minCol && currentCol <= indexes.maxCol && currentRow >= indexes.minRow && currentRow <= indexes.maxRow) {
+            if (currentCol >= minCol && currentCol <= maxCol && currentRow >= minRow && currentRow <= maxRow) {
                 return;
             }
         }
@@ -184,11 +195,14 @@ export class VirtualGridSelectionController {
 
         this.clearRangeSelection()
 
-        let indexes = this.getRangeIndexes()
+        let minColIndex = Math.min(this.rangeSelection.start.col.currentIndex, cell.colModel.currentIndex)
+        let maxColIndex = Math.max(this.rangeSelection.start.col.currentIndex, cell.colModel.currentIndex)
+        let minRowIndex = Math.min(this.rangeSelection.start.row.index, cell.rowModel.index)
+        let maxRowIndex = Math.max(this.rangeSelection.start.row.index, cell.rowModel.index)
 
-        for (let i = indexes.minRow; i <= indexes.maxRow; i++) {
+        for (let i = minRowIndex; i <= maxRowIndex; i++) {
             let _row = []
-            for (let j = indexes.minCol; j <= indexes.maxCol; j++) {
+            for (let j = minColIndex; j <= maxColIndex; j++) {
                 let cell = this.Grid.rows[i].renderedRow.cells[j]
                 cell.cellNode.classList.add("selected")
 
@@ -222,21 +236,5 @@ export class VirtualGridSelectionController {
         }
 
         this.Grid.Utils.toggleClass("hover", cell.cellNode, true)
-    }
-
-    getRangeIndexes() {
-        let rangeStart = this.rangeSelection.start
-        let rangeEnd = this.rangeSelection.end
-        let colFirst = rangeStart.col.currentIndex
-        let colLast = rangeEnd.col.currentIndex
-        let rowFirst = rangeStart.row.index
-        let rowLast = rangeEnd.row.index
-
-        let minCol = Math.min(colFirst, colLast)
-        let maxCol = Math.max(colFirst, colLast)
-        let minRow = Math.min(rowFirst, rowLast)
-        let maxRow = Math.max(rowFirst, rowLast)
-
-        return {minCol, maxCol, minRow, maxRow}
     }
 }
