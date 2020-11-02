@@ -60,6 +60,14 @@ export class VirtualGridColumnApi implements IVirtualGridColumnApi {
         this._toggleVisibility(false, -1 * this.col.width)
     }
 
+    setWidth = (width: number) => {
+
+        width = width < this.col.minWidth ? this.col.minWidth : width
+
+        let diff = this.col.width == void 0 ? width : width - this.col.width
+        this._updateCellWidth(diff)
+    }
+
     /**
      * adds this column to the row grouping
      */

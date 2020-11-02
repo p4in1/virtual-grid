@@ -23,7 +23,7 @@ export class SectionOneComponent implements AfterViewInit {
             columns: data.columns,
             element: this.grid.nativeElement,
             showHeader: true,
-            showGroupPanel:true,
+            showGroupPanel: true,
             selectionMethod: "range"
         }
 
@@ -33,6 +33,7 @@ export class SectionOneComponent implements AfterViewInit {
 
         data.columns[2].pinned = "right"
         data.columns[3].pinned = "right"
+        data.columns[4].suppressPinning = true
 
         this.gridInstance = new VirtualGrid(config)
     }

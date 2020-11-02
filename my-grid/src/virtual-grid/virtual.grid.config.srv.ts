@@ -103,7 +103,7 @@ export class VirtualGridConfigController {
 
         if (this.showGroupPanel) {
             config.columns.unshift({
-                isGroupColumn: true,
+                suppressDragging: true,
                 suppressMoving: true,
                 isSystemColumn: true,
                 isHierarchyColumn: true,
@@ -138,8 +138,8 @@ export class VirtualGridConfigController {
 
                 isSuppressSort: col.suppressSorting || this.suppressSorting,
                 isSuppressResize: col.suppressResize || this.suppressResize,
-                isSuppressDragging: col.suppressDragging || this.suppressDragging,
                 isSuppressPinning: col.suppressPinning || this.suppressPinning,
+                isSuppressDragging: col.suppressDragging || this.suppressDragging,
                 isSuppressMoving: col.suppressMoving || this.suppressMoving,
 
                 cellRenderer: col.cellRenderer,

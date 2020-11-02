@@ -1,29 +1,10 @@
 import {
-    IVirtualColumnRowGroup,
+    IVirtualColumnRowGroup, IVirtualDragData,
     IVirtualGrid,
     IVirtualGridColumn,
     IVirtualGridDom
 } from "./interfaces/virtual.grid.interfaces";
 import {VirtualGridUIDomController} from "./virtual.grid.ui.dom.srv";
-
-interface IVirtualDragData {
-    x: number,
-    y: number,
-    col: IVirtualGridColumn,
-    cell: HTMLElement
-    rect: ClientRect,
-    offset: number
-}
-
-interface IVirtualDragData {
-    x: number,
-    y: number,
-    col: IVirtualGridColumn,
-    cell: HTMLElement,
-    rect: ClientRect,
-    offset: number,
-    pinned: string
-}
 
 export class VirtualGridDragAndDropController {
     dom: IVirtualGridDom
@@ -241,6 +222,8 @@ export class VirtualGridDragAndDropController {
     onColDragStart = (event: any, column: IVirtualGridColumn): void => {
         let rect = column.dom.cellTextContainer.getBoundingClientRect();
 
+        console.log(column.isSuppressPinning)
+
         this.colDragData = {
             x: event.clientX,
             y: event.clientY,
@@ -400,7 +383,7 @@ export class VirtualGridDragAndDropController {
             })
 
             let isOutOfBounds = top + this.ghostHeight < dragData.rect.top;
-            if (!isOutOfBounds) {
+            if (!isOutOfBounds && !dragData.col.isSuppressMoving) {
 
                 this.currentCursorX = event.clientX - dragData.offset
 
@@ -413,15 +396,26 @@ export class VirtualGridDragAndDropController {
                         this.moveColumn(dragData.col.currentIndex, nextIndex)
                     }
 
-                    this.checkPinState(dragData, event, nextIndex)
+                    if (!dragData.col.isSuppressPinning) {
+                        this.checkPinState(dragData, nextIndex, event)
+                    }
                 }
             }
         }
     }
 
-    checkPinState(dragData, event, nextIndex) {
+    checkPinState(dragData, nextIndex, event) {
         let width = this.Grid.domController.calculatePartialWidths()
         let currentX = event.clientX - dragData.offset + this.scrollOffset;
+
+        let left = this.Grid.columns.filter(x => x.pinned == "left")
+        let right = this.Grid.columns.filter(x => x.pinned == "right")
+
+        if (nextIndex < left.length) {
+            this.pinColumn(this.Grid.columns[nextIndex], "left", nextIndex)
+        } else if (nextIndex > this.Grid.columns.length - right.length) {
+            this.pinColumn(this.Grid.columns[nextIndex], "right", nextIndex)
+        }
 
         if (currentX < width.left && dragData.col.pinned != "left") {
             this.pinColumn(dragData.col, "left", nextIndex)
@@ -444,7 +438,7 @@ export class VirtualGridDragAndDropController {
      */
     pinColumn = (column: IVirtualGridColumn, area, index?) => {
 
-        if (area == column.pinned) {
+        if (area == column.pinned || column.isSuppressPinning) {
             return
         }
 
@@ -488,7 +482,15 @@ export class VirtualGridDragAndDropController {
      */
     moveColumn = (fromIndex, toIndex) => {
         if (toIndex != void 0 && toIndex != fromIndex) {
-            //     //swap the columns
+            // swap the columns
+            let fromCol = this.Grid.columns[fromIndex]
+            let toCol = this.Grid.columns[toIndex]
+
+            if (fromCol.pinned != toCol.pinned && fromCol.isSuppressPinning) {
+                console.log("trying to enter pinned area")
+                return
+            }
+
             this._moveArrayItem(this.Grid.columns, fromIndex, toIndex)
 
             this.Grid.ColumnController.setCurrentColumnIndex()
@@ -499,16 +501,7 @@ export class VirtualGridDragAndDropController {
             }
 
             // set width and left
-            this.Grid.eventController.adjustCell([this.Grid.columns[fromIndex], this.Grid.columns[toIndex]], 0)
-
-            let left = this.Grid.columns.filter(x => x.pinned == "left")
-            let right = this.Grid.columns.filter(x => x.pinned == "right")
-
-            if (toIndex < left.length) {
-                this.pinColumn(this.Grid.columns[toIndex], "left", toIndex)
-            } else if (toIndex > this.Grid.columns.length - right.length) {
-                this.pinColumn(this.Grid.columns[toIndex], "right", toIndex)
-            }
+            this.Grid.eventController.adjustCell([fromCol, toCol], 0)
         }
     }
 

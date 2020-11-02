@@ -385,6 +385,13 @@ export interface IVirtualGridColumnApi {
     setRowGroup(): void
 
     /**
+     * sets the column's width to the given value if possible
+     * either minWidth or maxWidth could be suppressing this
+     * @param width
+     */
+    setWidth(width: number): void
+
+    /**
      * removes the grouping of this column
      */
     removeRowGroup(): void
@@ -463,6 +470,7 @@ export interface IVirtualGridColumn {
     isSuppressSort?: boolean
     isSuppressDragging?: boolean
     isSuppressMoving?: boolean
+    isSuppressPinning?: boolean
 
     width?: number
     minWidth?: number
@@ -670,4 +678,14 @@ export interface IVirtualGridContextmenuEntry {
     subMenuInstance?: VirtualGridContextMenu
 
     action?(row, col): void
+}
+
+export interface IVirtualDragData {
+    x: number,
+    y: number,
+    col: IVirtualGridColumn,
+    cell: HTMLElement,
+    rect: ClientRect,
+    offset: number,
+    pinned: string
 }

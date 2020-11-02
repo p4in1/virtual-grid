@@ -95,7 +95,7 @@ export class VirtualGridApi {
 
         this.Grid.FilterController.resetFilter()
         // refreshing the visual projection
-        this.Grid.api.refreshGrid(true, true);
+        this.Grid.ColumnController.applySorting();
     };
 
     setConfig = (config): void => {
@@ -113,8 +113,9 @@ export class VirtualGridApi {
             currentColumn.colType !== "boolean" && this.Grid.FilterController.setTextFilter(currentColumn, col.filterValue, col.content)
         }
 
-        for (let col of config.sort) {
-            this.Grid.ColumnController.sortColumn(columns[col.index], config.sort.length > 1, col.dir)
+        for (let col of config.colWidths) {
+            let column = columns.find(x => x.field == col.field)
+            column.api.setWidth(col.width)
         }
 
         if (config.groups != void 0) {
@@ -122,11 +123,20 @@ export class VirtualGridApi {
 
             for (let col of config.groups) {
                 let column = columns.find(x => x.field == col.field)
-                column.api.setRowGroup()
+                this.Grid.DnDController._addGroup(column, true)
             }
+
+            this.Grid.DnDController.applyGrouping()
         }
 
-        this.refreshGrid(true, true)
+        if (config && config.sort && Array.isArray(config.sort)) {
+            for (let col of config.sort) {
+                let column = columns.find(x => x.field == col.field)
+                this.Grid.ColumnController.sortColumn(column, config.sort.length > 1, col.dir)
+            }
+        } else {
+            this.refreshGrid(true, true)
+        }
 
         if (config.scrollTop !== 0) {
             this.Grid.domController.dom.bodyWrapper.scrollTop = config.scrollTop
@@ -140,11 +150,11 @@ export class VirtualGridApi {
         })
 
         let colWidths = columns.map((col) => {
-            return {"index": col.index, "width": col.width}
+            return {"field": col.field, "width": col.width}
         })
 
         let sort = this.Grid.ColumnController.sortedColumns.map((col) => {
-            return {"index": col.index, "dir": col.sortDirection}
+            return {"field": col.field, "dir": col.sortDirection}
         })
 
         let filter = {
@@ -153,7 +163,7 @@ export class VirtualGridApi {
         }
 
         let groups = this.Grid.DnDController.groups.map((group) => {
-            return {"index": group.col.index, field: group.col.field}
+            return {field: group.col.field}
         })
 
         for (let index in this.Grid.FilterController.currentFilter.columns) {
