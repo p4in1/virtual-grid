@@ -1,5 +1,3 @@
-import {IVirtualGridColumn, IVirtualGridRow} from "./interfaces/virtual.grid.interfaces";
-
 export class VirtualGridUtils {
     CHAR_WIDTH_MAP = {};
     DEFAULT_CHAR = 'M';

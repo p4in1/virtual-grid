@@ -394,7 +394,7 @@ export class VirtualGridUIEventController {
 
             headerCell.addEventListener("click", (event: any) => {
                 if (!column.isSuppressSort) {
-                    this.Grid.ColumnController.sortColumn(column, event.shiftKey)
+                    this.Grid.SortController.sortColumn(column, event.shiftKey)
                 }
             })
 

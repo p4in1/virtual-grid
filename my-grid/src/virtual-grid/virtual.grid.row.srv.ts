@@ -238,7 +238,7 @@ export class VirtualGridRowController {
         rowToMove.parent = targetRow;
         targetRow[this.config.childNodesKey].push(rowToMove);
 
-        this.Grid.ColumnController.applySorting();
+        // this.Grid.SortController.applySorting();
 
         const baseLevel: number =
             appendAsChild ? targetRow.level + 1 : targetRow.parent != void 0 ? targetRow.parent.level : 0;
@@ -279,7 +279,7 @@ export class VirtualGridRowController {
         this.setRowIndexes();
         this.setTotalChildCounts(rows);
 
-        this.Grid.ColumnController.applySorting();
+        // this.Grid.SortController.applySorting();
         this.Grid.api.refreshGrid();
     };
     /**
@@ -309,7 +309,7 @@ export class VirtualGridRowController {
                 () => {
                     row.isLoading = false;
 
-                    this.Grid.ColumnController.applySorting();
+                    // this.Grid.SortController.applySorting();
                     this.expandCollapse(row);
                 });
 

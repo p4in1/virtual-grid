@@ -95,7 +95,8 @@ export class VirtualGridApi {
 
         this.Grid.FilterController.resetFilter()
         // refreshing the visual projection
-        this.Grid.ColumnController.applySorting();
+        this.Grid.api.refreshGrid(false, true)
+        // this.Grid.SortController.applySorting();
     };
 
     setConfig = (config): void => {
@@ -132,7 +133,7 @@ export class VirtualGridApi {
         if (config && config.sort && Array.isArray(config.sort)) {
             for (let col of config.sort) {
                 let column = columns.find(x => x.field == col.field)
-                this.Grid.ColumnController.sortColumn(column, config.sort.length > 1, col.dir)
+                this.Grid.SortController.sortColumn(column, config.sort.length > 1, col.dir)
             }
         } else {
             this.refreshGrid(true, true)
@@ -153,9 +154,10 @@ export class VirtualGridApi {
             return {"field": col.field, "width": col.width}
         })
 
-        let sort = this.Grid.ColumnController.sortedColumns.map((col) => {
-            return {"field": col.field, "dir": col.sortDirection}
-        })
+        let sort
+        // let sort = this.Grid.SortController.sortedColumns.map((col) => {
+        //     return {"field": col.field, "dir": col.sortDirection}
+        // })
 
         let filter = {
             global: this.Grid.FilterController.currentFilter.text,

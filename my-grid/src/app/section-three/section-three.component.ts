@@ -45,6 +45,11 @@ export class SectionThreeComponent implements AfterViewInit {
 
         for (let i = 0; i < 30; i++) {
             data.rows.forEach((item) => {
+
+                if (item.data.user.userFirstName === "a" || item.data.user.userFirstName === "aaron") {
+                    return
+                }
+
                 let test = {...item}
 
                 test.lastName = this.getRandomLastName()

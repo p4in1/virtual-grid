@@ -10,6 +10,7 @@ import {VirtualGridUIEventController} from "../virtual.grid.ui.event.srv";
 import {VirtualGridContextmenuController} from "../virtual.grid.contextmenu.srv";
 import {VirtualGridContextMenu} from "../virtual.grid.contextmenu.model";
 import {VirtualGridSelectionController} from "../virtual.grid.selection.srv";
+import {VirtualGridSortController} from "../virtual.grid.sort.srv";
 
 export interface IVirtualGridConfig {
 
@@ -247,14 +248,16 @@ export interface IVirtualGrid {
     Utils: VirtualGridUtils
 
     DnDController: VirtualGridDragAndDropController
-    ColumnController: VirtualGridColumnController
+
     ContextmenuController: VirtualGridContextmenuController
     SelectionController: VirtualGridSelectionController
+    FilterController: VirtualGridFilterController
+    SortController: VirtualGridSortController
 
     RowController: VirtualGridRowController
-    ConfigController: VirtualGridConfigController
-    FilterController: VirtualGridFilterController
+    ColumnController: VirtualGridColumnController
 
+    ConfigController: VirtualGridConfigController
 
     domController: VirtualGridUIDomController
     eventController: VirtualGridUIEventController
