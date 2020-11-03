@@ -40,7 +40,7 @@ export class VirtualGridColumnApi implements IVirtualGridColumnApi {
     }
 
     /**
-     * showing a column that has nevver been seen starts with 200px in width
+     * showing a column that has never been seen starts with 200px in width
      * otherwise we start with its width
      */
     show = () => {
