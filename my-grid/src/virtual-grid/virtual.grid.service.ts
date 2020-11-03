@@ -53,7 +53,8 @@ export class VirtualGrid implements IVirtualGrid {
         this.ConfigController = new VirtualGridConfigController(this, config)
         this.ContextmenuController = new VirtualGridContextmenuController(this, this.ConfigController)
         this.SelectionController = new VirtualGridSelectionController(this, this.ConfigController)
-        this.SortController = new VirtualGridSortController(this)
+        this.SortController = new VirtualGridSortController(this, this.ConfigController)
+
         log.push(`config took --> ${+new Date() - s}`)
         s = +new Date()
 

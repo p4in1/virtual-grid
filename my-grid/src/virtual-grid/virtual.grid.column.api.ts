@@ -87,11 +87,12 @@ export class VirtualGridColumnApi implements IVirtualGridColumnApi {
             for (let i = 0; i < this.Grid.DnDController.groups.length; i++) {
                 let group = this.Grid.DnDController.groups[i]
                 if (group.col.id == this.col.id) {
-                    this.Grid.DnDController.groups.splice(i, 1)
                     this.col.isRowGrouped = false
+                    this.Grid.DnDController.groups.splice(i, 1)
                     this.Grid.DnDController.createGroupElements()
 
                     if (group.isActive) {
+                        this.Grid.SortController.groupColumn(this.col, false)
                         this.Grid.DnDController.applyGrouping()
                     }
                     break;

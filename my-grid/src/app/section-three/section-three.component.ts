@@ -73,7 +73,7 @@ export class SectionThreeComponent implements AfterViewInit {
                     field: "data.user.userFirstName",
                     title: "Vorname",
                     type: "text",
-                    isRowGrouped: true
+                    // isRowGrouped: true
                 },
                 {
                     field: "lastName",
@@ -126,12 +126,12 @@ export class SectionThreeComponent implements AfterViewInit {
 
                 return entries
             },
-            onGridReady(Grid: IVirtualGrid) {
-                let config = JSON.parse(localStorage.getItem("virtual-grid-config"))
-                if (config) {
-                    Grid.api.setConfig(config)
-                }
-            }
+            // onGridReady(Grid: IVirtualGrid) {
+            //     let config = JSON.parse(localStorage.getItem("virtual-grid-config"))
+            //     if (config) {
+            //         Grid.api.setConfig(config)
+            //     }
+            // }
         }
 
         this.gridInstance = new VirtualGrid(config)

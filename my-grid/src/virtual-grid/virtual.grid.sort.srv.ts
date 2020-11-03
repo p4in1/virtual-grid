@@ -1,4 +1,6 @@
 import {IVirtualGrid, IVirtualGridColumn, IVirtualGridRow} from "./interfaces/virtual.grid.interfaces";
+import {VirtualGridRow} from "./virtual.grid.row.model";
+import {VirtualGridConfigController} from "./virtual.grid.config.srv";
 
 interface IVirtualStatusGroup {
     type: string
@@ -9,7 +11,7 @@ export class VirtualGridSortController {
 
     statusGroups: IVirtualStatusGroup[] = [];
 
-    constructor(private Grid: IVirtualGrid) {
+    constructor(private Grid: IVirtualGrid, private config: VirtualGridConfigController) {
 
     }
 
@@ -23,31 +25,44 @@ export class VirtualGridSortController {
             return;
         }
 
-        let s = +new Date()
-        let tree = {};
+        this.applySortGroupStatus()
+    }
 
-        for (let row of this.Grid.rows) {
-            if (!row.isRowGroup) {
-                this._addGroupRows(tree, row)
+    public groupColumn(col: IVirtualGridColumn, addGroup = true): void {
+        this.Grid.SelectionController.clearRangeSelection()
+
+        if (addGroup) {
+            this.statusGroups.push({type: "grouping", col})
+        } else {
+            for (let i = 0; i < this.statusGroups.length; i++) {
+                let group = this.statusGroups[i]
+                if (col.id == group.col.id) {
+                    this.statusGroups.splice(i, 1)
+                }
             }
         }
 
-        console.log("grouping took -->", +new Date() - s)
-        s = +new Date()
-        this.applySorting(tree)
-        console.log("sorting keys took -->", +new Date() - s)
-        //
-        // let rows = [];
-        // for (let key of keys) {
-        //     for (let child of tree[key].children) {
-        //         rows.push(child)
-        //     }
+        if (this.statusGroups.filter(x => x.type == "grouping").length === 0) {
+            let rows = []
+            for (let row of this.Grid.rows) {
+                if (!row.isRowGroup) {
+                    rows[rows.length] = row
+                }
+            }
+
+            this.Grid.rows = rows
+            this.Grid.api.refreshGrid(true, true);
+            return
+        }
+
+        // if (this.statusGroups.length === 0) {
+        //     return
         // }
 
-
+        this.applySortGroupStatus()
     }
 
-    updateSorting(col, isMultiSelect, dir) {
+    private updateSorting(col, isMultiSelect, dir) {
         // reset all columns --> there was a multi sort present but now its not
         if (!isMultiSelect) {
             let sortedCol = this.statusGroups.find(group => group.col.field === col.field)
@@ -63,75 +78,109 @@ export class VirtualGridSortController {
         this.editSorting(col, isMultiSelect, dir);
     }
 
-    applySorting(treePart) {
+    private applySortGroupStatus() {
+        let s = +new Date()
+        let tree = {};
+
+        for (let row of this.Grid.rows) {
+            if (!row.isRowGroup) {
+                this._addGroupRows(tree, row)
+            }
+        }
+
         let rows = []
         let sortGroups = this.statusGroups.filter(x => x.type == "sorting")
-        let groupingGroups = this.statusGroups.filter(x => x.type == "grouping")
+        let rowGroups = this.statusGroups.filter(x => x.type == "grouping")
 
-        // if (group.type == "sorting") {
+        rows = this.getGroupedContent(tree, 0)
 
-        rows = this.getGroupedContent(treePart, 0)
+        if (rowGroups.length > 0) {
+            this.generateTreeStructure(rows)
 
-        // for (let key of keys) {
-        //     for (let _row of treePart[key].children) {
-        //         rows[rows.length] = _row
-        //     }
-        //
-        // }
+            rows = this.Grid.Utils.flatten(rows)
+        }
 
-        // } else {
-        //
-        //     let keys = Object.keys(treePart).sort((a, b) => {
-        //         return a.localeCompare(b)
-        //     })
-        //
-        //     for (let key of keys) {
-        //         let rowNode: any = {isRowGroup: true}
-        //         let childKey = this.Grid.ConfigController.childNodesKey
-        //         rowNode.value = key
-        //         rowNode[childKey] = []
-        //
-        //         rows.push(rowNode)
-        //
-        //         if (Object.keys(treePart[key].rowGroups).length > 0) {
-        //             // rowNode[childKey] = this._createGroupRows(treePart[key].rowGroups)
-        //         } else {
-        //             for (let _row of treePart[key].children) {
-        //                 rowNode[childKey].push(_row.rowData)
-        //             }
-        //         }
-        //     }
-        // }
+        console.log("setting grouping / sorting status took -->", +new Date() - s)
 
         this.Grid.rows = rows
-        this.Grid.api.refreshGrid(false, true);
+        this.Grid.SelectionController.clearRangeSelection()
+        this.Grid.api.refreshGrid(true, true);
+
         return rows
     }
 
-    getGroupedContent(treePart, index) {
+    generateTreeStructure(rows, level: number = 0, parent?) {
+        for (let i = 0; i < rows.length; i++) {
+            let row = rows[i]
+            let children = row[this.config.childNodesKey]
+
+            row[this.config.childNodesKey] = []
+
+            if (row.isRowGroup) {
+                let virtualRow: IVirtualGridRow = new VirtualGridRow(this.Grid, row)
+
+                rows[i] = virtualRow
+            }
+
+            rows[i][this.config.childNodesKey] = children
+            rows[i].parent = parent
+            rows[i].level = level
+
+            if (children && children.length > 0) {
+                this.generateTreeStructure(children, level + 1, row)
+            }
+        }
+    }
+
+    private getGroupedContent(treePart, index) {
         let rows = []
         let currentGroup = this.statusGroups[index]
         let nextGroup = this.statusGroups[index + 1]
-        if (nextGroup && nextGroup.type == "sorting") {
-            let keys = Object.keys(treePart)
-            for (let key of keys) {
-                let _rows = this.getGroupedContent(treePart[key].sortGroups, index + 1)
-                _rows.forEach((row) => {
-                    rows[rows.length] = row
+
+        if (currentGroup.type == "sorting") {
+            if (nextGroup && nextGroup.type == "sorting") {
+                let keys = Object.keys(treePart)
+                for (let key of keys) {
+                    let _rows = this.getGroupedContent(treePart[key].sortGroups, index + 1)
+                    _rows.forEach((row) => {
+                        rows[rows.length] = row
+                    })
+                }
+            } else {
+                let keys = Object.keys(treePart)
+                let sortDir = currentGroup.col.sortDirection === "desc" ? -1 : currentGroup.col.sortDirection === "asc" ? 1 : 0
+
+                keys.sort((a, b) => {
+                    return this.sortComparator(a, b, sortDir, currentGroup.col.colType)
                 })
+
+                for (let key of keys) {
+                    for (let _row of treePart[key].children) {
+                        rows[rows.length] = _row
+                    }
+                }
             }
 
         } else {
-            let keys = Object.keys(treePart)
-            let sortDir = currentGroup.col.sortDirection === "desc" ? -1 : currentGroup.col.sortDirection === "asc" ? 1 : 0
 
-            keys.sort((a, b) => {
-                return this.sortComparator(a, b, sortDir, currentGroup.col.colType)
+            let keys = Object.keys(treePart).sort((a, b) => {
+                return a.localeCompare(b)
             })
 
             for (let key of keys) {
-                for (let _row of treePart[key].children) {
-                    rows[rows.length] = _row
+                let rowNode: any = {isRowGroup: true}
+                let childKey = this.Grid.ConfigController.childNodesKey
+                rowNode.value = key
+                rowNode[childKey] = []
+
+                rows.push(rowNode)
+
+                if (Object.keys(treePart[key].rowGroups).length > 0) {
+                    rowNode[childKey] = this.getGroupedContent(treePart[key].rowGroups, index + 1)
+                } else {
+                    for (let _row of treePart[key].children) {
+                        rowNode[childKey].push(_row)
+                    }
                 }
             }
         }
@@ -140,13 +189,16 @@ export class VirtualGridSortController {
     }
 
 
-    _addGroupRows(rowGroupTree, row) {
+    private _addGroupRows(rowGroupTree, row) {
         let currentNode = rowGroupTree
 
         for (let i = 0; i < this.statusGroups.length; i++) {
             let currentGroup = this.statusGroups[i]
             let value = row.getCellValue(currentGroup.col)
 
+            if (currentGroup.type == "grouping" && value === "") {
+                value = "[Empty]"
+            }
             // deduplicate entries
             if (currentNode[value] == void 0) {
                 currentNode[value] = {
@@ -156,8 +208,6 @@ export class VirtualGridSortController {
                 }
             }
 
-            currentNode[value].children[currentNode[value].children.length] = row
-
             // in case that the group is a row group
             let nextGroup = this.statusGroups[i + 1]
             if (nextGroup) {
@@ -166,11 +216,13 @@ export class VirtualGridSortController {
                 } else {
                     currentNode = currentNode[value].rowGroups
                 }
+            } else {
+                currentNode[value].children[currentNode[value].children.length] = row
             }
         }
     }
 
-    sortComparator(a: any, b: any, dir?: any, type?: string): number {
+    private sortComparator(a: any, b: any, dir?: any, type?: string): number {
         dir = dir !== null ? dir : 1;
 
         switch (type) {
@@ -197,7 +249,7 @@ export class VirtualGridSortController {
         return a == b ? 0 : a > b ? 1 * dir : -1 * dir;
     }
 
-    resetColumnSort() {
+    private resetColumnSort() {
         for (let col of this.Grid.originalColumns) {
             this.resetGridRowIndexes();
             this.statusGroups = [];

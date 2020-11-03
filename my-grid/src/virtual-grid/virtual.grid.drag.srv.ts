@@ -107,92 +107,19 @@ export class VirtualGridDragAndDropController {
 
             this.colDragData.col.rowGroup.element.classList.remove("inactive")
             this.colDragData.col.rowGroup.isActive = true
+            this.Grid.SortController.groupColumn(this.colDragData.col)
             this.applyGrouping()
         }
     }
 
     applyGrouping() {
 
-        let s = +new Date()
-        let rows
         let groupColumn = this.Grid.columns.find(x => x.isRowGroupColumn)
-        let groupTree = {}
 
         if (this.groups.length > 0) {
             !groupColumn.isVisible && groupColumn.api.show()
-
-            for (let row of this.Grid.rows) {
-                if (!row.isRowGroup) {
-                    this._addGroupRows(groupTree, row)
-                }
-            }
-
-            rows = this._createGroupRows(groupTree)
-
-        } else if (groupColumn.isVisible) {
-            groupColumn.api.hide()
-            rows = this.Grid.ConfigController.originalRows
         } else {
-            return;
-        }
-
-        console.log("grouping took --> ", +new Date - s)
-
-        this.Grid.SelectionController.clearRangeSelection()
-        this.Grid.api.updateGridRows(rows, false, true)
-    }
-
-    _createGroupRows(treePart) {
-
-        let rows = []
-
-        let keys = Object.keys(treePart).sort((a, b) => {
-            return a.localeCompare(b)
-        })
-
-        for (let key of keys) {
-            let rowNode: any = {isRowGroup: true}
-            let childKey = this.Grid.ConfigController.childNodesKey
-            rowNode.value = key
-            rowNode[childKey] = []
-
-            rows.push(rowNode)
-
-            if (Object.keys(treePart[key].rowGroups).length > 0) {
-                rowNode[childKey] = this._createGroupRows(treePart[key].rowGroups)
-            } else {
-                for (let _row of treePart[key].children) {
-                    rowNode[childKey].push(_row.rowData)
-                }
-            }
-        }
-
-        return rows
-    }
-
-    _addGroupRows(rowGroupTree, row) {
-        let currentNode = rowGroupTree
-
-        for (let i = 0; i < this.groups.length; i++) {
-            let currentGroup = this.groups[i]
-            let value = row.getCellValue(currentGroup.col).trim()
-
-            if (value === "") {
-                value = "[Empty]"
-            }
-
-            if (currentNode[value] == void 0) {
-                currentNode[value] = {
-                    children: [],
-                    rowGroups: {}
-                }
-            }
-
-            currentNode[value].children.push(row)
-
-            if (i !== this.groups.length - 1) {
-                currentNode = currentNode[value].rowGroups
-            }
+            groupColumn.isVisible && groupColumn.api.hide()
         }
     }
 
