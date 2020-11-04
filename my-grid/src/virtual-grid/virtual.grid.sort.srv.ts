@@ -52,10 +52,6 @@ export class VirtualGridSortController {
             return
         }
 
-        // if (this.statusGroups.length === 0) {
-        //     return
-        // }
-
         this.applySortGroupStatus()
     }
 
@@ -153,12 +149,14 @@ export class VirtualGridSortController {
                     })
                 }
             } else {
-                let keys = Object.keys(treePart)
                 let sortDir = currentGroup.col.sortDirection === "desc" ? -1 : currentGroup.col.sortDirection === "asc" ? 1 : 0
 
-                keys.sort((a, b) => {
-                    return this.sortComparator(a, b, sortDir, currentGroup.col.colType)
-                })
+                let keys = Object.keys(treePart)
+                if (keys.length > 1) {
+                    keys.sort((a, b) => {
+                        return this.sortComparator(a, b, sortDir, currentGroup.col.colType)
+                    })
+                }
 
                 for (let key of keys) {
                     for (let _row of treePart[key].children) {
