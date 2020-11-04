@@ -354,7 +354,7 @@ export interface IVirtualGridRow {
      */
     updateRowData(rowData: any): void
 
-    getCellValue(col: IVirtualGridColumn, stringify?: boolean): string
+    getCellValue(col: IVirtualGridColumn, options?: IVirtualGetCellValueOptions): string
 }
 
 export interface IVirtualGridColumnApi {
@@ -691,4 +691,9 @@ export interface IVirtualDragData {
     rect: ClientRect,
     offset: number,
     pinned: string
+}
+
+export interface IVirtualGetCellValueOptions {
+    stringify?: boolean
+    suppressFormatting?: boolean
 }

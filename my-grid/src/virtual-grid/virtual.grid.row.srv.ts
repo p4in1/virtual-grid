@@ -413,7 +413,7 @@ export class VirtualGridRowController {
             return
         }
 
-        let cellValue: any = cell.rowModel.getCellValue(cell.colModel, false) //this.getCellData(cell.rowModel.rowData, cell.fieldPath);
+        let cellValue: any = cell.rowModel.getCellValue(cell.colModel, {stringify: false})
 
         if (colType == "boolean") {
             let cellNode = this.Grid.Utils.el("i", ["action-icon", "virtual-material-icons"])

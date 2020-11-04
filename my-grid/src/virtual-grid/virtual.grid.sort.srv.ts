@@ -196,12 +196,12 @@ export class VirtualGridSortController {
     }
 
 
-    private _addGroupRows(rowGroupTree, row) {
+    private _addGroupRows(rowGroupTree, row: IVirtualGridRow) {
         let currentNode = rowGroupTree
 
         for (let i = 0; i < this.statusGroups.length; i++) {
             let currentGroup = this.statusGroups[i]
-            let value = row.getCellValue(currentGroup.col)
+            let value = row.getCellValue(currentGroup.col, {suppressFormatting: true, stringify: false})
 
             if (currentGroup.type == "grouping" && value === "") {
                 value = "[Empty]"
