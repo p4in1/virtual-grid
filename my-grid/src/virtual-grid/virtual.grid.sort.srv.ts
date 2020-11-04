@@ -52,6 +52,14 @@ export class VirtualGridSortController {
             return
         }
 
+        if (rowGroups.length === 0) {
+            let group = this.statusGroups.find(x => x.col.isRowGroupColumn)
+            if (group) {
+                this.sortColumn(group.col, sortGroups.length > 1, "none")
+                return;
+            }
+        }
+
         this.applySortGroupStatus()
     }
 
@@ -136,71 +144,82 @@ export class VirtualGridSortController {
 
     private getGroupedContent(treePart, index) {
         let rows = []
+
+        if (this.statusGroups[index].type == "sorting") {
+            this._applySorting(treePart, rows, index)
+        } else {
+            this._applyGrouping(treePart, rows, index)
+        }
+
+        return rows
+    }
+
+    private _applySorting(treePart, rows, index) {
         let currentGroup = this.statusGroups[index]
         let nextGroup = this.statusGroups[index + 1]
 
-        if (currentGroup.type == "sorting") {
-            if (nextGroup && nextGroup.type == "sorting") {
-                let keys = Object.keys(treePart)
-                for (let key of keys) {
-                    let _rows = this.getGroupedContent(treePart[key].sortGroups, index + 1)
-                    _rows.forEach((row) => {
-                        rows[rows.length] = row
-                    })
-                }
-            } else {
-                let sortDir = currentGroup.col.sortDirection === "desc" ? -1 : currentGroup.col.sortDirection === "asc" ? 1 : 0
-
-                let keys = Object.keys(treePart)
-                if (keys.length > 1) {
-                    keys.sort((a, b) => {
-                        return this.sortComparator(a, b, sortDir, currentGroup.col.colType)
-                    })
-                }
-
-                for (let key of keys) {
-                    for (let _row of treePart[key].children) {
-                        rows[rows.length] = _row
-                    }
-                }
+        if (nextGroup && nextGroup.type == "sorting") {
+            let keys = Object.keys(treePart)
+            for (let key of keys) {
+                let _rows = this.getGroupedContent(treePart[key].sortGroups, index + 1)
+                _rows.forEach((row) => {
+                    rows[rows.length] = row
+                })
             }
-
         } else {
-            // in case there is a sorting order for the grouping column
-            // we use it while grouping .. this will speed up the process
-            // the fallback is ascending sort, since the groups shall be displayed in this order
-            let dir = 1;
+            let sortDir = currentGroup.col.sortDirection === "desc" ? -1 : currentGroup.col.sortDirection === "asc" ? 1 : 0
 
-            let group = this.statusGroups.find(x => x.col.isRowGroupColumn)
-            if (group) {
-                dir = group.col.sortDirection == "asc" ? 1 : group.col.sortDirection == "desc" ? -1 : 1
+            let keys = Object.keys(treePart)
+            if (keys.length > 1) {
+                keys.sort((a, b) => {
+                    return this.sortComparator(a, b, sortDir, currentGroup.col.colType)
+                })
             }
-
-            // sort the grouped keys by its name
-            let keys = Object.keys(treePart).sort((a, b) => {
-                return a.localeCompare(b) * dir
-            })
 
             for (let key of keys) {
-                let rowNode: any = {isRowGroup: true}
-                let childKey = this.Grid.ConfigController.childNodesKey
-                rowNode.value = key
-                rowNode[childKey] = []
-
-                rows.push(rowNode)
-
-                if (nextGroup) {
-                    let groups = nextGroup.type == "grouping" ? treePart[key].rowGroups : treePart[key].sortGroups
-                    rowNode[childKey] = this.getGroupedContent(groups, index + 1)
-                } else {
-                    for (let _row of treePart[key].children) {
-                        rowNode[childKey].push(_row)
-                    }
+                for (let _row of treePart[key].children) {
+                    rows[rows.length] = _row
                 }
             }
         }
 
-        return rows
+    }
+
+    private _applyGrouping(treePart, rows, index) {
+        let nextGroup = this.statusGroups[index + 1]
+
+        // in case there is a sorting order for the grouping column
+        // we use it while grouping .. this will speed up the process
+        // the fallback is ascending sort, since the groups shall be displayed in this order
+        let dir = 1;
+
+        let group = this.statusGroups.find(x => x.col.isRowGroupColumn)
+        if (group) {
+            dir = group.col.sortDirection == "asc" ? 1 : group.col.sortDirection == "desc" ? -1 : 1
+        }
+
+        // sort the grouped keys by its name
+        let keys = Object.keys(treePart).sort((a, b) => {
+            return a.localeCompare(b) * dir
+        })
+
+        for (let key of keys) {
+            let rowNode: any = {isRowGroup: true}
+            let childKey = this.Grid.ConfigController.childNodesKey
+            rowNode.value = key
+            rowNode[childKey] = []
+
+            rows.push(rowNode)
+
+            if (nextGroup) {
+                let groups = nextGroup.type == "grouping" ? treePart[key].rowGroups : treePart[key].sortGroups
+                rowNode[childKey] = this.getGroupedContent(groups, index + 1)
+            } else {
+                for (let _row of treePart[key].children) {
+                    rowNode[childKey].push(_row)
+                }
+            }
+        }
     }
 
 
