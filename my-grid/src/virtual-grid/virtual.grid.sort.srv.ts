@@ -168,9 +168,19 @@ export class VirtualGridSortController {
             }
 
         } else {
+            // in case there is a sorting order for the grouping column
+            // we use it while grouping .. this will speed up the process
+            // the fallback is ascending sort, since the groups shall be displayed in this order
+            let dir = 1;
 
+            let group = this.statusGroups.find(x => x.col.isRowGroupColumn)
+            if (group) {
+                dir = group.col.sortDirection == "asc" ? 1 : group.col.sortDirection == "desc" ? -1 : 1
+            }
+
+            // sort the grouped keys by its name
             let keys = Object.keys(treePart).sort((a, b) => {
-                return a.localeCompare(b)
+                return a.localeCompare(b) * dir
             })
 
             for (let key of keys) {
