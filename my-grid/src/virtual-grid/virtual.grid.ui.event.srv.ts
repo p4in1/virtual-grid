@@ -490,6 +490,6 @@ export class VirtualGridUIEventController {
      * @returns {Array} - an array
      */
     private getAutoSizableColumns(colsToBeResized: IVirtualGridColumn[], isGrowing: boolean): IVirtualGridColumn[] {
-        return colsToBeResized.filter((col) => col.isVisible && col.pinned === "center" && ((!isGrowing && col.canShrink) || isGrowing))
+        return colsToBeResized.filter((col) => !col.isSuppressResize && col.isVisible && col.pinned === "center" && ((!isGrowing && col.canShrink) || isGrowing))
     }
 }

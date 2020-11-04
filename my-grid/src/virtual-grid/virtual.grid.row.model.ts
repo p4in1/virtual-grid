@@ -1,4 +1,10 @@
-import {IRenderedRow, IVirtualGrid, IVirtualGridColumn, IVirtualGridRow} from "./interfaces/virtual.grid.interfaces";
+import {
+    IRenderedRow,
+    IVirtualGetCellValueOptions,
+    IVirtualGrid,
+    IVirtualGridColumn,
+    IVirtualGridRow
+} from "./interfaces/virtual.grid.interfaces";
 
 export class VirtualGridRow implements IVirtualGridRow {
 
@@ -73,15 +79,17 @@ export class VirtualGridRow implements IVirtualGridRow {
      * 4. data type of the column   -> this is the lowest priority but the highest probability and we interpret the datatype which should not be problematic
      *
      * @param col
-     * @param stringify
+     * @param options
      */
-    public getCellValue = (col: IVirtualGridColumn, stringify: boolean = true): string => {
+    public getCellValue = (col: IVirtualGridColumn, options: IVirtualGetCellValueOptions = {}): string => {
         let cellData: any = this.Grid.RowController.getCellData(this.rowData, col.fieldPath);
         let cellValue: string;
         let cell: any = {
             rowModel: this.Grid.rows[this.index],
             colModel: this.Grid.originalColumns[col.index]
         };
+
+        options.stringify = options.stringify == void 0 ? options.stringify = true : options.stringify
 
         if (typeof cell.colModel.cellRenderer === "function") {
             cellValue = cell.colModel.cellRenderer(cell)
@@ -90,11 +98,14 @@ export class VirtualGridRow implements IVirtualGridRow {
         } else {
             cellValue = cellData
         }
-        if (typeof cell.colModel.cellValueFormatter == "function") {
-            cellValue = cell.colModel.cellValueFormatter(cell, cellData)
+
+        if (!options.suppressFormatting) {
+            if (typeof cell.colModel.cellValueFormatter == "function") {
+                cellValue = cell.colModel.cellValueFormatter(cell, cellData)
+            }
         }
 
-        return stringify ? Array.isArray(cellValue) ? cellData.join(" ") : cellValue.toString() : cellValue
+        return options.stringify ? Array.isArray(cellValue) ? cellData.join(" ") : cellValue.toString() : cellValue
     }
 
     // private renderRow() {
