@@ -3,7 +3,8 @@ import {VirtualGridRow} from "./virtual.grid.row.model";
 import {VirtualGridConfigController} from "./virtual.grid.config.srv";
 
 interface IVirtualStatusGroup {
-    type: string
+    isGroup?: boolean
+    isSort?: boolean
     col: IVirtualGridColumn
 }
 
@@ -21,89 +22,66 @@ export class VirtualGridSortController {
 
         if (this.statusGroups.length == 0) {
             this.resetGridRowIndexes();
-            this.Grid.api.refreshGrid(true, true);
+            this._apply()
             return;
         }
 
-        this.applySortGroupStatus()
-    }
+        let hierarchyColumn = this.Grid.columns.find(x => x.isHierarchyColumn && !x.isRowGroupColumn)
+        if (hierarchyColumn) {
+            let roots: IVirtualGridRow[] = [];
 
-    public groupColumn(col: IVirtualGridColumn, addGroup = true): void {
-        this.Grid.SelectionController.clearRangeSelection()
-
-        if (addGroup) {
-            this.statusGroups.push({type: "grouping", col})
-        } else {
-            for (let i = 0; i < this.statusGroups.length; i++) {
-                let group = this.statusGroups[i]
-                if (col.id == group.col.id) {
-                    this.statusGroups.splice(i, 1)
+            for (let row of this.Grid.rows) {
+                if (row.level == 0) {
+                    roots.push(row)
                 }
             }
+
+            let s = +new Date()
+
+            this.Grid.rows = this.Grid.Utils.flatten(this.sortAsTree(roots));
+
+            console.log("tree sorting took --> ", +new Date() - s)
+
+            this._apply()
+        } else {
+            this.applySortGroupStatus()
         }
-
-        let rowGroups = this.statusGroups.filter(x => x.type == "grouping")
-        let sortGroups = this.statusGroups.filter(x => x.type == "sorting")
-
-        // no status groups --> reset everything
-        if (rowGroups.length === 0 && sortGroups.length === 0) {
-            this.removeGroups()
-            this.resetGridRowIndexes()
-            this.Grid.api.refreshGrid(true, true);
-            return
-        }
-
-        // in case the groups are empty now we have to remove the possible sorting of columns
-        // because the sort order would persist in case it was sorted descending
-        if (rowGroups.length === 0) {
-            let group = this.statusGroups.find(x => x.col.isRowGroupColumn)
-            if (group) {
-                this.sortColumn(group.col, sortGroups.length > 1, "none")
-                return;
-            }
-        }
-
-        this.applySortGroupStatus()
     }
 
-    private removeGroups() {
-        let rows = []
-        for (let row of this.Grid.rows) {
-            if (!row.isRowGroup) {
-                rows[rows.length] = row
+    sortAsTree(rows) {
+        let tree = {}
+        let _rows;
+        let firstGroup = this.statusGroups[0]
+        let childKey = this.config.childNodesKey
+
+        if (this.statusGroups.length === 1 && firstGroup.isSort && firstGroup.col.sortDirection == "desc") {
+            _rows = rows.reverse()
+        } else {
+            for (let row of rows) {
+                this._addGroupRows(tree, row)
+            }
+
+            _rows = this.getGroupedContent(tree, 0)
+        }
+
+        for (let row of rows) {
+            if (row[childKey] && row[childKey].length > 0) {
+                row[childKey] = this.sortAsTree(row[childKey])
             }
         }
 
-        this.Grid.rows = rows
-    }
-
-    private updateSorting(col, isMultiSelect, dir) {
-        let statusGroups = this.statusGroups
-        // reset all columns --> there was a multi sort present but now its not
-        if (!isMultiSelect) {
-            let sortedCol = statusGroups.find(group => group.col.field === col.field)
-            let sortGroups = statusGroups.filter(x => x.type == "sorting")
-
-            // multi sort is present but this click is not with shift --> reset
-            if (sortGroups.length > 1 || !sortedCol) {
-                this.resetColumnSort()
-            }
-        }
-
-        this.editSorting(col, isMultiSelect, dir);
+        return _rows
     }
 
     private applySortGroupStatus() {
         let s = +new Date()
         let tree = {};
 
-
         if (this.statusGroups.length === 1) {
             let firstGroup = this.statusGroups[0]
-            if (firstGroup.type == "sorting" && firstGroup.col.sortDirection == "desc") {
+            if (firstGroup.isSort && firstGroup.col.sortDirection == "desc") {
                 this.Grid.rows.reverse()
-                this.Grid.SelectionController.clearRangeSelection()
-                this.Grid.api.refreshGrid(true, true);
+                this._apply()
                 return
             }
         }
@@ -116,7 +94,7 @@ export class VirtualGridSortController {
 
         console.log("grouping rows took -->", +new Date() - s)
 
-        let rowGroups = this.statusGroups.filter(x => x.type == "grouping")
+        let rowGroups = this.statusGroups.filter(x => x.isGroup)
         let rows = this.getGroupedContent(tree, 0)
 
         if (rowGroups.length > 0) {
@@ -128,8 +106,7 @@ export class VirtualGridSortController {
         console.log("setting grouping / sorting status took -->", +new Date() - s)
 
         this.Grid.rows = rows
-        this.Grid.SelectionController.clearRangeSelection()
-        this.Grid.api.refreshGrid(true, true);
+        this._apply()
     }
 
     generateTreeStructure(rows, level: number = 0, parent?) {
@@ -159,7 +136,7 @@ export class VirtualGridSortController {
     private getGroupedContent(treePart, index) {
         let rows = []
 
-        if (this.statusGroups[index].type == "sorting") {
+        if (this.statusGroups[index].isSort) {
             this._applySorting(treePart, rows, index)
         } else {
             this._applyGrouping(treePart, rows, index)
@@ -172,7 +149,7 @@ export class VirtualGridSortController {
         let currentGroup = this.statusGroups[index]
         let nextGroup = this.statusGroups[index + 1]
 
-        if (nextGroup && nextGroup.type == "sorting") {
+        if (nextGroup && nextGroup.isSort) {
             let keys = Object.keys(treePart)
             for (let key of keys) {
                 let _rows = this.getGroupedContent(treePart[key].sortGroups, index + 1)
@@ -196,7 +173,6 @@ export class VirtualGridSortController {
                 }
             }
         }
-
     }
 
     private _applyGrouping(treePart, rows, index) {
@@ -226,7 +202,7 @@ export class VirtualGridSortController {
             rows.push(rowNode)
 
             if (nextGroup) {
-                let groups = nextGroup.type == "grouping" ? treePart[key].rowGroups : treePart[key].sortGroups
+                let groups = nextGroup.isGroup ? treePart[key].rowGroups : treePart[key].sortGroups
                 rowNode[childKey] = this.getGroupedContent(groups, index + 1)
             } else {
                 for (let _row of treePart[key].children) {
@@ -245,7 +221,7 @@ export class VirtualGridSortController {
 
             let value = row.getCellValue(currentGroup.col, {suppressFormatting: true, stringify: false})
 
-            if (currentGroup.type == "grouping" && value === "") {
+            if (currentGroup.isGroup && value === "") {
                 value = "[Empty]"
             }
             // deduplicate entries
@@ -260,7 +236,7 @@ export class VirtualGridSortController {
             // in case that the group is a row group
             let nextGroup = this.statusGroups[i + 1]
             if (nextGroup) {
-                if (nextGroup.type == "sorting") {
+                if (nextGroup.isSort) {
                     currentNode = currentNode[value].sortGroups
                 } else {
                     currentNode = currentNode[value].rowGroups
@@ -302,10 +278,77 @@ export class VirtualGridSortController {
         return a == b ? 0 : a > b ? 1 * dir : -1 * dir;
     }
 
+
+    public groupColumn(col: IVirtualGridColumn, addGroup = true): void {
+        this.Grid.SelectionController.clearRangeSelection()
+
+        if (addGroup) {
+            this.statusGroups.push({isGroup: true, col})
+        } else {
+            for (let i = 0; i < this.statusGroups.length; i++) {
+                let group = this.statusGroups[i]
+                if (col.id == group.col.id) {
+                    this.statusGroups.splice(i, 1)
+                }
+            }
+        }
+
+        let rowGroups = this.statusGroups.filter(x => x.isGroup)
+        let sortGroups = this.statusGroups.filter(x => x.isSort)
+
+        // no status groups --> reset everything
+        if (rowGroups.length === 0 && sortGroups.length === 0) {
+            this.removeGroups()
+            this.resetGridRowIndexes()
+            this.Grid.api.refreshGrid(true, true);
+            return
+        }
+
+        // in case the groups are empty now we have to remove the possible sorting of columns
+        // because the sort order would persist in case it was sorted descending
+        if (rowGroups.length === 0) {
+            let group = this.statusGroups.find(x => x.col.isRowGroupColumn)
+            if (group) {
+                this.sortColumn(group.col, sortGroups.length > 1, "none")
+                return;
+            }
+        }
+
+        this.applySortGroupStatus()
+    }
+
+    private removeGroups() {
+        let rows = []
+        for (let row of this.Grid.rows) {
+            if (!row.isRowGroup) {
+                rows[rows.length] = row
+            }
+        }
+
+        this.Grid.rows = rows
+    }
+
+    private updateSorting(col, isMultiSelect, dir) {
+        let statusGroups = this.statusGroups
+        // reset all columns --> there was a multi sort present but now its not
+        if (!isMultiSelect) {
+            let sortedCol = statusGroups.find(group => group.col.field === col.field)
+            let sortGroups = statusGroups.filter(x => x.isSort)
+
+            // multi sort is present but this click is not with shift --> reset
+            if (sortGroups.length > 1 || !sortedCol) {
+                this.resetColumnSort()
+            }
+        }
+
+        this.editSorting(col, isMultiSelect, dir);
+    }
+
+
     private resetColumnSort() {
         for (let col of this.Grid.originalColumns) {
             this.resetGridRowIndexes();
-            this.statusGroups = this.statusGroups.filter(x => x.type == "grouping")
+            this.statusGroups = this.statusGroups.filter(x => x.isGroup)
             col.sortDirection = null;
             col.dom.cellSortArrow.classList.remove("icon-asc");
             col.dom.cellSortArrow.classList.remove("icon-desc");
@@ -340,7 +383,7 @@ export class VirtualGridSortController {
         this.resetGridRowIndexes();
 
         for (let i = 0; i < this.statusGroups.length; i++) {
-            if (col.id == this.statusGroups[i].col.id && this.statusGroups[i].type == "sorting") {
+            if (col.id == this.statusGroups[i].col.id && this.statusGroups[i].isSort) {
                 this.statusGroups.splice(i, 1)
                 return
             }
@@ -351,7 +394,7 @@ export class VirtualGridSortController {
         col.sortDirection = "asc";
         col.dom.cellSortArrow.classList.add("icon-asc");
 
-        this.statusGroups.push({type: "sorting", col})
+        this.statusGroups.push({isSort: true, col})
     }
 
     private _sortDesc(col) {
@@ -367,10 +410,9 @@ export class VirtualGridSortController {
                 }
             }
         } else {
-            this.statusGroups.push({col, type: "sorting"})
+            this.statusGroups.push({isSort: true, col})
         }
     }
-
 
     /**
      * resets the indexes of the grid rows to the initial value
@@ -383,5 +425,10 @@ export class VirtualGridSortController {
         }
 
         this.Grid.rows = orderedRows;
+    }
+
+    private _apply() {
+        this.Grid.SelectionController.clearRangeSelection()
+        this.Grid.api.refreshGrid(true, true);
     }
 }
