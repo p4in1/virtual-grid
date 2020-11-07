@@ -36,6 +36,7 @@ export class SectionOneComponent implements AfterViewInit {
         data.columns[4].suppressPinning = true
 
         this.gridInstance = new VirtualGrid(config)
+        console.log(data.columns)
     }
 
     filter(event) {

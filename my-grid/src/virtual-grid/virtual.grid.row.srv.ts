@@ -353,6 +353,11 @@ export class VirtualGridRowController {
      */
     getCellData(rowData, path) {
 
+        if (path.length === 1) {
+            let value = rowData[path[0]] || ""
+            return typeof value == "string" ? value.trim() : value
+        }
+
         let currentObject = rowData;
 
         for (let value of path) {

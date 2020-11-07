@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, Input, ViewChild} from '@angular/core';
 import {
     IRenderedCell,
     IVirtualGrid, IVirtualGridColumn,
@@ -24,6 +24,10 @@ export class SectionThreeComponent implements AfterViewInit {
         }
     }
 
+    getRandomNumber() {
+        return Math.random() * (9999999 - 1000000) + 1000000;
+    }
+
     getRandomLastName() {
         let first = this.lastNames[Math.floor(Math.random() * this.lastNames.length)];
         let second = this.lastNames[Math.floor(Math.random() * this.lastNames.length)];
@@ -43,7 +47,7 @@ export class SectionThreeComponent implements AfterViewInit {
 
         let items = []
 
-        for (let i = 0; i < 30; i++) {
+        for (let i = 0; i < 150; i++) {
             data.rows.forEach((item) => {
 
                 if (item.data.user.userFirstName === "a" || item.data.user.userFirstName === "aaron") {
@@ -53,6 +57,7 @@ export class SectionThreeComponent implements AfterViewInit {
                 let test = {...item}
 
                 test.lastName = this.getRandomLastName()
+                test.stuff = this.getRandomNumber()
                 items.push(test)
             })
         }
@@ -95,12 +100,51 @@ export class SectionThreeComponent implements AfterViewInit {
                 {
                     type: "date",
                     field: "data.user.adminProperties.riskAssessment.deadlineDateSet",
-                    title: "Forderungs Datum",
+                    title: "Forderungsdatum",
                     cellValueFormatter(cell: IRenderedCell, value: any): any {
                         let date = new Date(value)
                         return value === "" ? "" : `${date.getFullYear()} / ${date.getMonth() + 1} / ${date.getDate()}`
                     }
-                }
+                },
+                {
+                    field: "data.amountToPay",
+                    title: "Forderung",
+                    type: "number",
+                    cellValueFormatter(cell: IRenderedCell, value: any): any {
+                        return value != void 0 && value != "" ? `${value} €` : ""
+                    }
+                },
+                {
+                    field: "stuff",
+                    title: "Umsatz",
+                    type: "number",
+                    cellValueFormatter: function (cell: IRenderedCell, value: any): any {
+                        if (value == void 0 || value == "") {
+                            return ""
+                        }
+                        let newValue = []
+                        let counter = 0;
+                        let _value = value.toFixed(2)
+                        let parts = _value.split(".")
+                        let preNumber = parts[0].toString()
+
+                        for (let i = preNumber.length - 1; i >= 0; i--) {
+                            let char = preNumber[i]
+
+                            if (/[0-9]/.test(char)) {
+                                newValue.push(char)
+                            }
+
+                            counter++
+
+                            if (counter % 3 == 0) {
+                                newValue.push("'")
+                            }
+                        }
+
+                        return `£ ${newValue.reverse().join("")}.${parts[1]}`
+                    }
+                },
             ],
             element: this.grid.nativeElement,
             showHeader: true,
@@ -125,13 +169,7 @@ export class SectionThreeComponent implements AfterViewInit {
                     })
 
                 return entries
-            },
-            // onGridReady(Grid: IVirtualGrid) {
-            //     let config = JSON.parse(localStorage.getItem("virtual-grid-config"))
-            //     if (config) {
-            //         Grid.api.setConfig(config)
-            //     }
-            // }
+            }
         }
 
         this.gridInstance = new VirtualGrid(config)

@@ -45,6 +45,7 @@ export class VirtualGridSortController {
         let rowGroups = this.statusGroups.filter(x => x.type == "grouping")
         let sortGroups = this.statusGroups.filter(x => x.type == "sorting")
 
+        // no status groups --> reset everything
         if (rowGroups.length === 0 && sortGroups.length === 0) {
             this.removeGroups()
             this.resetGridRowIndexes()
@@ -52,6 +53,8 @@ export class VirtualGridSortController {
             return
         }
 
+        // in case the groups are empty now we have to remove the possible sorting of columns
+        // because the sort order would persist in case it was sorted descending
         if (rowGroups.length === 0) {
             let group = this.statusGroups.find(x => x.col.isRowGroupColumn)
             if (group) {
@@ -94,11 +97,24 @@ export class VirtualGridSortController {
         let s = +new Date()
         let tree = {};
 
+
+        if (this.statusGroups.length === 1) {
+            let firstGroup = this.statusGroups[0]
+            if (firstGroup.type == "sorting" && firstGroup.col.sortDirection == "desc") {
+                this.Grid.rows.reverse()
+                this.Grid.SelectionController.clearRangeSelection()
+                this.Grid.api.refreshGrid(true, true);
+                return
+            }
+        }
+
         for (let row of this.Grid.rows) {
             if (!row.isRowGroup) {
                 this._addGroupRows(tree, row)
             }
         }
+
+        console.log("grouping rows took -->", +new Date() - s)
 
         let rowGroups = this.statusGroups.filter(x => x.type == "grouping")
         let rows = this.getGroupedContent(tree, 0)
@@ -114,8 +130,6 @@ export class VirtualGridSortController {
         this.Grid.rows = rows
         this.Grid.SelectionController.clearRangeSelection()
         this.Grid.api.refreshGrid(true, true);
-
-        return rows
     }
 
     generateTreeStructure(rows, level: number = 0, parent?) {
@@ -228,6 +242,7 @@ export class VirtualGridSortController {
 
         for (let i = 0; i < this.statusGroups.length; i++) {
             let currentGroup = this.statusGroups[i]
+
             let value = row.getCellValue(currentGroup.col, {suppressFormatting: true, stringify: false})
 
             if (currentGroup.type == "grouping" && value === "") {
@@ -251,7 +266,7 @@ export class VirtualGridSortController {
                     currentNode = currentNode[value].rowGroups
                 }
             } else {
-                currentNode[value].children[currentNode[value].children.length] = row
+                currentNode[value].children.push(row)
             }
         }
     }
@@ -263,6 +278,10 @@ export class VirtualGridSortController {
             case "boolean":
                 a = !!a
                 b = !!b
+                break;
+            case "number":
+                a = a == void 0 || a == "" ? "" : +a
+                b = b == void 0 || b == "" ? "" : +b
                 break;
             case "date":
                 a = !a ? "" : a
