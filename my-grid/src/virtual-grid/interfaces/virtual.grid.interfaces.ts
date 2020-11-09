@@ -10,6 +10,7 @@ import {VirtualGridUIEventController} from "../virtual.grid.ui.event.srv";
 import {VirtualGridContextmenuController} from "../virtual.grid.contextmenu.srv";
 import {VirtualGridContextMenu} from "../virtual.grid.contextmenu.model";
 import {VirtualGridSelectionController} from "../virtual.grid.selection.srv";
+import {VirtualGridSortController} from "../wirtual.grid.sort.srv";
 
 export interface IVirtualGridConfig {
 
@@ -254,6 +255,7 @@ export interface IVirtualGrid {
     RowController: VirtualGridRowController
     ConfigController: VirtualGridConfigController
     FilterController: VirtualGridFilterController
+    SortController: VirtualGridSortController
 
 
     domController: VirtualGridUIDomController
@@ -275,6 +277,7 @@ export interface VirtualGridCurrentFilter {
 }
 
 export interface IVirtualGridRow {
+    value? : any
     /**
      * The level describes the current depth of the row
      * Starting at level 0 for the root
@@ -351,7 +354,7 @@ export interface IVirtualGridRow {
      */
     updateRowData(rowData: any): void
 
-    getCellValue(col: IVirtualGridColumn, options?: IVirtualGetCellValueOptions): string
+    getCellValue(col: IVirtualGridColumn, options?: IVirtualGetCellValueOptions): any
 }
 
 export interface IVirtualGridColumnApi {
@@ -692,5 +695,5 @@ export interface IVirtualDragData {
 
 export interface IVirtualGetCellValueOptions {
     stringify?: boolean
-    suppressFormatting?: boolean
+    format?: boolean
 }
