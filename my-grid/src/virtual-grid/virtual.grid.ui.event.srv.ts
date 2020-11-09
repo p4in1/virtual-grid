@@ -204,7 +204,7 @@ export class VirtualGridUIEventController {
         if (start != void 0) {
             let startCol = isRightPinResizing ? [nextColumn] : [startColumn]
             let startDiff = isRightPinResizing ? -1 * diff : diff
-            let colDiff = isRightPinResizing ? diff : -1 * diff
+            let colDiff = isVisibilityChange ? 0 : isRightPinResizing ? diff : -1 * diff
             let isGrowing = isRightPinResizing ? diff > 0 : diff < 0
             let columns = isRightPinResizing || isLeftPinResizing ? centerColumns : centerColumns.filter(x => x.currentIndex > start)
             let widths = this.domController.calculatePartialWidths()
@@ -394,7 +394,7 @@ export class VirtualGridUIEventController {
 
             headerCell.addEventListener("click", (event: any) => {
                 if (!column.isSuppressSort) {
-                    this.Grid.ColumnController.sortColumn(column, event.shiftKey)
+                    this.Grid.SortController.sortColumn(column, event.shiftKey)
                 }
             })
 

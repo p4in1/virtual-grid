@@ -99,13 +99,13 @@ export class VirtualGridRow implements IVirtualGridRow {
             cellValue = cellData
         }
 
-        if (!options.suppressFormatting) {
+        if (options.format) {
             if (typeof cell.colModel.cellValueFormatter == "function") {
                 cellValue = cell.colModel.cellValueFormatter(cell, cellData)
             }
         }
 
-        return options.stringify ? Array.isArray(cellValue) ? cellData.join(" ") : cellValue.toString() : cellValue
+        return !options.stringify ? cellValue : col.colType == "multiLine" && Array.isArray(cellValue) ? cellData.join(" ") : cellValue.toString()
     }
 
     // private renderRow() {

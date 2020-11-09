@@ -76,13 +76,8 @@ export class VirtualGridApi {
      *
      * @param {Array} rows
      * @param {boolean} resetRowConfig
-     * @param {boolean} isRowGrouping
      */
-    public updateGridRows = (rows: any[], resetRowConfig?: boolean, isRowGrouping?): void => {
-        if (!isRowGrouping) {
-            this.Grid.ConfigController.originalRows = rows
-        }
-
+    public updateGridRows = (rows: any[], resetRowConfig?: boolean): void => {
         this.scrollPosTopBackup = this.Grid.domController.dom.bodyWrapper.scrollTop
 
         if (resetRowConfig) {
@@ -95,7 +90,7 @@ export class VirtualGridApi {
 
         this.Grid.FilterController.resetFilter()
         // refreshing the visual projection
-        this.Grid.ColumnController.applySorting();
+        this.Grid.SortController.applySorting();
     };
 
     setConfig = (config): void => {
@@ -132,7 +127,7 @@ export class VirtualGridApi {
         if (config && config.sort && Array.isArray(config.sort)) {
             for (let col of config.sort) {
                 let column = columns.find(x => x.field == col.field)
-                this.Grid.ColumnController.sortColumn(column, config.sort.length > 1, col.dir)
+                this.Grid.SortController.sortColumn(column, config.sort.length > 1, col.dir)
             }
         } else {
             this.refreshGrid(true, true)
@@ -153,7 +148,7 @@ export class VirtualGridApi {
             return {"field": col.field, "width": col.width}
         })
 
-        let sort = this.Grid.ColumnController.sortedColumns.map((col) => {
+        let sort = this.Grid.SortController.sortedColumns.map((col) => {
             return {"field": col.field, "dir": col.sortDirection}
         })
 

@@ -15,6 +15,7 @@ import {VirtualGridUIDomController} from "./virtual.grid.ui.dom.srv";
 import {VirtualGridUIEventController} from "./virtual.grid.ui.event.srv";
 import {VirtualGridContextmenuController} from "./virtual.grid.contextmenu.srv";
 import {VirtualGridSelectionController} from "./virtual.grid.selection.srv";
+import {VirtualGridSortController} from "./wirtual.grid.sort.srv";
 
 export class VirtualGrid implements IVirtualGrid {
     /**
@@ -30,7 +31,7 @@ export class VirtualGrid implements IVirtualGrid {
     SelectionController: VirtualGridSelectionController
     FilterController: VirtualGridFilterController
     DnDController: VirtualGridDragAndDropController
-
+    SortController: VirtualGridSortController
     domController: VirtualGridUIDomController;
     eventController: VirtualGridUIEventController;
 
@@ -51,6 +52,7 @@ export class VirtualGrid implements IVirtualGrid {
         this.ConfigController = new VirtualGridConfigController(this, config)
         this.ContextmenuController = new VirtualGridContextmenuController(this, this.ConfigController)
         this.SelectionController = new VirtualGridSelectionController(this, this.ConfigController)
+        this.SortController = new VirtualGridSortController(this, this.ConfigController)
         log.push(`config took --> ${+new Date() - s}`)
         s = +new Date()
 
