@@ -102,17 +102,6 @@ export class SectionTwoComponent implements AfterViewInit {
                     field: "phoneNumber",
                     title: "Telefonnummer",
                     showFilter: false
-                },
-                {
-                    type: "boolean",
-                    field: "adminProperties.riskAssessment.deadlineDateSet",
-                    title: "Auszahlung gefordert",
-
-                },
-                {
-                    type: "date",
-                    field: "adminProperties.riskAssessment.deadlineDateSet",
-                    title: "Forderungs Datum",
                 }
             ],
             element: this.grid.nativeElement,

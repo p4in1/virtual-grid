@@ -2,9 +2,11 @@ import {
     IVirtualColumnRowGroup, IVirtualDragData,
     IVirtualGrid,
     IVirtualGridColumn,
-    IVirtualGridDom
+    IVirtualGridDom, IVirtualGridRow
 } from "./interfaces/virtual.grid.interfaces";
 import {VirtualGridUIDomController} from "./virtual.grid.ui.dom.srv";
+import {VirtualGridRow} from "./virtual.grid.row.model";
+import {VirtualGridConfigController} from "./virtual.grid.config.srv";
 
 export class VirtualGridDragAndDropController {
     dom: IVirtualGridDom
@@ -26,7 +28,7 @@ export class VirtualGridDragAndDropController {
 
     groupingDebounce
 
-    constructor(private Grid: IVirtualGrid) {
+    constructor(private Grid: IVirtualGrid, private config: VirtualGridConfigController) {
         this.domController = this.Grid.domController
         this.dom = this.domController.dom
     }
@@ -111,7 +113,7 @@ export class VirtualGridDragAndDropController {
         }
     }
 
-    applyGrouping() {
+    applyGrouping(suppressRefresh = false, suppressSorting = false) {
 
         let s = +new Date()
         let rows
@@ -131,15 +133,64 @@ export class VirtualGridDragAndDropController {
 
         } else if (groupColumn.isVisible) {
             groupColumn.api.hide()
-            rows = this.Grid.ConfigController.originalRows
+            this._removeRowGroups()
+            this.Grid.RowController.resetGridRowIndexes()
+            this.Grid.api.refreshGrid(true, true);
+            return
         } else {
             return;
         }
 
-        console.log("grouping took --> ", +new Date - s)
-
         this.Grid.SelectionController.clearRangeSelection()
-        this.Grid.api.updateGridRows(rows, false, true)
+        this._generateTreeStructure(rows)
+
+        console.log("setting grouping / sorting status took -->", +new Date() - s)
+
+
+        this.Grid.rows = this.Grid.Utils.flatten(rows)
+
+        if (this.Grid.SortController.sortedColumns.length && !suppressSorting) {
+            this.Grid.SortController.applySorting(true)
+        }
+
+        if (!suppressRefresh) {
+            this.Grid.api.refreshGrid(true, true);
+        }
+    }
+
+    private _generateTreeStructure(rows, level: number = 0, parent?) {
+        let childKey = this.config.childNodesKey
+        for (let i = 0; i < rows.length; i++) {
+            let row = rows[i]
+            let children = row[childKey]
+
+            row[childKey] = []
+
+            if (row.isRowGroup) {
+                let virtualRow: IVirtualGridRow = new VirtualGridRow(this.Grid, row)
+
+                rows[i] = virtualRow
+            }
+
+            rows[i][childKey] = children
+            rows[i].parent = parent
+            rows[i].level = level
+
+            if (children && children.length > 0) {
+                this._generateTreeStructure(children, level + 1, row)
+            }
+        }
+    }
+
+    private _removeRowGroups() {
+        let rows = []
+        for (let row of this.Grid.rows) {
+            if (!row.isRowGroup) {
+                rows.push(row)
+            }
+        }
+
+        this.Grid.rows = rows
     }
 
     _createGroupRows(treePart) {
@@ -158,11 +209,13 @@ export class VirtualGridDragAndDropController {
 
             rows.push(rowNode)
 
-            if (Object.keys(treePart[key].rowGroups).length > 0) {
-                rowNode[childKey] = this._createGroupRows(treePart[key].rowGroups)
+            let treeNode = treePart[key]
+
+            if (Object.keys(treeNode.rowGroups).length > 0) {
+                rowNode[childKey] = this._createGroupRows(treeNode.rowGroups)
             } else {
-                for (let _row of treePart[key].children) {
-                    rowNode[childKey].push(_row.rowData)
+                for (let _row of treeNode.children) {
+                    rowNode[childKey].push(_row)
                 }
             }
         }
@@ -221,8 +274,6 @@ export class VirtualGridDragAndDropController {
      */
     onColDragStart = (event: any, column: IVirtualGridColumn): void => {
         let rect = column.dom.cellTextContainer.getBoundingClientRect();
-
-        console.log(column.isSuppressPinning)
 
         this.colDragData = {
             x: event.clientX,

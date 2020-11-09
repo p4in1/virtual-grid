@@ -625,6 +625,7 @@ export class VirtualGridRowController {
      * resets the indexes of the grid rows to the initial value
      */
     resetGridRowIndexes() {
+
         let orderedRows: IVirtualGridRow[] = [];
         for (let row of this.Grid.rows) {
             orderedRows[row.initialIndex] = row;
@@ -632,5 +633,12 @@ export class VirtualGridRowController {
         }
 
         this.Grid.rows = orderedRows;
+
+        if (this.Grid.DnDController.groups.length !== 0) {
+            let suppressSortAndRefresh = this.Grid.SortController.sortedColumns.length > 0
+            this.Grid.DnDController.applyGrouping(suppressSortAndRefresh, suppressSortAndRefresh)
+        } else if (this.Grid.SortController.sortedColumns.length !== 0) {
+            this.Grid.SortController.applySorting()
+        }
     }
 }

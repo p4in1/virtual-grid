@@ -10,7 +10,7 @@ import {VirtualGridUIEventController} from "../virtual.grid.ui.event.srv";
 import {VirtualGridContextmenuController} from "../virtual.grid.contextmenu.srv";
 import {VirtualGridContextMenu} from "../virtual.grid.contextmenu.model";
 import {VirtualGridSelectionController} from "../virtual.grid.selection.srv";
-import {VirtualGridSortController} from "../wirtual.grid.sort.srv";
+import {VirtualGridSortController} from "../virtual.grid.sort.srv";
 
 export interface IVirtualGridConfig {
 

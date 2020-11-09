@@ -25,10 +25,6 @@ export class VirtualGridApi {
             return;
         }
 
-        if (this.Grid.domController.renderedRows.length > this.Grid.domController.renderedRowCount) {
-            console.error('Rendered row count exceeded the configured maximum!!!');
-        }
-
         clearTimeout(this.debounceTimeout);
 
         if (immediate) {
@@ -47,6 +43,8 @@ export class VirtualGridApi {
         if (this.Grid === void 0) {
             return;
         }
+
+        let s = +new Date()
 
         this.Grid.FilterController.applyFilter()
 
@@ -69,6 +67,8 @@ export class VirtualGridApi {
             this.Grid.domController.dom.bodyWrapper.scrollTop = this.scrollPosTopBackup
             this.scrollPosTopBackup = 0;
         }
+
+        console.log("refreshing grid took -->", +new Date() - s, "ms")
     }
 
     /**
@@ -148,8 +148,8 @@ export class VirtualGridApi {
             return {"field": col.field, "width": col.width}
         })
 
-        let sort = this.Grid.SortController.sortedColumns.map((col) => {
-            return {"field": col.field, "dir": col.sortDirection}
+        let sort = this.Grid.SortController.sortedColumns.map((sortCol) => {
+            return {"field": sortCol.col.field, "dir": sortCol.col.sortDirection}
         })
 
         let filter = {
