@@ -60,7 +60,7 @@ export class VirtualGridConfigController {
         this.suppressContextmenu = config.suppressContextmenu
         this.suppressContextmenuDefault = config.suppressContextmenuDefault
 
-        this.showHeader = config.showHeader
+        this.showHeader = config.showHeader == void 0 ? true : config.showHeader
         this.showColumnFilter = config.showColumnFilter
         this.showGroupPanel = config.showHeader && config.showGroupPanel
 
