@@ -18,7 +18,6 @@ export class VirtualGridRow implements IVirtualGridRow {
 
     initialIndex: number;
 
-    isLoading: boolean;
     isRowGroup: boolean = false
     isSelectable: boolean = true;
     isSelected: boolean = false;
@@ -43,7 +42,7 @@ export class VirtualGridRow implements IVirtualGridRow {
 
         if (node[Grid.ConfigController.childNodesKey]) {
             this.isExpanded = Grid.ConfigController.expandNodesByDefault || node.expanded;
-            this.isSelectable = Grid.ConfigController.useIntermediateNodes;
+            this.isSelectable = Grid.ConfigController.selectLeavesOnly;
         }
 
         // TODO observe changes on the rowData

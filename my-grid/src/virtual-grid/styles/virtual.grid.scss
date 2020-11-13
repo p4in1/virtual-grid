@@ -115,7 +115,61 @@
         }
 
         .cell.selected {
-            background-color: $color-accent-extra-light;
+            &.stack-1 {
+                background-color: rgba($color-accent-light, .08);
+            }
+
+            &.stack-2 {
+                background-color: rgba($color-accent-light, .16);
+            }
+
+            &.stack-3 {
+                background-color: rgba($color-accent-light, .24);
+            }
+
+            &.stack-4 {
+                background-color: rgba($color-accent-light, .32);
+            }
+
+            &.stack-5 {
+                background-color: rgba($color-accent-light, .40);
+            }
+
+            &.stack-6 {
+                background-color: rgba($color-accent-light, .48);
+            }
+
+            &.stack-7 {
+                background-color: rgba($color-accent-light, .56);
+            }
+
+            &.stack-8 {
+                background-color: rgba($color-accent-light, .64);
+            }
+
+            &.stack-9 {
+                background-color: rgba($color-accent-light, .72);
+            }
+
+            &.stack-10 {
+                background-color: rgba($color-accent-light, .80);
+            }
+
+            &.range-border-top {
+                border-top: 1px solid $color-accent !important;
+            }
+
+            &.range-border-bottom {
+                border-bottom: 1px solid $color-accent !important;
+            }
+
+            &.range-border-left {
+                border-left: 1px solid $color-accent !important;
+            }
+
+            &.range-border-right {
+                border-right: 1px solid $color-accent !important;
+            }
         }
     }
 
@@ -281,6 +335,20 @@
                         white-space: nowrap;
                         color: rgba(0, 0, 0, .87);
 
+                        border-left: 1px solid transparent;
+                        border-right: 1px solid transparent;
+                        border-top: 1px solid transparent;
+                        border-bottom: 1px solid transparent;
+
+                        .checkbox {
+                            margin-right: 8px;
+                            min-width: 16px;
+                            min-height: 16px;
+                            width: 16px;
+                            height: 16px;
+                            border: 1px solid rgba(0, 0, 0, .2);
+                        }
+
                         &.text-node {
                             display: flex;
                             flex-direction: row;
@@ -295,6 +363,7 @@
                                 display: flex;
                                 align-items: center;
                                 justify-content: center;
+                                margin-right: 8px;
                             }
 
                             .expanded {
@@ -332,18 +401,6 @@
                             display: flex;
                             align-items: center;
                             justify-content: center;
-                        }
-
-                        &.checkbox-node {
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-
-                            .checkbox {
-                                width: 16px;
-                                height: 16px;
-                                border: 1px solid rgba(0, 0, 0, .2);
-                            }
                         }
 
                         &.avatar-node {

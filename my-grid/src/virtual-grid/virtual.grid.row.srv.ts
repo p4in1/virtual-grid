@@ -296,7 +296,6 @@ export class VirtualGridRowController {
         row.isExpanded = bool != void 0 ? bool : !row.isExpanded;
 
         if (row.isExpanded && typeof (this.config.onNodeExpandAsync) == "function") {
-            row.isLoading = true;
 
             for (const renderedRow of this.domController.renderedRows) {
                 if (renderedRow.index == row.index) {
@@ -307,7 +306,6 @@ export class VirtualGridRowController {
 
             this.config.onNodeExpandAsync({row, api: this.Grid.api},
                 () => {
-                    row.isLoading = false;
 
                     this.Grid.SortController.applySorting();
                     this.expandCollapse(row);
@@ -484,16 +482,17 @@ export class VirtualGridRowController {
         if (cell.colModel.isHierarchyColumn) {
             cell.cellNode.style["padding-left"] = `${16 * cell.rowModel.level}px`;
             cell.treeChildCountNode.innerText = ""
+
             if (cell.treeNode != void 0) {
                 const children: IVirtualGridRow[] = cell.rowModel.children;
 
                 if (children != void 0 && children.length > 0) {
                     cell.treeChildCountNode.innerText = `(${children.length})`
 
-                    if (cell.rowModel.isExpanded && !cell.rowModel.isLoading) {
-                        cell.treeNode.innerHTML = "remove"
+                    if (cell.rowModel.isExpanded) {
+                        cell.treeNode.innerHTML = "keyboard_arrow_up"
                     } else {
-                        cell.treeNode.innerHTML = "add"
+                        cell.treeNode.innerHTML = "keyboard_arrow_down"
                     }
                 } else {
                     cell.treeNode.innerHTML = ""
@@ -634,9 +633,9 @@ export class VirtualGridRowController {
 
         this.Grid.rows = orderedRows;
 
-        if (this.Grid.DnDController.groups.length !== 0) {
+        if (this.Grid.GroupController.groups.length !== 0) {
             let suppressSortAndRefresh = this.Grid.SortController.sortedColumns.length > 0
-            this.Grid.DnDController.applyGrouping(suppressSortAndRefresh, suppressSortAndRefresh)
+            this.Grid.GroupController.applyGrouping(suppressSortAndRefresh, suppressSortAndRefresh)
         } else if (this.Grid.SortController.sortedColumns.length !== 0) {
             this.Grid.SortController.applySorting()
         }

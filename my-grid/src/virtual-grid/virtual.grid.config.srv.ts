@@ -25,7 +25,10 @@ export class VirtualGridConfigController {
     showGroupPanel: boolean = false
     showColumnFilter: boolean = false;
 
-    selectionMethod: string
+    isSingleSelect: boolean = true;
+    isMultiSelect: boolean = false;
+    isRangeSelect: boolean = false;
+
     element: HTMLElement;
     childNodesKey: string
 
@@ -44,8 +47,7 @@ export class VirtualGridConfigController {
     headerValueGetter: Function
 
     expandNodesByDefault = false;
-    useCheckboxSelection = false;
-    useIntermediateNodes = false;
+    selectLeavesOnly = false;
     deselectWhenCollapse = false;
 
     originalRows: any[] = []
@@ -65,7 +67,11 @@ export class VirtualGridConfigController {
         this.showGroupPanel = config.showHeader && config.showGroupPanel
 
         this.element = config.element
-        this.selectionMethod = config.selectionMethod == void 0 ? "single" : config.selectionMethod
+
+        this.isSingleSelect = !config.useMultiselect
+        this.isMultiSelect = !!config.useMultiselect
+        this.isRangeSelect = !!config.useRangeSelect
+
         this.headerValueGetter = config.headerValueGetter
         this.childNodesKey = config.childNodesKey != void 0 && config.childNodesKey !== '' ? config.childNodesKey : 'children';
 
@@ -81,8 +87,7 @@ export class VirtualGridConfigController {
         this.onNodeExpandAsync = config.onNodeExpandAsync;
 
         this.expandNodesByDefault = config.expandNodesByDefault == void 0 ? true : config.expandNodesByDefault;
-        this.useCheckboxSelection = config.useCheckboxSelection;
-        this.useIntermediateNodes = config.useIntermediateNodes;
+        this.selectLeavesOnly = config.selectLeavesOnly;
         this.deselectWhenCollapse = config.deselectWhenCollapse;
 
         this.externalFilter = config.externalFilter
@@ -96,10 +101,6 @@ export class VirtualGridConfigController {
     }
 
     getColDefs(config) {
-
-        if (this.useCheckboxSelection) {
-            config.columns.unshift({isCheckboxColumn: true, pinned: "left", suppressMoving: true, isSystemColumn: true})
-        }
 
         if (this.showGroupPanel) {
             config.columns.unshift({
@@ -129,7 +130,7 @@ export class VirtualGridConfigController {
                 isActionColumn: col.type == "action",
                 isIconColumn: col.type == "icon",
                 isAvatarColumn: col.type == "avatar",
-                isCheckboxColumn: col.isCheckboxColumn,
+                isCheckboxColumn: col.checkbox,
                 isHierarchyColumn: col.isHierarchyColumn,
                 isSystemColumn: col.isSystemColumn,
 
@@ -157,10 +158,6 @@ export class VirtualGridConfigController {
 
             colDef.isPinned = colDef.pinned == "left" || colDef.pinned == "right";
 
-            if (colDef.isCheckboxColumn) {
-                colDef.type = "checkbox"
-            }
-
             if (colDef.isShowFilter) {
                 this.headerRowHeight = 80
                 this.showColumnFilter = true
@@ -172,7 +169,7 @@ export class VirtualGridConfigController {
                 this.setMinimumProperties(colDef)
             }
 
-            if (colDef.isAvatarColumn || colDef.isCheckboxColumn) {
+            if (colDef.isAvatarColumn) {
                 colDef.width = 56
                 this.setMinimumProperties(colDef)
             }

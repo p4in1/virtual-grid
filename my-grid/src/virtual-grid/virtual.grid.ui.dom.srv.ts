@@ -117,7 +117,7 @@ export class VirtualGridUIDomController {
     }
 
     setGridDefaults() {
-        if (this.Grid.ConfigController.selectionMethod == "range") {
+        if (this.Grid.ConfigController.isRangeSelect) {
             this.dom.virtualGrid.classList.add("range-selection")
         } else {
             this.dom.virtualGrid.classList.add("default-selection")
@@ -468,6 +468,7 @@ export class VirtualGridUIDomController {
                 checkboxNode: null,
                 avatarNode: null,
                 avatarPlaceholder: null,
+                cellId: this.Utils.generateUUID(),
                 cellNode: this.Utils.el("div", ["cell"]),
                 cellContentNode: this.Utils.el("div", ["cell-content"]),
                 colId: col.id,
@@ -486,14 +487,18 @@ export class VirtualGridUIDomController {
                 cell.cellNode.append(cell.treeNode)
             }
 
-            if (this.config.useCheckboxSelection && col.isCheckboxColumn) {
+            if (col.isCheckboxColumn) {
                 cell.checkboxNode = this.Utils.el("div", ["checkbox"])
                 cell.checkboxIcon = this.Utils.el("i", ["checkbox-icon", "virtual-material-icons", "small"]);
-                cell.cellNode.classList.add("checkbox-node")
                 cell.cellNode.append(cell.checkboxNode)
                 cell.checkboxNode.append(cell.checkboxIcon)
 
-            } else if (col.isAvatarColumn) {
+                cell.checkboxNode.addEventListener("click", (event) => {
+                    this.Grid.eventController.onClick(event, true)
+                });
+            }
+
+            if (col.isAvatarColumn) {
 
                 cell.avatarNode = this.Utils.el("div", ["avatar-icon"]);
                 cell.avatarPlaceholder = this.Utils.el("span", ["avatar-placeholder"]);
@@ -535,7 +540,7 @@ export class VirtualGridUIDomController {
                 cell.cellNode.append(cell.cellContentNode)
             }
 
-            if(col.isRowGroupColumn){
+            if (col.isRowGroupColumn) {
                 cell.cellNode.append(cell.treeChildCountNode)
             }
 

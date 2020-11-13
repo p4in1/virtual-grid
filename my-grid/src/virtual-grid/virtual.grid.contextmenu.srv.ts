@@ -67,55 +67,66 @@ export class VirtualGridContextmenuController {
     }
 
     exportAsCsv = () => {
-        let selection = this.Grid.SelectionController.getSelection()
-
-        let exportData = []
-
-        if (this.config.selectionMethod == "range") {
-            exportData = selection.range
-        } else {
-            for (let row of selection) {
-                exportData.push(row.renderedRow.cells)
-            }
-        }
-
-        let rows = []
-        for (let row of this._getPreformattedRows(exportData)) {
-            let _row = []
-            row.forEach((cell) => {
-                _row.push(cell.value)
-            })
-
-            rows.push(_row)
-        }
-
-        let csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
-        let encodedUri = encodeURI(csvContent);
-        let link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "export.csv");
-        document.body.appendChild(link); // Required for FF
-
-        link.click();
-
-        document.body.removeChild(link)
+        // let selection = this.Grid.SelectionController.getSelection()
+        //
+        // let exportData = []
+        //
+        // if (this.config.isRangeSelect) {
+        //     exportData = selection.range
+        // } else {
+        //     for (let row of selection) {
+        //         exportData.push(row.renderedRow.cells)
+        //     }
+        // }
+        //
+        // let rows = []
+        // for (let row of this._getPreformattedRows(exportData)) {
+        //     let _row = []
+        //     row.forEach((cell) => {
+        //         _row.push(cell.value)
+        //     })
+        //
+        //     rows.push(_row)
+        // }
+        //
+        // let csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
+        // let encodedUri = encodeURI(csvContent);
+        // let link = document.createElement("a");
+        // link.setAttribute("href", encodedUri);
+        // link.setAttribute("download", "export.csv");
+        // document.body.appendChild(link); // Required for FF
+        //
+        // link.click();
+        //
+        // document.body.removeChild(link)
     }
 
     copySelectionToClipboard = () => {
-        let selection = this.Grid.SelectionController.getSelection()
-        let exportData = []
+        let selectedRanges = this.Grid.SelectionController.getRangeSelection()
+        let selectedRows = this.Grid.SelectionController.getSelectedRows()
 
-        if (this.config.selectionMethod == "range") {
-            exportData = selection.range
-        } else {
-            for (let row of selection) {
-                exportData.push(row.renderedRow.cells)
+        let exportData = []
+        for (let row of selectedRows) {
+            exportData.push(row.renderedRow.cells)
+        }
+
+        let lines = this._getLines(exportData)
+
+        if (this.config.isRangeSelect) {
+            for (let range of selectedRanges) {
+
+                lines += this._getLines(range.rows)
+
             }
         }
 
-        let lines = ""
+        this.Grid.Utils.copyToClipboard(lines)
+    }
 
-        for (let row of this._getPreformattedRows(exportData)) {
+    _getLines(data) {
+
+        let lines = ""
+        for (let row of this._getPreformattedRows(data)) {
 
             let line = ""
 
@@ -134,7 +145,9 @@ export class VirtualGridContextmenuController {
             lines += line
         }
 
-        this.Grid.Utils.copyToClipboard(lines)
+        lines += "\r\n"
+
+        return lines
     }
 
     _getPreformattedRows(exportData) {

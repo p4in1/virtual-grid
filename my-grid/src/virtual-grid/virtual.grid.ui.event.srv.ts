@@ -24,14 +24,21 @@ export class VirtualGridUIEventController {
     /**
      * onClick callback
      * @param event - the click event
+     * @param isCheckboxClick
      */
-    private onClick = (event: any): void => {
+    onClick = (event: any, isCheckboxClick?): void => {
 
         const row: IVirtualGridRow = this.getRowByEvent(event);
-        const ctrlSelection = event.ctrlKey || this.Grid.ConfigController.useCheckboxSelection
+        const ctrlSelection = event.ctrlKey
 
-        if (row.isSelectable && this.Grid.ConfigController.selectionMethod != "range") {
-            this.Grid.SelectionController.select(row, ctrlSelection, event.shiftKey);
+        if (row.isSelectable) {
+
+            let checkbox = this.Grid.columns.find(x => x.isCheckboxColumn)
+            if (checkbox && isCheckboxClick) {
+                this.Grid.SelectionController.select(row, true, event.shiftKey);
+            } else {
+                this.Grid.SelectionController.select(row, ctrlSelection, event.shiftKey);
+            }
         }
 
         this.config.onRowClick({row, event, api: this.Grid.api});
@@ -44,7 +51,7 @@ export class VirtualGridUIEventController {
     private onDoubleClick = (event: any): void => {
         const row: IVirtualGridRow = this.getRowByEvent(event);
 
-        if (!this.Grid.ConfigController.useCheckboxSelection && this.Grid.ConfigController.selectionMethod != "range" && row.isSelectable) {
+        if (!this.Grid.ConfigController.isRangeSelect && row.isSelectable) {
             this.Grid.SelectionController.select(row);
         }
 
@@ -57,6 +64,11 @@ export class VirtualGridUIEventController {
      */
     private onRightClick = (event: any): void => {
         const row: IVirtualGridRow = this.getRowByEvent(event);
+
+        if (!row.isSelected && row.isSelectable) {
+            this.Grid.SelectionController.select(row);
+        }
+
         this.config.onRowRightClick({row, event, api: this.Grid.api});
     };
 
@@ -90,6 +102,8 @@ export class VirtualGridUIEventController {
         if (!this.config.suppressContextmenu) {
             this.Grid.ContextmenuController.showMenu(cell.rowModel, cell.colModel, event)
         }
+
+        this.onRightClick(event)
     }
 
     /**
@@ -290,14 +304,14 @@ export class VirtualGridUIEventController {
                 currentColumn.width = width;
             }
 
-            let _width = currentColumn.isVisible ? currentColumn.width : 0
+            let _width = Math.floor(currentColumn.isVisible ? currentColumn.width : 0)
 
-            this.domController.setStyles(currentColumn.dom.cell, {"width": `${Math.floor(_width)}px`})
+            this.domController.setStyles(currentColumn.dom.cell, {"width": `${_width}px`})
 
             for (const row of this.domController.renderedRows) {
                 let styles = {}
                 let cell = row.cells[currentColumn.currentIndex].cellNode
-                styles["width"] = `${Math.floor(_width)}px`
+                styles["width"] = `${_width}px`
 
                 if (currentColumn.isHierarchyColumn && this.Grid.rows[row.index] != void 0) {
                     styles["padding-left"] = `${this.Grid.rows[row.index].level * 16}px`
@@ -314,8 +328,8 @@ export class VirtualGridUIEventController {
      */
     private _adjustCellLeft() {
 
-        let left = 0;
-        let side = "left"
+        let left
+        let side
 
         for (let i = 0; i < this.Grid.columns.length; i++) {
             let currentColumn = this.Grid.columns[i]
@@ -331,10 +345,28 @@ export class VirtualGridUIEventController {
                 left += currentColumn.width
             }
 
-            this.domController.setStyles(currentColumn.dom.cell, {"transform": `translateX(${Math.floor(currentColumn.left)}px)`})
+            // due to rounding issues when we want to size columns with floating pixels
+            // there are sometimes differences of just one pixel
+            // we are going to fix this at this point
+            let _left = Math.floor(currentColumn.left)
+            let _styles = {"transform": `translateX(${_left}px)`}
+            let _prevCol = this.Grid.columns[i - 1]
+            let _prevColDiff = 0;
+            let _prevColStyles;
+            if (_prevCol && _left != Math.floor(_prevCol.left) + Math.floor(_prevCol.width)) {
+                _prevColDiff = _left - (Math.floor(_prevCol.left) + Math.floor(_prevCol.width))
+                _prevColStyles = {"width": `${Math.floor(_prevCol.width + _prevColDiff)}px`}
+                this.domController.setStyles(_prevCol.dom.cell, _prevColStyles)
+            }
+
+            this.domController.setStyles(currentColumn.dom.cell, _styles)
 
             for (const row of this.domController.renderedRows) {
-                this.domController.setStyles(row.cells[currentColumn.currentIndex].cellNode, {"transform": `translateX(${Math.floor(currentColumn.left)}px)`})
+                this.domController.setStyles(row.cells[currentColumn.currentIndex].cellNode, _styles)
+
+                if (_prevColDiff != 0) {
+                    this.domController.setStyles(row.cells[_prevCol.currentIndex].cellNode, _prevColStyles)
+                }
             }
         }
     }
@@ -343,16 +375,8 @@ export class VirtualGridUIEventController {
         for (const renderedRow of this.domController.renderedRows) {
 
             [renderedRow.left, renderedRow.center, renderedRow.right].forEach((partial) => {
-                if (this.Grid.ConfigController.useCheckboxSelection) {
-                    let checkbox = partial.cells.find(x => x.colModel.isCheckboxColumn)
 
-                    if (checkbox) {
-                        checkbox.checkboxNode.addEventListener("click", this.onClick)
-                    }
-                } else {
-                    partial.element.addEventListener("click", this.onClick);
-                }
-
+                partial.element.addEventListener("click", this.onClick);
                 partial.element.addEventListener("dblclick", this.onDoubleClick);
                 partial.element.addEventListener("contextmenu", this.onRightClick);
                 partial.element.addEventListener("mouseenter", this.onMouseEnter);
@@ -390,7 +414,6 @@ export class VirtualGridUIEventController {
 
             const headerCell: HTMLElement = column.dom.cellTextContainer;
             const filterField: HTMLInputElement = column.dom.cellFilter
-            const filterAdvanced: HTMLElement = column.dom.cellFilterAdvancedButton
 
             headerCell.addEventListener("click", (event: any) => {
                 if (!column.isSuppressSort) {
@@ -417,10 +440,6 @@ export class VirtualGridUIEventController {
                 } else {
                     filterField.addEventListener("input", () => {
                         this.Grid.FilterController.setTextFilter(column, filterField.value)
-                    })
-
-                    filterAdvanced.addEventListener("click", (event) => {
-                        this.Grid.FilterController.showAdvancedFilter(event, column)
                     })
                 }
             }
@@ -455,9 +474,9 @@ export class VirtualGridUIEventController {
 
         this.dom.scrollYCenterScrollPort.addEventListener("scroll", this.onBodyScrollX)
 
-        this.dom.groupPanel.addEventListener("mouseenter", this.Grid.DnDController.onGroupPanelMouseEnter)
-        this.dom.groupPanel.addEventListener("mouseleave", this.Grid.DnDController.onGroupPanelMouseLeave)
-        this.dom.groupPanel.addEventListener("mouseup", this.Grid.DnDController.onGroupPanelMouseUp)
+        this.dom.groupPanel.addEventListener("mouseenter", this.Grid.GroupController.onGroupPanelMouseEnter)
+        this.dom.groupPanel.addEventListener("mouseleave", this.Grid.GroupController.onGroupPanelMouseLeave)
+        this.dom.groupPanel.addEventListener("mouseup", this.Grid.GroupController.onGroupPanelMouseUp)
 
         this.bindRowEvents()
         this.bindColumnEvents()

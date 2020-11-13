@@ -16,6 +16,7 @@ import {VirtualGridUIEventController} from "./virtual.grid.ui.event.srv";
 import {VirtualGridContextmenuController} from "./virtual.grid.contextmenu.srv";
 import {VirtualGridSelectionController} from "./virtual.grid.selection.srv";
 import {VirtualGridSortController} from "./virtual.grid.sort.srv";
+import {VirtualGridGroupController} from "./virtual.grid.group.srv";
 
 export class VirtualGrid implements IVirtualGrid {
     /**
@@ -32,6 +33,7 @@ export class VirtualGrid implements IVirtualGrid {
     FilterController: VirtualGridFilterController
     DnDController: VirtualGridDragAndDropController
     SortController: VirtualGridSortController
+    GroupController: VirtualGridGroupController
     domController: VirtualGridUIDomController;
     eventController: VirtualGridUIEventController;
 
@@ -53,6 +55,7 @@ export class VirtualGrid implements IVirtualGrid {
         this.ContextmenuController = new VirtualGridContextmenuController(this, this.ConfigController)
         this.SelectionController = new VirtualGridSelectionController(this, this.ConfigController)
         this.SortController = new VirtualGridSortController(this, this.ConfigController)
+
         log.push(`config took --> ${+new Date() - s}`)
         s = +new Date()
 
@@ -91,6 +94,7 @@ export class VirtualGrid implements IVirtualGrid {
 
         this.FilterController = new VirtualGridFilterController(this, this.ConfigController)
         this.DnDController = new VirtualGridDragAndDropController(this, this.ConfigController)
+        this.GroupController = new VirtualGridGroupController(this, this.ConfigController)
 
         log.push(`filter + dnd controller --> ${+new Date() - s}`)
         s = +new Date()
@@ -111,7 +115,7 @@ export class VirtualGrid implements IVirtualGrid {
                 this.domController.calculateScrollGuard()
                 this.eventController.adjustCell(this.originalColumns, 0)
                 this.eventController.bindGlobalOnResize()
-                this.DnDController.setColGroups()
+                this.GroupController.setColGroups()
             });
 
             this.api.setGridContent();

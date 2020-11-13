@@ -72,10 +72,10 @@ export class VirtualGridColumnApi implements IVirtualGridColumnApi {
      * adds this column to the row grouping
      */
     setRowGroup = () => {
-        let rowGroup = this.Grid.DnDController.groups.find(x => x.col.id == this.col.id)
+        let rowGroup = this.Grid.GroupController.groups.find(x => x.col.id == this.col.id)
         if (!this.col.isRowGrouped || !rowGroup) {
-            this.Grid.DnDController._addGroup(this.col, true)
-            this.Grid.DnDController.applyGrouping()
+            this.Grid.GroupController._addGroup(this.col, true)
+            this.Grid.GroupController.applyGrouping()
         }
     }
 
@@ -84,15 +84,15 @@ export class VirtualGridColumnApi implements IVirtualGridColumnApi {
      */
     removeRowGroup = () => {
         if (this.col.isRowGrouped) {
-            for (let i = 0; i < this.Grid.DnDController.groups.length; i++) {
-                let group = this.Grid.DnDController.groups[i]
+            for (let i = 0; i < this.Grid.GroupController.groups.length; i++) {
+                let group = this.Grid.GroupController.groups[i]
                 if (group.col.id == this.col.id) {
-                    this.Grid.DnDController.groups.splice(i, 1)
+                    this.Grid.GroupController.groups.splice(i, 1)
                     this.col.isRowGrouped = false
-                    this.Grid.DnDController.createGroupElements()
+                    this.Grid.GroupController.createGroupElements()
 
                     if (group.isActive) {
-                        this.Grid.DnDController.applyGrouping()
+                        this.Grid.GroupController.applyGrouping()
                     }
                     break;
                 }

@@ -6,9 +6,10 @@ import {
 import {VirtualGridConfigController} from "./virtual.grid.config.srv";
 
 interface IVirtualRangeSelection {
-    start: any,
-    end: any,
-    range: any[]
+    start: any
+    end: any
+    rows: any
+    id: string
 }
 
 export class VirtualGridSelectionController {
@@ -16,23 +17,19 @@ export class VirtualGridSelectionController {
     selectedRows: IVirtualGridRow[] = []
 
     isRangeSelectActive: boolean = false
-
-    rangeSelection: IVirtualRangeSelection = {
-        start: {},
-        end: {},
-        range: []
-    }
+    currentRangeSelection: IVirtualRangeSelection;
+    rangeSelection: IVirtualRangeSelection[] = []
 
     constructor(private Grid: IVirtualGrid, private config: VirtualGridConfigController) {
 
     }
 
-    getSelection(): any {
-        if (this.config.selectionMethod == "range") {
-            return this.rangeSelection
-        } else {
-            return this.selectedRows
-        }
+    getRangeSelection() {
+        return this.rangeSelection
+    }
+
+    getSelectedRows(): any {
+        return this.selectedRows
     }
 
     /**
@@ -57,7 +54,7 @@ export class VirtualGridSelectionController {
         }
 
         // in this case we deselect all other selected rows
-        if ((!useCtrl && !useShift) || this.config.selectionMethod !== "multi") {
+        if ((!useCtrl && !useShift) || !this.config.isMultiSelect) {
             this.deselectAll();
         }
 
@@ -138,37 +135,41 @@ export class VirtualGridSelectionController {
 
     onCellMouseDown = (event: any, cell: IRenderedCell): void => {
 
-        if (this.Grid.ConfigController.selectionMethod != "range") {
+        if (!this.Grid.ConfigController.isRangeSelect) {
             return
         }
 
         if (event.buttons != 1) {
-
-            let rangeStart = this.rangeSelection.start
-            let rangeEnd = this.rangeSelection.end
-            let colFirst = rangeStart.col.currentIndex
-            let colLast = rangeEnd.col.currentIndex
-            let rowFirst = rangeStart.row.index
-            let rowLast = rangeEnd.row.index
-
-            let minCol = Math.min(colFirst, colLast)
-            let maxCol = Math.max(colFirst, colLast)
-            let minRow = Math.min(rowFirst, rowLast)
-            let maxRow = Math.max(rowFirst, rowLast)
-
             let currentCol = cell.colModel.currentIndex
             let currentRow = cell.rowModel.index
-            if (currentCol >= minCol && currentCol <= maxCol && currentRow >= minRow && currentRow <= maxRow) {
-                return;
+
+            for (let range of this.rangeSelection) {
+                let minMax = this._getMinMax(range)
+                if (currentCol >= minMax.minCol && currentCol <= minMax.maxCol && currentRow >= minMax.minRow && currentRow <= minMax.maxRow) {
+                    return;
+                }
             }
         }
 
-        this.clearRangeSelection()
+        if (!event.ctrlKey) {
+            this.clearRangeSelection()
+        }
 
         this.isRangeSelectActive = true
-        this.rangeSelection.start.row = cell.rowModel
-        this.rangeSelection.start.col = cell.colModel
-        this.rangeSelection.range = []
+
+        let range: IVirtualRangeSelection = {
+            start: {},
+            end: {},
+            rows: [],
+            id: this.Grid.Utils.generateUUID()
+        }
+
+        range.start.row = cell.rowModel
+        range.start.col = cell.colModel
+        range.rows = []
+
+        this.currentRangeSelection = range
+        this.rangeSelection.push(range)
 
         const _unbind = (): void => {
 
@@ -182,42 +183,117 @@ export class VirtualGridSelectionController {
 
     public clearRangeSelection = (): void => {
 
-        for (let selectedRow of this.rangeSelection.range) {
-            for (let cell of selectedRow) {
-                cell.cellNode.classList.remove("selected")
-            }
+        for (let range of this.rangeSelection) {
+            this._clearRange(range)
         }
 
-        this.rangeSelection.range = []
+        this.rangeSelection = []
     }
 
-    handleRangeSelect = (cell: IRenderedCell): void => {
+    private _clearRange(range) {
+        for (let selectedRow of range.rows) {
+            for (let cell of selectedRow) {
+                cell.cellNode.classList.remove("selected", "range-border-top", "range-border-bottom", "range-border-right", "range-border-left")
 
-        this.clearRangeSelection()
+                for (let i = 1; i <= 10; i++) {
+                    cell.cellNode.classList.remove(`stack-${i}`);
+                }
+            }
+        }
+    }
 
-        let minColIndex = Math.min(this.rangeSelection.start.col.currentIndex, cell.colModel.currentIndex)
-        let maxColIndex = Math.max(this.rangeSelection.start.col.currentIndex, cell.colModel.currentIndex)
-        let minRowIndex = Math.min(this.rangeSelection.start.row.index, cell.rowModel.index)
-        let maxRowIndex = Math.max(this.rangeSelection.start.row.index, cell.rowModel.index)
+    handleRangeSelect = (event: MouseEvent, cell: IRenderedCell): void => {
 
-        for (let i = minRowIndex; i <= maxRowIndex; i++) {
-            let _row = []
-            for (let j = minColIndex; j <= maxColIndex; j++) {
-                let cell = this.Grid.rows[i].renderedRow.cells[j]
-                cell.cellNode.classList.add("selected")
+        this._clearRange(this.currentRangeSelection)
 
-                _row.push(cell)
+        let currentRange = this.currentRangeSelection
+        let indexes = this._getMinMax(currentRange, cell)
+
+        currentRange.rows = []
+
+        for (let i = indexes.minRow; i <= indexes.maxRow; i++) {
+            let _row: IRenderedCell[] = []
+
+            for (let j = indexes.minCol; j <= indexes.maxCol; j++) {
+                _row.push(this.Grid.rows[i].renderedRow.cells[j])
             }
 
-            this.rangeSelection.range.push(_row)
+            currentRange.rows.push(_row)
         }
 
-        this.rangeSelection.end.row = cell.rowModel
-        this.rangeSelection.end.col = cell.colModel
+        currentRange.end.row = cell.rowModel
+        currentRange.end.col = cell.colModel
+
+        this._drawRanges()
+    }
+
+    _drawRanges() {
+
+        let cellSelectCount = {}
+
+        for (let range of this.rangeSelection) {
+            let indexes = this._getMinMax(range)
+
+            for (let i = indexes.minRow; i <= indexes.maxRow; i++) {
+
+                for (let j = indexes.minCol; j <= indexes.maxCol; j++) {
+                    let cell = this.Grid.rows[i].renderedRow.cells[j]
+
+                    if (cellSelectCount[cell.cellId] == void 0) {
+                        cellSelectCount[cell.cellId] = {count: 0, cell}
+                    }
+
+                    cellSelectCount[cell.cellId].count++
+
+                    cell.cellNode.classList.add("selected")
+
+                    if (i === indexes.minRow) {
+                        cell.cellNode.classList.add("range-border-top")
+                    }
+
+                    if (i === indexes.maxRow) {
+                        cell.cellNode.classList.add("range-border-bottom")
+                    }
+
+                    if (j === indexes.minCol) {
+                        cell.cellNode.classList.add("range-border-left")
+                    }
+
+                    if (j === indexes.maxCol) {
+                        cell.cellNode.classList.add("range-border-right")
+                    }
+                }
+            }
+        }
+
+        for (let key in cellSelectCount) {
+            let countObj = cellSelectCount[key]
+            if (countObj.count > 10) {
+                countObj.count = 10
+            }
+
+            countObj.cell.cellNode.classList.add(`stack-${countObj.count}`)
+        }
+    }
+
+    _getMinMax(range, cell?) {
+        let rangeStart = range.start
+        let rangeEnd = range.end
+        let colFirst = rangeStart.col.currentIndex
+        let colLast = cell ? cell.colModel.currentIndex : rangeEnd.col.currentIndex
+        let rowLast = cell ? cell.rowModel.index : rangeEnd.row.index
+        let rowFirst = rangeStart.row.index
+
+        return {
+            minCol: Math.min(colFirst, colLast),
+            maxCol: Math.max(colFirst, colLast),
+            minRow: Math.min(rowFirst, rowLast),
+            maxRow: Math.max(rowFirst, rowLast)
+        }
     }
 
     onCellMouseLeave = (event: any, cell: IRenderedCell): void => {
-        if (this.Grid.ConfigController.selectionMethod != "range") {
+        if (!this.Grid.ConfigController.isRangeSelect) {
             return
         }
 
@@ -226,12 +302,12 @@ export class VirtualGridSelectionController {
 
     onCellMouseEnter = (event: any, cell: IRenderedCell): void => {
 
-        if (this.Grid.ConfigController.selectionMethod != "range") {
+        if (!this.Grid.ConfigController.isRangeSelect) {
             return
         }
 
         if (this.isRangeSelectActive) {
-            this.handleRangeSelect(cell)
+            this.handleRangeSelect(event, cell)
             return
         }
 

@@ -11,11 +11,12 @@ import {VirtualGridContextmenuController} from "../virtual.grid.contextmenu.srv"
 import {VirtualGridContextMenu} from "../virtual.grid.contextmenu.model";
 import {VirtualGridSelectionController} from "../virtual.grid.selection.srv";
 import {VirtualGridSortController} from "../virtual.grid.sort.srv";
+import {VirtualGridGroupController} from "../virtual.grid.group.srv";
 
 export interface IVirtualGridConfig {
 
     /**
-     * the dom element to attach to
+     * the dom element to attach the grid to
      */
     element: HTMLElement
     /**
@@ -54,18 +55,18 @@ export interface IVirtualGridConfig {
     childNodesKey?: string
 
     /**
+     * enables multi selection holding the shift key for a range or ctrl for single items
+     * enables multiple ranges to be selected
      * @property {string} single "single"
      * @property {string} multi "multi"
-     * @property {string} range "range"
-     * @property {string} checkbox "checkbox"
      * @default {string} single "single"
      */
-    selectionMethod?: string
+    useMultiselect?: boolean
 
     /**
-     * when set to true only the checkboxes can be used to select rows
+     * enables range selection
      */
-    useCheckboxSelection?: boolean
+    useRangeSelect?: boolean
 
     /**
      * deselects nodes when the parent has been collapsed
@@ -78,7 +79,7 @@ export interface IVirtualGridConfig {
      * in this case only leaves can be selected
      * @default false
      */
-    useIntermediateNodes?: boolean
+    selectLeavesOnly?: boolean
 
     /**
      * determines whether to expand nodes by default or not
@@ -227,6 +228,8 @@ export interface IVirtualGridColumnConfig {
     suppressDragging?: boolean
     suppressPinning?: boolean
 
+    checkbox?: boolean
+
     isRowGrouped?: boolean
     pinned?: string
     avatarConfig?: IVirtualAvatar
@@ -256,7 +259,7 @@ export interface IVirtualGrid {
     ConfigController: VirtualGridConfigController
     FilterController: VirtualGridFilterController
     SortController: VirtualGridSortController
-
+    GroupController: VirtualGridGroupController
 
     domController: VirtualGridUIDomController
     eventController: VirtualGridUIEventController
@@ -277,7 +280,7 @@ export interface VirtualGridCurrentFilter {
 }
 
 export interface IVirtualGridRow {
-    value? : any
+    value?: any
     /**
      * The level describes the current depth of the row
      * Starting at level 0 for the root
@@ -308,16 +311,6 @@ export interface IVirtualGridRow {
      * Determines whether the row has children and the children are shown
      */
     isExpanded?: boolean
-    /**
-     * Determines whether the content of the row is still loading
-     * This is useful in case the user / developer / whatever uses the "onNodeExpandAsync" callback to show an indicator
-     * if the content is still being loaded
-     */
-    isLoading?: boolean
-    /**
-     * indicates that the content of a node had to be requested asynchronously and that the request has finished
-     */
-    isLoadingFinished?: boolean
     /**
      * The index of each row starting from 0
      * Caution: The Grids gets flatted and the index is given afterwards.
@@ -501,6 +494,7 @@ export interface IRenderedCell {
     avatarNode: HTMLElement
     avatarPlaceholder: HTMLElement
 
+    cellId: string
     colId: string
     field: string
     fieldPath: string[]
