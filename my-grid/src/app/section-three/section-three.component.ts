@@ -54,7 +54,7 @@ export class SectionThreeComponent implements AfterViewInit {
 
         let items = []
 
-        for (let i = 0; i < 32; i++) {
+        for (let i = 0; i < 8; i++) {
             data.rows.forEach((item) => {
 
                 let test = {...item}
@@ -62,6 +62,14 @@ export class SectionThreeComponent implements AfterViewInit {
                 test.lastName = this.getRandomLastName()
                 test.float = this.getRandomFloat()
                 test.integer = this.getRandomInteger()
+                test.integer1 = this.getRandomInteger()
+                test.integer2 = this.getRandomInteger()
+                test.integer3 = this.getRandomInteger()
+                test.integer4 = this.getRandomInteger()
+                test.integer5 = this.getRandomInteger()
+                test.integer6 = this.getRandomInteger()
+                test.integer7 = this.getRandomInteger()
+                test.integer8 = this.getRandomInteger()
                 items.push(test)
             })
         }
@@ -119,7 +127,27 @@ export class SectionThreeComponent implements AfterViewInit {
                     }
                 },
                 {
-                    field: "integer",
+                    field: "integer1",
+                    title: "Integer",
+                    type: "number",
+                },
+                {
+                    field: "integer2",
+                    title: "Integer",
+                    type: "number",
+                },
+                {
+                    field: "integer3",
+                    title: "Integer",
+                    type: "number",
+                },
+                {
+                    field: "integer4",
+                    title: "Integer",
+                    type: "number",
+                },
+                {
+                    field: "integer5",
                     title: "Integer",
                     type: "number",
                 },
@@ -158,7 +186,8 @@ export class SectionThreeComponent implements AfterViewInit {
             element: this.grid.nativeElement,
             showHeader: true,
             showGroupPanel: true,
-            selectionMethod: "multi",
+            useMultiselect: true,
+            useRangeSelect: true,
             suppressContextmenu: false,
             suppressContextmenuDefault: false,
             getContextMenuEntries(row: IVirtualGridRow, col: IVirtualGridColumn): IVirtualGridContextmenuEntry[] {
@@ -166,16 +195,36 @@ export class SectionThreeComponent implements AfterViewInit {
 
                 entries.push(
                     {
-                        label: "Custom entry", icon: "favorite", action(row, col) {
+                        label: "Custom entry",
+                        icon: "favorite", action(row, col) {
                             console.log("custom entry action")
                         }
-                    }, {
+                    },
+                    {
+                        label: "Travel options",
+                        icon: "navigation",
+                        subMenu:[{
+                            label: "Plane",
+                            icon: "local_airport", action(row, col) {
+                                console.log("Plane")
+                            },
+                        },{
+                            label: "Bike",
+                            icon: "directions_bike", action(row, col) {
+                                console.log("Bike")
+                            },
+                        }]
+                    },
+                    {
                         isDivider: true
-                    }, {
-                        label: "Secondary action", icon: "fingerprint", action(row, col) {
+                    },
+                    {
+                        label: "Secondary action",
+                        icon: "fingerprint", action(row, col) {
                             console.log("I need fingerprints")
                         }
-                    })
+                    }
+                    )
 
                 return entries
             }

@@ -91,6 +91,7 @@ export class SectionTwoComponent implements AfterViewInit {
                     title: "Gruppenstruktur",
                     isHierarchyColumn: true,
                     type: "multiLine",
+                    checkbox: true,
                     minWidth: 200
                 },
                 {
@@ -108,8 +109,7 @@ export class SectionTwoComponent implements AfterViewInit {
             showHeader: true,
             showColumnFilter: true,
             deselectWhenCollapse: true,
-            useCheckboxSelection: true,
-            selectionMethod: "multi"
+            useMultiselect: true
         }
 
         this.gridInstance = new VirtualGrid(config)

@@ -114,14 +114,14 @@ export class VirtualGridApi {
         }
 
         if (config.groups != void 0) {
-            this.Grid.DnDController.clearGrouping()
+            this.Grid.GroupController.clearGrouping()
 
             for (let col of config.groups) {
                 let column = columns.find(x => x.field == col.field)
-                this.Grid.DnDController._addGroup(column, true)
+                this.Grid.GroupController._addGroup(column, true)
             }
 
-            this.Grid.DnDController.applyGrouping()
+            this.Grid.GroupController.applyGrouping()
         }
 
         if (config && config.sort && Array.isArray(config.sort)) {
@@ -157,7 +157,7 @@ export class VirtualGridApi {
             columns: []
         }
 
-        let groups = this.Grid.DnDController.groups.map((group) => {
+        let groups = this.Grid.GroupController.groups.map((group) => {
             return {field: group.col.field}
         })
 
