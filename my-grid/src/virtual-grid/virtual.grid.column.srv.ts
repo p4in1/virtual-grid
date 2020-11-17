@@ -1,4 +1,5 @@
 import {
+    IValueFormatterParams,
     IVirtualGrid,
     IVirtualGridColumn,
     IVirtualGridRow
@@ -44,13 +45,6 @@ export class VirtualGridColumnController {
             column.dom.cellText.textContent = headerValue;
         }
     };
-
-    /**
-     * releases the resize detection
-     */
-    public destroy(): void {
-
-    }
 
     /**
      * creates column models ... *duh*
@@ -121,5 +115,72 @@ export class VirtualGridColumnController {
                 }
             }
         }
+    }
+
+    aggregate() {
+        let s = +new Date()
+
+        for (let col of this.Grid.columns) {
+            if (col.aggFunc) {
+
+                let values = []
+
+                for (let row of this.Grid.rows) {
+                    if (!row.isRowGroup) {
+                        values.push(row.getCellValue(col, {stringify: false, format: false}))
+                    }
+                }
+
+                let func: Function = this.getAggFunction(col)
+                if (func) {
+                    let value = func(values)
+
+                    if (typeof col.cellValueFormatter == "function") {
+                        value = col.cellValueFormatter({colModel: col, rowModel: null, isAggregate: true}, value)
+                    } else if (col.colType === "number" && !this.Grid.Utils.isInteger(value)) {
+                        value = Number(value).toFixed(2)
+                    }
+
+                    col.dom.cellAggregationValue.textContent = value
+                }
+            }
+        }
+
+        console.log("aggregating values took -->", +new Date() - s)
+    }
+
+    getAggFunction(col) {
+        if (typeof col.aggFunc === "function") {
+            return col.aggFunc
+        }
+
+        switch (col.aggFunc) {
+            case "min":
+                return this.getMinValue
+            case "max":
+                return this.getMaxValue
+            case "avg":
+                return this.getAverageValue
+            case "sum":
+                return this.getTotalValue
+        }
+    }
+
+    getMinValue = (values) => {
+        return Math.min(...values)
+    }
+
+    getMaxValue = (values) => {
+        return Math.max(...values)
+    }
+
+    getAverageValue = (values) => {
+        return this.getTotalValue(values) / values.length
+    }
+
+    getTotalValue = (values) => {
+        return values.reduce(function (a, b) {
+            return a + b;
+        }, 0);
     }
 }

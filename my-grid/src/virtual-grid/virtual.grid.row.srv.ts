@@ -416,7 +416,7 @@ export class VirtualGridRowController {
             return
         }
 
-        let cellValue: any = cell.rowModel.getCellValue(cell.colModel, {stringify: false})
+        let cellValue: any = cell.rowModel.getCellValue(cell.colModel, {stringify: false, format: !cell.rowModel.isRowGroup})
 
         if (colType == "boolean") {
             let cellNode = this.Grid.Utils.el("i", ["action-icon", "virtual-material-icons"])
@@ -433,7 +433,7 @@ export class VirtualGridRowController {
             cellValue = !Array.isArray(cellValue) ? [cellValue] : cellValue
 
             for (let i = 0; i < cell.textNodes.length; i++) {
-                cell.textNodes[i].innerHTML = cellValue[i] == void 0 ? "" : cellValue[i].toString().trim()
+                cell.textNodes[i].innerHTML = cellValue[i] == void 0 ? "" : cellValue[i].toString()
             }
         }
     }

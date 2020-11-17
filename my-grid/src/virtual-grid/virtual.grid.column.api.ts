@@ -64,8 +64,7 @@ export class VirtualGridColumnApi implements IVirtualGridColumnApi {
 
         width = width < this.col.minWidth ? this.col.minWidth : width
 
-        let diff = this.col.width == void 0 ? width : width - this.col.width
-        this._updateCellWidth(diff)
+        this._updateCellWidth(this._getWidthDiff(this.col, width))
     }
 
     /**
@@ -102,27 +101,37 @@ export class VirtualGridColumnApi implements IVirtualGridColumnApi {
 
     sizeToFit = () => {
         let col = this.col
-        let cellWidth: number = 0;
-        for (const row of this.Grid.rows) {
-            let value = row.getCellValue(col)
-            let _width: number = this.Grid.Utils.getTextWidthInPixel(value)
+        let cellWidth: number = col.colType === "boolean" ? 32 : 0;
 
-            cellWidth = _width < cellWidth ? cellWidth : _width
+        if (col.colType !== "boolean") {
+            for (const row of this.Grid.rows) {
+                let value = row.getCellValue(col, {format: true})
+                let _width: number = this.Grid.Utils.getTextWidthInPixel(value)
+
+                cellWidth = _width < cellWidth ? cellWidth : _width
+            }
         }
 
         cellWidth = col.maxWidth && cellWidth > col.maxWidth ? col.maxWidth : col.width < cellWidth ? Math.floor(cellWidth) : cellWidth
 
-        let width = col.width == void 0 ? cellWidth : cellWidth - col.width
-        this._updateCellWidth(width)
+        this._updateCellWidth(this._getWidthDiff(col, cellWidth))
+    }
+
+    private _getWidthDiff(col, width) {
+        let diff = col.width == void 0 ? width : width - col.width
+
+        diff = col.width + diff < col.minWidth ? (diff / Math.abs(diff)) * (col.width - col.minWidth) : diff
+
+        return diff
     }
 
     private _toggleVisibility(isVisible, width) {
         this.col.isVisible = isVisible
-        this._updateCellWidth(width)
+        this._updateCellWidth(width, true)
     }
 
-    private _updateCellWidth(width) {
-        this.Grid.eventController.updateCellWidth(this.col.currentIndex, width, true)
+    private _updateCellWidth(width, isVisibilityChange = false) {
+        this.Grid.eventController.updateCellWidth(this.col.currentIndex, width, isVisibilityChange)
         this.Grid.eventController.updateGridWidth();
         this.Grid.domController.calculateScrollGuard()
     }

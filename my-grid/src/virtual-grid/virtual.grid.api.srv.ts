@@ -4,6 +4,7 @@
  */
 import {IVirtualGrid, IVirtualGridRow} from "./interfaces/virtual.grid.interfaces";
 import {VirtualGridConfigController} from "./virtual.grid.config.srv";
+import {VirtualGridRow} from "./virtual.grid.row.model";
 
 export class VirtualGridApi {
     private debounceTimeout: any = null;
@@ -66,6 +67,10 @@ export class VirtualGridApi {
             this.Grid.domController.recalculateRowOrder(this.scrollPosTopBackup)
             this.Grid.domController.dom.bodyWrapper.scrollTop = this.scrollPosTopBackup
             this.scrollPosTopBackup = 0;
+        }
+
+        if (this.Grid.ConfigController.showColumnAggregation) {
+            this.Grid.ColumnController.aggregate()
         }
 
         console.log("refreshing grid took -->", +new Date() - s, "ms")
@@ -204,8 +209,8 @@ export class VirtualGridApi {
      * return the selected rows
      * @returns {Array}
      */
-    public getSelectedRows = (): any => {
-        return this.Grid == void 0 ? [] : this.Grid.SelectionController.getSelection()
+    public getSelectedRows = (): IVirtualGridRow[] => {
+        return this.Grid == void 0 ? [] : this.Grid.SelectionController.getSelectedRows()
     };
 
     /**

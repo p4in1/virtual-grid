@@ -48,6 +48,11 @@ export interface IVirtualGridConfig {
     showColumnFilter?: boolean
 
     /**
+     * this enables the column aggregation
+     * if active the aggregation function of each column will be applied
+     */
+    showColumnAggregation?: boolean
+    /**
      * the child nodes key is only necessary when you are dealing with tree structures
      * using this key the grid knows how to display the tree nodes
      * @default 'children'
@@ -218,7 +223,8 @@ export interface IVirtualGridColumnConfig {
     field?: string
     title?: string
     type?: string
-
+    aggFunc?: string | Function
+    aggFuncTitle?: string
     showFilter?: boolean
 
     suppressResize?: boolean
@@ -243,7 +249,7 @@ export interface IVirtualGridColumnConfig {
 
     cellValueGetter?(cell: IRenderedCell, value: any): any
 
-    cellValueFormatter?(cell: IRenderedCell, value: any): any
+    cellValueFormatter?(cell: IValueFormatterParams, value: any): any
 }
 
 export interface IVirtualGrid {
@@ -421,6 +427,9 @@ export interface IVirtualGridColumn {
         cellContent: HTMLElement
         cellTextContainer: HTMLElement
         cellFilterContainer: HTMLElement
+        cellAggregationContainer: HTMLElement
+        cellAggregationTitle: HTMLSpanElement
+        cellAggregationValue: HTMLSpanElement
     }
 
     api: IVirtualGridColumnApi
@@ -479,6 +488,9 @@ export interface IVirtualGridColumn {
     avatarConfig?: IVirtualAvatar
 
     filter: IVirtualColumnFilter
+
+    aggFunc: string | Function
+    aggFuncTitle: string
 
     rowGroup: IVirtualColumnRowGroup
 }
@@ -575,6 +587,9 @@ export interface IVirtualCellDom {
     cellTextContainer: HTMLElement
     cellFilterContainer: HTMLElement
     cellFilterAdvancedButton: HTMLElement
+    cellAggregationContainer: HTMLElement
+    cellAggregationTitle: HTMLSpanElement
+    cellAggregationValue: HTMLSpanElement
 }
 
 export interface IVirtualColumnFilter {
@@ -655,6 +670,9 @@ export interface IVirtualColDefConfig {
     minWidth: number
     maxWidth: number
 
+    aggFunc: string | Function
+    aggFuncTitle: string
+
     cellRenderer(): void
 
     cellStyleGetter(): void
@@ -690,4 +708,11 @@ export interface IVirtualDragData {
 export interface IVirtualGetCellValueOptions {
     stringify?: boolean
     format?: boolean
+}
+
+export interface IValueFormatterParams {
+    rowModel: IVirtualGridRow
+    colModel: IVirtualGridColumn
+
+    isAggregate: boolean
 }

@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, ElementRef, Input, ViewChild} from '@angular/core';
 import {
-    IRenderedCell,
+    IRenderedCell, IValueFormatterParams,
     IVirtualGrid, IVirtualGridColumn,
     IVirtualGridConfig, IVirtualGridContextmenuEntry,
     IVirtualGridRow
@@ -74,6 +74,39 @@ export class SectionThreeComponent implements AfterViewInit {
             })
         }
 
+        const valueFormatter = (params: IValueFormatterParams, value: any) => {
+
+            if (value == void 0 || value == "") {
+                return ""
+            }
+            let newValue = []
+            let counter = 0;
+
+            if(typeof value != "number"){
+                debugger
+            }
+
+            let _value = value.toFixed(2)
+            let parts = _value.split(".")
+            let preNumber = parts[0].toString()
+
+            for (let i = preNumber.length - 1; i >= 0; i--) {
+                let char = preNumber[i]
+
+                if (/[0-9]/.test(char)) {
+                    newValue.push(char)
+                }
+
+                counter++
+
+                if (counter % 3 == 0) {
+                    newValue.push("'")
+                }
+            }
+
+            return `£ ${newValue.reverse().join("")}.${parts[1]}`
+        }
+
         let config: IVirtualGridConfig = {
             rows: items,
             columns: [
@@ -113,7 +146,7 @@ export class SectionThreeComponent implements AfterViewInit {
                     type: "date",
                     field: "data.user.adminProperties.riskAssessment.deadlineDateSet",
                     title: "Forderungsdatum",
-                    cellValueFormatter(cell: IRenderedCell, value: any): any {
+                    cellValueFormatter(cell: IValueFormatterParams, value: any): any {
                         let date = new Date(value)
                         return value === "" ? "" : `${date.getFullYear()} / ${date.getMonth() + 1} / ${date.getDate()}`
                     }
@@ -122,7 +155,7 @@ export class SectionThreeComponent implements AfterViewInit {
                     field: "data.amountToPay",
                     title: "Forderung",
                     type: "number",
-                    cellValueFormatter(cell: IRenderedCell, value: any): any {
+                    cellValueFormatter(cell: IValueFormatterParams, value: any): any {
                         return value != void 0 && value != "" ? `${value} €` : ""
                     }
                 },
@@ -130,62 +163,47 @@ export class SectionThreeComponent implements AfterViewInit {
                     field: "integer1",
                     title: "Integer",
                     type: "number",
+                    aggFunc: "min"
                 },
                 {
                     field: "integer2",
                     title: "Integer",
                     type: "number",
+                    aggFunc: "max"
                 },
                 {
                     field: "integer3",
                     title: "Integer",
                     type: "number",
+                    aggFunc: "avg"
                 },
                 {
                     field: "integer4",
                     title: "Integer",
                     type: "number",
+                    aggFunc: "sum",
+                    cellValueFormatter: valueFormatter
                 },
                 {
                     field: "integer5",
                     title: "Integer",
                     type: "number",
+                    aggFuncTitle: "L33t",
+                    aggFunc: (values) => {
+                        return 1337
+                    }
                 },
                 {
                     field: "float",
                     title: "Float",
                     type: "number",
-                    cellValueFormatter: function (cell: IRenderedCell, value: any): any {
-                        if (value == void 0 || value == "") {
-                            return ""
-                        }
-                        let newValue = []
-                        let counter = 0;
-                        let _value = value.toFixed(2)
-                        let parts = _value.split(".")
-                        let preNumber = parts[0].toString()
-
-                        for (let i = preNumber.length - 1; i >= 0; i--) {
-                            let char = preNumber[i]
-
-                            if (/[0-9]/.test(char)) {
-                                newValue.push(char)
-                            }
-
-                            counter++
-
-                            if (counter % 3 == 0) {
-                                newValue.push("'")
-                            }
-                        }
-
-                        return `£ ${newValue.reverse().join("")}.${parts[1]}`
-                    }
+                    cellValueFormatter: valueFormatter
                 },
             ],
             element: this.grid.nativeElement,
             showHeader: true,
             showGroupPanel: true,
+            showColumnAggregation: true,
             useMultiselect: true,
             useRangeSelect: true,
             suppressContextmenu: false,
@@ -203,12 +221,12 @@ export class SectionThreeComponent implements AfterViewInit {
                     {
                         label: "Travel options",
                         icon: "navigation",
-                        subMenu:[{
+                        subMenu: [{
                             label: "Plane",
                             icon: "local_airport", action(row, col) {
                                 console.log("Plane")
                             },
-                        },{
+                        }, {
                             label: "Bike",
                             icon: "directions_bike", action(row, col) {
                                 console.log("Bike")
@@ -224,7 +242,7 @@ export class SectionThreeComponent implements AfterViewInit {
                             console.log("I need fingerprints")
                         }
                     }
-                    )
+                )
 
                 return entries
             }

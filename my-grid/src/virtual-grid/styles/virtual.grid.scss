@@ -535,6 +535,23 @@
                         }
                     }
 
+                    .header-cell-aggregation-container {
+                        height: 40px;
+                        display: flex;
+                        flex-direction: column;
+                        padding: 0 8px;
+
+                        .header-cell-aggregation-title {
+                            font-size: 10px;
+                        }
+
+                        .header-cell-aggregation-value {
+                            font-size: 12.5px;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
+                    }
+
                     .header-cell-filter-container {
                         display: flex;
                         padding: 0 8px;

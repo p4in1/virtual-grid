@@ -14,8 +14,8 @@ export class VirtualGridUIDomController {
     dom: IVirtualGridDom
     Utils: VirtualGridUtils;
 
-    rowHeight: number = 24;
-    headerRowHeight: number = 24;
+    rowHeight: number = 40;
+    headerRowHeight: number = 40;
     renderedRows: IRenderedRow[] = [];
 
     renderedRowCount: number = 40;
@@ -405,6 +405,12 @@ export class VirtualGridUIDomController {
         dom.cellTextContainer = this.Utils.el("div", ["header-cell-text-container"])
         dom.cellFilterContainer = this.Utils.el("div", ["header-cell-filter-container"])
 
+        dom.cellAggregationContainer = this.Utils.el("div", ["header-cell-aggregation-container"])
+        dom.cellAggregationTitle = this.Utils.el("span", ["header-cell-aggregation-title"])
+        dom.cellAggregationValue = this.Utils.el("span", ["header-cell-aggregation-value"])
+
+        dom.cellAggregationContainer.append(dom.cellAggregationTitle, dom.cellAggregationValue)
+
         dom.cellTextContainer.append(dom.cellText, dom.cellSortArrow);
 
         let trueFilterIcon = this.Utils.el("i", ["filter-button", "virtual-material-icons"])
@@ -431,6 +437,27 @@ export class VirtualGridUIDomController {
             }
 
             dom.cellContent.append(dom.cellFilterContainer)
+        }
+
+        if (this.config.showColumnAggregation && column.aggFunc) {
+            let aggregationTitle = "Custom"
+            switch (column.aggFunc) {
+                case "min":
+                    aggregationTitle = "Minimum"
+                    break;
+                case "max":
+                    aggregationTitle = "Maximum"
+                    break;
+                case "avg":
+                    aggregationTitle = "Average"
+                    break;
+                case "sum":
+                    aggregationTitle = "Total"
+                    break;
+            }
+
+            dom.cellAggregationTitle.textContent = column.aggFuncTitle || aggregationTitle
+            dom.cellContent.append(dom.cellAggregationContainer)
         }
 
         if (!column.isSuppressResize && nextColumn && column.pinned == nextColumn.pinned) {

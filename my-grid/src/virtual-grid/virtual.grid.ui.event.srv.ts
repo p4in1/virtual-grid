@@ -206,11 +206,11 @@ export class VirtualGridUIEventController {
         // we need to do this because this is just a workaround for a much bigger problem when
         // you want to resize smaller than you can
         if (diff < 0 && !isRightPinResizing) {
-            if (isVisibilityChange != true && startColumn.width + diff <= startColumn.minWidth) {
+            if (isVisibilityChange != true && startColumn.width + diff < startColumn.minWidth) {
                 diff = 0
             }
         } else if (diff > 0 && isRightPinResizing) {
-            if (isVisibilityChange != true && nextColumn.width - diff <= nextColumn.minWidth) {
+            if (isVisibilityChange != true && nextColumn.width - diff < nextColumn.minWidth) {
                 diff = 0
             }
         }
@@ -218,7 +218,7 @@ export class VirtualGridUIEventController {
         if (start != void 0) {
             let startCol = isRightPinResizing ? [nextColumn] : [startColumn]
             let startDiff = isRightPinResizing ? -1 * diff : diff
-            let colDiff = isVisibilityChange ? 0 : isRightPinResizing ? diff : -1 * diff
+            let colDiff = isRightPinResizing ? diff : -1 * diff
             let isGrowing = isRightPinResizing ? diff > 0 : diff < 0
             let columns = isRightPinResizing || isLeftPinResizing ? centerColumns : centerColumns.filter(x => x.currentIndex > start)
             let widths = this.domController.calculatePartialWidths()
@@ -258,7 +258,10 @@ export class VirtualGridUIEventController {
             let scrollDiff = scrollPortWidth - widths.center
             let scrollDiffPerCol = scrollDiff / centerColumns.length
 
-            this.adjustCell(centerColumns, scrollDiffPerCol);
+            if (scrollDiffPerCol > 0.0001) {
+                console.log("closing gaps for the grid width")
+                this.adjustCell(centerColumns, scrollDiffPerCol);
+            }
         }
 
         this.domController.setStyles(this.dom.headerLeft, {"width": `${widths.left}px`})

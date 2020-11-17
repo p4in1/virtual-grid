@@ -65,7 +65,10 @@ export class VirtualGridColumn implements IVirtualGridColumn {
     cellRenderer: Function;
     cellStyleGetter: Function;
     cellValueGetter: Function;
-    cellValueFormatter:Function
+    cellValueFormatter: Function
+
+    aggFunc: string | Function
+    aggFuncTitle: string
 
     colType: string
     colDef: any;
@@ -81,7 +84,10 @@ export class VirtualGridColumn implements IVirtualGridColumn {
         cellContent: null,
         cellTextContainer: null,
         cellFilterContainer: null,
-        cellFilterAdvancedButton: null
+        cellFilterAdvancedButton: null,
+        cellAggregationContainer: null,
+        cellAggregationTitle: null,
+        cellAggregationValue: null
     };
 
     filter: IVirtualColumnFilter
@@ -113,6 +119,9 @@ export class VirtualGridColumn implements IVirtualGridColumn {
         this.cellStyleGetter = typeof (configColDef.cellStyleGetter) == "function" ? configColDef.cellStyleGetter : null;
         this.cellValueGetter = typeof (configColDef.cellValueGetter) == "function" ? configColDef.cellValueGetter : null;
         this.cellValueFormatter = typeof (configColDef.cellValueFormatter) == "function" ? configColDef.cellValueFormatter : null;
+
+        this.aggFunc = configColDef.aggFunc
+        this.aggFuncTitle = configColDef.aggFuncTitle
 
         this.width = configColDef.width;
         this.minWidth = configColDef.minWidth == void 0 ? 80 : configColDef.minWidth;

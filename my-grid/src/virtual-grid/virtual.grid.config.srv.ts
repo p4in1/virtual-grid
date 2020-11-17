@@ -24,6 +24,7 @@ export class VirtualGridConfigController {
     showHeader: boolean = false
     showGroupPanel: boolean = false
     showColumnFilter: boolean = false;
+    showColumnAggregation: boolean = false;
 
     isSingleSelect: boolean = true;
     isMultiSelect: boolean = false;
@@ -64,6 +65,7 @@ export class VirtualGridConfigController {
 
         this.showHeader = config.showHeader == void 0 ? true : config.showHeader
         this.showColumnFilter = config.showColumnFilter
+        this.showColumnAggregation = config.showColumnAggregation
         this.showGroupPanel = config.showHeader && config.showGroupPanel
 
         this.element = config.element
@@ -93,6 +95,13 @@ export class VirtualGridConfigController {
         this.externalFilter = config.externalFilter
 
         this.originalRows = config.rows
+
+        if (this.showColumnAggregation) {
+            this.headerRowHeight += 32
+        }
+        if (this.showColumnFilter) {
+            this.headerRowHeight += 40
+        }
 
         this.getColDefs(config)
     }
@@ -154,14 +163,12 @@ export class VirtualGridConfigController {
 
                 width: col.width,
                 minWidth: col.minWidth,
+
+                aggFunc: col.aggFunc,
+                aggFuncTitle: col.aggFuncTitle
             }
 
             colDef.isPinned = colDef.pinned == "left" || colDef.pinned == "right";
-
-            if (colDef.isShowFilter) {
-                this.headerRowHeight = 80
-                this.showColumnFilter = true
-            }
 
             if (colDef.isActionColumn) {
                 colDef.actions = col.actions

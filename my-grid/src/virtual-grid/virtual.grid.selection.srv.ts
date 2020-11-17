@@ -28,7 +28,7 @@ export class VirtualGridSelectionController {
         return this.rangeSelection
     }
 
-    getSelectedRows(): any {
+    getSelectedRows(): IVirtualGridRow[] {
         return this.selectedRows
     }
 

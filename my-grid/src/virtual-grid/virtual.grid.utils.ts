@@ -141,6 +141,10 @@ export class VirtualGridUtils {
         return !isNaN(value) && value !== ""
     }
 
+    isInteger(value) {
+        return parseInt(value) === value
+    }
+
     /**
      * check if the given "something" is a date or can be parsed into one
      * @param d
