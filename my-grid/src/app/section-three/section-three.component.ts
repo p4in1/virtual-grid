@@ -1,9 +1,9 @@
 import {AfterViewInit, Component, ElementRef, Input, ViewChild} from '@angular/core';
 import {
-    IRenderedCell, IValueFormatterParams,
-    IVirtualGrid, IVirtualGridColumn,
-    IVirtualGridConfig, IVirtualGridContextmenuEntry,
-    IVirtualGridRow
+    IValueFormatterParams,
+    IVirtualGrid,
+    IVirtualGridConfig,
+    IVirtualGridContextmenuEntry,
 } from "../../virtual-grid/interfaces/virtual.grid.interfaces";
 import {VirtualGrid} from "../../virtual-grid/virtual.grid.service";
 
@@ -42,6 +42,12 @@ export class SectionThreeComponent implements AfterViewInit {
         return first + " - " + second
     }
 
+    getRandomBoolean() {
+        let booleans = [true, false, null]
+
+        return booleans[Math.floor(Math.random() * booleans.length)];
+    }
+
     ngAfterViewInit() {
 
         this.lastNames = [];
@@ -54,13 +60,14 @@ export class SectionThreeComponent implements AfterViewInit {
 
         let items = []
 
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < 32; i++) {
             data.rows.forEach((item) => {
 
                 let test = {...item}
 
                 test.lastName = this.getRandomLastName()
                 test.float = this.getRandomFloat()
+                test.boolean = this.getRandomBoolean()
                 test.integer = this.getRandomInteger()
                 test.integer1 = this.getRandomInteger()
                 test.integer2 = this.getRandomInteger()
@@ -74,37 +81,16 @@ export class SectionThreeComponent implements AfterViewInit {
             })
         }
 
-        const valueFormatter = (params: IValueFormatterParams, value: any) => {
+        const thousandSeparatorFormatter = (params: IValueFormatterParams, value: any) => {
 
             if (value == void 0 || value == "") {
                 return ""
             }
-            let newValue = []
-            let counter = 0;
 
-            if (typeof value != "number") {
-                debugger
-            }
+            let parts = Number(value).toFixed(value.toString().includes(".") ? 2 : 0).toString().split(".");
+            let newValue = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, "'") + (parts[1] ? "." + parts[1] : "");
 
-            let _value = value.toFixed(2)
-            let parts = _value.split(".")
-            let preNumber = parts[0].toString()
-
-            for (let i = preNumber.length - 1; i >= 0; i--) {
-                let char = preNumber[i]
-
-                if (/[0-9]/.test(char)) {
-                    newValue.push(char)
-                }
-
-                counter++
-
-                if (counter % 3 == 0) {
-                    newValue.push("'")
-                }
-            }
-
-            return `£ ${newValue.reverse().join("")}.${parts[1]}`
+            return `£ ${newValue}`
         }
 
         let config: IVirtualGridConfig = {
@@ -139,7 +125,7 @@ export class SectionThreeComponent implements AfterViewInit {
                 },
                 {
                     type: "boolean",
-                    field: "data.user.adminProperties.riskAssessment.deadlineDateSet",
+                    field: "boolean",
                     title: "Auszahlung gefordert"
                 },
                 {
@@ -163,13 +149,15 @@ export class SectionThreeComponent implements AfterViewInit {
                     field: "integer1",
                     title: "Integer",
                     type: "number",
-                    aggFunc: "min"
+                    aggFunc: "min",
+                    aggregateRowGroups: true,
                 },
                 {
                     field: "integer2",
                     title: "Integer",
                     type: "number",
-                    aggFunc: "max"
+                    aggFunc: "max",
+                    aggregateRowGroups: true,
                 },
                 {
                     field: "integer3",
@@ -182,14 +170,15 @@ export class SectionThreeComponent implements AfterViewInit {
                     title: "Integer",
                     type: "number",
                     aggFunc: "sum",
-                    cellValueFormatter: valueFormatter
+                    aggregateRowGroups: true,
+                    cellValueFormatter: thousandSeparatorFormatter
                 },
                 {
                     field: "integer5",
                     title: "Integer",
                     type: "number",
                     aggFuncTitle: "L33t",
-                    aggFunc: (values) => {
+                    aggFunc: () => {
                         return 1337
                     }
                 },
@@ -197,7 +186,7 @@ export class SectionThreeComponent implements AfterViewInit {
                     field: "float",
                     title: "Float",
                     type: "number",
-                    cellValueFormatter: valueFormatter
+                    cellValueFormatter: thousandSeparatorFormatter
                 },
                 {
                     pinned: "right",
@@ -218,13 +207,13 @@ export class SectionThreeComponent implements AfterViewInit {
             useRangeSelect: true,
             suppressContextmenu: false,
             suppressContextmenuDefault: false,
-            getContextMenuEntries(row: IVirtualGridRow, col: IVirtualGridColumn): IVirtualGridContextmenuEntry[] {
+            getContextMenuEntries(): IVirtualGridContextmenuEntry[] {
                 let entries: IVirtualGridContextmenuEntry[] = []
 
                 entries.push(
                     {
                         label: "Custom entry",
-                        icon: "favorite", action(row, col) {
+                        icon: "favorite", action() {
                             console.log("custom entry action")
                         }
                     },
@@ -233,12 +222,12 @@ export class SectionThreeComponent implements AfterViewInit {
                         icon: "navigation",
                         subMenu: [{
                             label: "Plane",
-                            icon: "local_airport", action(row, col) {
+                            icon: "local_airport", action() {
                                 console.log("Plane")
                             },
                         }, {
                             label: "Bike",
-                            icon: "directions_bike", action(row, col) {
+                            icon: "directions_bike", action() {
                                 console.log("Bike")
                             },
                         }]
@@ -248,7 +237,7 @@ export class SectionThreeComponent implements AfterViewInit {
                     },
                     {
                         label: "Secondary action",
-                        icon: "fingerprint", action(row, col) {
+                        icon: "fingerprint", action() {
                             console.log("I need fingerprints")
                         }
                     }

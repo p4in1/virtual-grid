@@ -118,39 +118,49 @@ export class VirtualGridColumnController {
     }
 
     aggregate() {
-        // let s = +new Date()
+        let s = +new Date()
 
         for (let col of this.Grid.columns) {
             if (col.aggFunc) {
-
-                let values = []
-
-                for (let row of this.Grid.rows) {
-                    if (!row.isRowGroup) {
-                        values.push(row.getCellValue(col, {stringify: false, format: false}))
-                    }
-                }
-
-                // filter everything that is not a number
-                // the NaN check for numbers is because typeof NaN === 'number' is true
-                values = values.filter(x => x != void 0 && x !== "" && (typeof (x) == "number" || typeof (x) == "string") && !isNaN(typeof x === "string" ? +x : x))
-
-                let func: Function = this.getAggFunction(col)
-                if (func) {
-                    let value = func(values)
-
-                    if (typeof col.cellValueFormatter == "function") {
-                        value = col.cellValueFormatter({colModel: col, rowModel: null, isAggregate: true}, value)
-                    } else if (col.colType === "number" && !this.Grid.Utils.isInteger(value)) {
-                        value = Number(value).toFixed(2)
-                    }
-
-                    col.dom.cellAggregationValue.textContent = value
-                }
+                col.dom.cellAggregationValue.textContent = this.getAggValue(col, this.Grid.rows)
             }
         }
 
-        // console.log("aggregating values took -->", +new Date() - s)
+        console.log("aggregating values took -->", +new Date() - s)
+    }
+
+    getAggValue(col, rows) {
+        let values = []
+        let aggValue = ""
+        let isCustomAgg = typeof col.aggFunc === "function"
+        for (let row of rows) {
+            if (!row.isRowGroup) {
+                let value = row.getCellValue(col, {stringify: false, format: false});
+                value = typeof value === "number" || isCustomAgg ? value : +value
+                values.push(value)
+            }
+        }
+
+        let func: Function = this.getAggFunction(col)
+        if (func) {
+            // custom aggregations will be called with the original values but since the build-in
+            // functions only support mathematical functions we convert them to numbers and remove NaN's
+            // for build-in functions we filter everything that is not a number including
+            // NaN and Infinity (not quite sure about infinity, but for now this is like it is)
+            // the NaN check for numbers is because typeof NaN === 'number' equals true
+            aggValue = isCustomAgg ? func(values) : func(values.filter(x => !Number.isNaN(x) && Number.isFinite(x)))
+
+            // we will use the valueFormatter, if there is one, because the aggregated number should be
+            // formatted like the cell values in each row (i would consider this common practice)
+            // if there is no formatter we only format numbers to not show dozens of floating point numbers
+            if (typeof col.cellValueFormatter == "function") {
+                aggValue = col.cellValueFormatter({colModel: col, rowModel: null, isAggregate: true}, aggValue)
+            } else if (col.colType === "number" && !this.Grid.Utils.isInteger(aggValue)) {
+                aggValue = Number(aggValue).toFixed(2)
+            }
+        }
+
+        return aggValue
     }
 
     getAggFunction(col) {

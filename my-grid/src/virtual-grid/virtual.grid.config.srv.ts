@@ -165,7 +165,8 @@ export class VirtualGridConfigController {
                 minWidth: col.minWidth,
 
                 aggFunc: col.aggFunc,
-                aggFuncTitle: col.aggFuncTitle
+                aggFuncTitle: col.aggFuncTitle,
+                aggregateRowGroups: col.aggregateRowGroups
             }
 
             colDef.isPinned = colDef.pinned == "left" || colDef.pinned == "right";

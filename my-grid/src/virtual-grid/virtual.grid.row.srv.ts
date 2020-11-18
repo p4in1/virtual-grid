@@ -397,6 +397,7 @@ export class VirtualGridRowController {
             cell.colModel = this.Grid.columns[cell.colIndex];
 
             this._renderContent(cell)
+            this._renderRowGroupContent(cell)
             this._renderCheckbox(cell)
             this._renderAvatar(cell)
             this._renderCustomStyles(cell)
@@ -416,7 +417,10 @@ export class VirtualGridRowController {
             return
         }
 
-        let cellValue: any = cell.rowModel.getCellValue(cell.colModel, {stringify: false, format: !cell.rowModel.isRowGroup})
+        let cellValue: any = cell.rowModel.getCellValue(cell.colModel, {
+            stringify: false,
+            format: !cell.rowModel.isRowGroup
+        })
 
         if (colType == "boolean") {
             let cellNode = this.Grid.Utils.el("i", ["action-icon", "virtual-material-icons"])
@@ -427,7 +431,7 @@ export class VirtualGridRowController {
 
             let val = cellValue === true || cellValue === "true" ? true : cellValue === false || cellValue === "false" ? false : !!cellValue
 
-            cellNode.innerHTML = val === true ? "done" : ""
+            cellNode.textContent = val === true ? "done" : ""
 
         } else {
             cellValue = !Array.isArray(cellValue) ? [cellValue] : cellValue
@@ -435,6 +439,15 @@ export class VirtualGridRowController {
             for (let i = 0; i < cell.textNodes.length; i++) {
                 cell.textNodes[i].innerHTML = cellValue[i] == void 0 ? "" : cellValue[i].toString()
             }
+        }
+    }
+
+    private _renderRowGroupContent(cell: IRenderedCell) {
+        let row = cell.rowModel
+        let col = cell.colModel
+        if (row.isRowGroup && col.aggregateRowGroups && col.aggFunc) {
+            let children = this.Grid.Utils.flatten(row[this.config.childNodesKey])
+            cell.textNodes[0].textContent = this.Grid.ColumnController.getAggValue(col, children)
         }
     }
 
@@ -484,10 +497,10 @@ export class VirtualGridRowController {
             cell.treeChildCountNode.innerText = ""
 
             if (cell.treeNode != void 0) {
-                const children: IVirtualGridRow[] = cell.rowModel.children;
+                const children: IVirtualGridRow[] = cell.rowModel[this.config.childNodesKey];
 
                 if (children != void 0 && children.length > 0) {
-                    cell.treeChildCountNode.innerText = `(${children.length})`
+                    cell.treeChildCountNode.innerText = `(${this.Grid.Utils.flatten(children).filter(x => !x.isRowGroup).length})`
 
                     if (cell.rowModel.isExpanded) {
                         cell.treeNode.innerHTML = "keyboard_arrow_up"

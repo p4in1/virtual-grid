@@ -225,6 +225,7 @@ export interface IVirtualGridColumnConfig {
     type?: string
     aggFunc?: string | Function
     aggFuncTitle?: string
+    aggregateRowGroups?: boolean
     showFilter?: boolean
 
     suppressResize?: boolean
@@ -490,6 +491,7 @@ export interface IVirtualGridColumn {
 
     aggFunc: string | Function
     aggFuncTitle: string
+    aggregateRowGroups: boolean
 
     rowGroup: IVirtualColumnRowGroup
 }
@@ -670,6 +672,7 @@ export interface IVirtualColDefConfig {
 
     aggFunc: string | Function
     aggFuncTitle: string
+    aggregateRowGroups: boolean
 
     cellRenderer(): void
 
