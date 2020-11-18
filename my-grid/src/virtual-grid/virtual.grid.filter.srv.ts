@@ -75,12 +75,12 @@ export class VirtualGridFilterController {
     };
 
     applyFilter(expandParents: boolean = true) {
-        let start = +new Date();
+        // let start = +new Date();
 
         if (this._isFilterChanged()) {
             let filteredArray: IVirtualGridRow[] = this._getFilteredArray();
 
-            console.log("filter took --> ", +new Date() - start, "filtered count --> ", filteredArray.length);
+            // console.log("filter took --> ", +new Date() - start, "filtered count --> ", filteredArray.length);
 
             this.currentFilter.text = this.filterValue
 
@@ -106,7 +106,7 @@ export class VirtualGridFilterController {
         let isMorePreciseFilter = this._isMorePreciseFilter();
         let isFilterSet = this._isFilterSet();
 
-        console.log("is more precise", isMorePreciseFilter)
+        // console.log("is more precise", isMorePreciseFilter)
 
         let filteredColIndexes = this.Grid.columns.map(x => x.isFilterPresent ? x.currentIndex : null).filter(x => x != void 0)
         let filteredArray = []

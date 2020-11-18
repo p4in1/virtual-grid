@@ -567,26 +567,6 @@
                             width: 100%;
                         }
 
-                        .header-filter-advanced-button {
-                            display: inline-flex;
-                            align-items: center;
-                            padding: 0 4px;
-                            background-color: white;
-                            box-sizing: border-box;
-                            height: 32px;
-                            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-                            border-left: 1px solid rgba(0, 0, 0, 0.1);
-                            cursor: pointer;
-
-                            &:hover {
-                                background-color: $color-background-panel
-                            }
-
-                            &.active {
-                                background-color: $color-accent-extra-light
-                            }
-                        }
-
                         .header-filter-bool-button {
                             display: flex;
                             align-items: center;

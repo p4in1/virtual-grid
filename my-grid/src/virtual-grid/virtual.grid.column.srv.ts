@@ -118,7 +118,7 @@ export class VirtualGridColumnController {
     }
 
     aggregate() {
-        let s = +new Date()
+        // let s = +new Date()
 
         for (let col of this.Grid.columns) {
             if (col.aggFunc) {
@@ -146,7 +146,7 @@ export class VirtualGridColumnController {
             }
         }
 
-        console.log("aggregating values took -->", +new Date() - s)
+        // console.log("aggregating values took -->", +new Date() - s)
     }
 
     getAggFunction(col) {

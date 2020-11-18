@@ -259,7 +259,7 @@ export class VirtualGridUIEventController {
             let scrollDiffPerCol = scrollDiff / centerColumns.length
 
             if (scrollDiffPerCol > 0.0001) {
-                console.log("closing gaps for the grid width")
+                // console.log("closing gaps for the grid width")
                 this.adjustCell(centerColumns, scrollDiffPerCol);
             }
         }

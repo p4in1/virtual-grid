@@ -300,7 +300,7 @@ export class VirtualGridDragAndDropController {
             let toCol = this.Grid.columns[toIndex]
 
             if (fromCol.pinned != toCol.pinned && fromCol.isSuppressPinning) {
-                console.log("trying to enter pinned area")
+                // console.log("trying to enter pinned area")
                 return
             }
 

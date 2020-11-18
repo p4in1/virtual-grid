@@ -46,37 +46,37 @@ export class VirtualGrid implements IVirtualGrid {
 
     constructor(config: IVirtualGridConfig) {
 
-        let log = [];
-        let gStart = +new Date();
+        // let log = [];
+        // let gStart = +new Date();
         this.initDone = false;
 
-        let s = +new Date()
+        // let s = +new Date()
         this.ConfigController = new VirtualGridConfigController(this, config)
         this.ContextmenuController = new VirtualGridContextmenuController(this, this.ConfigController)
         this.SelectionController = new VirtualGridSelectionController(this, this.ConfigController)
         this.SortController = new VirtualGridSortController(this, this.ConfigController)
 
-        log.push(`config took --> ${+new Date() - s}`)
-        s = +new Date()
+        // log.push(`config took --> ${+new Date() - s}`)
+        // s = +new Date()
 
         this.api = new VirtualGridApi(this, this.ConfigController);
         this.Utils = new VirtualGridUtils();
 
-        log.push(`api + utils took --> ${+new Date() - s}`)
-        s = +new Date()
+        // log.push(`api + utils took --> ${+new Date() - s}`)
+        // s = +new Date()
 
         this.domController = new VirtualGridUIDomController(this, this.ConfigController);
         this.eventController = new VirtualGridUIEventController(this, this.ConfigController, this.domController);
 
 
-        log.push(`dom + event controller --> ${+new Date() - s}`)
-        s = +new Date()
+        // log.push(`dom + event controller --> ${+new Date() - s}`)
+        // s = +new Date()
 
         this.ColumnController = new VirtualGridColumnController(this, this.ConfigController, this.domController);
         this.RowController = new VirtualGridRowController(this, this.ConfigController, this.domController);
 
-        log.push(`row + column controller --> ${+new Date() - s}`)
-        s = +new Date()
+        // log.push(`row + column controller --> ${+new Date() - s}`)
+        // s = +new Date()
 
         this.rows = this.RowController.createRowModels(config.rows);
 
@@ -89,15 +89,15 @@ export class VirtualGrid implements IVirtualGrid {
         this.columns = [...left, ...center, ...right]
         this.ColumnController.setCurrentColumnIndex()
 
-        log.push(`rows + columns enriched in --> ${+new Date() - s}`)
-        s = +new Date()
+        // log.push(`rows + columns enriched in --> ${+new Date() - s}`)
+        // s = +new Date()
 
         this.FilterController = new VirtualGridFilterController(this, this.ConfigController)
         this.DnDController = new VirtualGridDragAndDropController(this, this.ConfigController)
         this.GroupController = new VirtualGridGroupController(this, this.ConfigController)
 
-        log.push(`filter + dnd controller --> ${+new Date() - s}`)
-        s = +new Date()
+        // log.push(`filter + dnd controller --> ${+new Date() - s}`)
+        // s = +new Date()
 
         if (this.initDone == false) {
 
@@ -105,8 +105,8 @@ export class VirtualGrid implements IVirtualGrid {
 
             this.eventController.bindEvents();
 
-            log.push(`grid dom + events binding took --> ${+new Date() - s}`)
-            s = +new Date()
+            // log.push(`grid dom + events binding took --> ${+new Date() - s}`)
+            // s = +new Date()
 
             // this needs to happen after the initial drawing
             setTimeout(() => {
@@ -120,8 +120,8 @@ export class VirtualGrid implements IVirtualGrid {
 
             this.api.setGridContent();
 
-            log.push(`setting the content --> ${+new Date() - s}`)
-            s = +new Date()
+            // log.push(`setting the content --> ${+new Date() - s}`)
+            // s = +new Date()
 
             setTimeout(() => {
                 this.ConfigController.onGridReady(this);
@@ -130,6 +130,6 @@ export class VirtualGrid implements IVirtualGrid {
             this.initDone = true;
         }
 
-        console.log(log, `grid ready after --> ${gStart - s} with `, this.rows.length, " rows")
+        // console.log(log, `grid ready after --> ${gStart - s} with `, this.rows.length, " rows")
     }
 }

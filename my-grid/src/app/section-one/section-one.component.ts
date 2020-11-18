@@ -24,6 +24,7 @@ export class SectionOneComponent implements AfterViewInit {
             element: this.grid.nativeElement,
             showHeader: true,
             showGroupPanel: true,
+            showColumnFilter:true,
             useRangeSelect: true
         }
 

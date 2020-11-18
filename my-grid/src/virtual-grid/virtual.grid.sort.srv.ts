@@ -63,7 +63,7 @@ export class VirtualGridSortController {
      * apply the current sorting to each row set
      */
     public applySorting(suppressRefresh = false): void {
-        let s = +new Date()
+        // let s = +new Date()
 
         let hierarchyColumn = this.Grid.columns.find(x => x.isHierarchyColumn)
         if (hierarchyColumn && hierarchyColumn.isVisible) {
@@ -82,7 +82,7 @@ export class VirtualGridSortController {
             this.multiSort(this.Grid.rows)
         }
 
-        console.log("sorting took -->", +new Date() - s)
+        // console.log("sorting took -->", +new Date() - s)
 
         this.Grid.rows.forEach((row, index) => {
             row.index = index

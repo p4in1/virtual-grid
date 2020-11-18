@@ -45,7 +45,7 @@ export class VirtualGridApi {
             return;
         }
 
-        let s = +new Date()
+        // let s = +new Date()
 
         this.Grid.FilterController.applyFilter()
 
@@ -73,7 +73,7 @@ export class VirtualGridApi {
             this.Grid.ColumnController.aggregate()
         }
 
-        console.log("refreshing grid took -->", +new Date() - s, "ms")
+        // console.log("refreshing grid took -->", +new Date() - s, "ms")
     }
 
     /**
@@ -347,8 +347,6 @@ export class VirtualGridApi {
      */
     public destroy = (): void => {
         this.Grid.rows = [];
-
-        this.Grid.ColumnController.destroy();
     };
 
     public setGridContent() {

@@ -24,7 +24,7 @@ export class VirtualGridGroupController {
 
     applyGrouping(suppressRefresh = false, suppressSorting = false) {
 
-        let s = +new Date()
+        // let s = +new Date()
         let rows
         let groupColumn = this.Grid.columns.find(x => x.isRowGroupColumn)
         let groupTree = {}
@@ -53,7 +53,7 @@ export class VirtualGridGroupController {
         this.Grid.SelectionController.clearRangeSelection()
         this._generateTreeStructure(rows)
 
-        console.log("setting grouping / sorting status took -->", +new Date() - s)
+        // console.log("setting grouping / sorting status took -->", +new Date() - s)
 
 
         this.Grid.rows = this.Grid.Utils.flatten(rows)
@@ -177,6 +177,7 @@ export class VirtualGridGroupController {
         for (let row of this.Grid.rows) {
             if (!row.isRowGroup) {
                 rows.push(row)
+                row.isVisible = row.isVisibleAfterFilter
             }
         }
 

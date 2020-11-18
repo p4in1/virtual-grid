@@ -84,7 +84,6 @@ export class VirtualGridColumn implements IVirtualGridColumn {
         cellContent: null,
         cellTextContainer: null,
         cellFilterContainer: null,
-        cellFilterAdvancedButton: null,
         cellAggregationContainer: null,
         cellAggregationTitle: null,
         cellAggregationValue: null

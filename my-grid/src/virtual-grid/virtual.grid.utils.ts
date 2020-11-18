@@ -237,7 +237,7 @@ export class VirtualGridUtils {
             try {
                 let successful = document.execCommand('copy');
                 let msg = successful ? 'successful' : 'unsuccessful';
-                console.log('Fallback: Copying text command was ' + msg);
+                // console.log('Fallback: Copying text command was ' + msg);
             } catch (err) {
                 console.error('Fallback: Oops, unable to copy', err);
             }
