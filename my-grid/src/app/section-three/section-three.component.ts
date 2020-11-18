@@ -199,6 +199,15 @@ export class SectionThreeComponent implements AfterViewInit {
                     type: "number",
                     cellValueFormatter: valueFormatter
                 },
+                {
+                    pinned: "right",
+                    type: "action",
+                    actions: [{
+                        icon: "delete", color: "red", callback: () => {
+
+                        }
+                    }]
+                }
             ],
             element: this.grid.nativeElement,
             showHeader: true,

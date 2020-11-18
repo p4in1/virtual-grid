@@ -131,6 +131,10 @@ export class VirtualGridColumnController {
                     }
                 }
 
+                // filter everything that is not a number
+                // the NaN check for numbers is because typeof NaN === 'number' is true
+                values = values.filter(x => x != void 0 && x !== "" && (typeof (x) == "number" || typeof (x) == "string") && !isNaN(typeof x === "string" ? +x : x))
+
                 let func: Function = this.getAggFunction(col)
                 if (func) {
                     let value = func(values)

@@ -263,7 +263,7 @@ export class VirtualGridSortController {
                 }
             }
         } else {
-            this.sortedColumns.push(col)
+            this.sortedColumns.push({col, isChanged: true})
         }
     }
 
