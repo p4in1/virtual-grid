@@ -82,7 +82,7 @@ export class SectionThreeComponent implements AfterViewInit {
             let newValue = []
             let counter = 0;
 
-            if(typeof value != "number"){
+            if (typeof value != "number") {
                 debugger
             }
 
@@ -203,6 +203,7 @@ export class SectionThreeComponent implements AfterViewInit {
             element: this.grid.nativeElement,
             showHeader: true,
             showGroupPanel: true,
+            showColumnFilter: true,
             showColumnAggregation: true,
             useMultiselect: true,
             useRangeSelect: true,

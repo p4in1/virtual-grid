@@ -29,8 +29,16 @@ export class VirtualGridGroupController {
         let groupColumn = this.Grid.columns.find(x => x.isRowGroupColumn)
         let groupTree = {}
 
+        if (groupColumn) {
+
+            if (this.groups.length > 0) {
+                !groupColumn.isVisible && groupColumn.api.show()
+            } else {
+                groupColumn.isVisible && groupColumn.api.hide()
+            }
+        }
+
         if (this.groups.length > 0) {
-            !groupColumn.isVisible && groupColumn.api.show()
 
             for (let row of this.Grid.rows) {
                 if (!row.isRowGroup) {
@@ -40,14 +48,11 @@ export class VirtualGridGroupController {
 
             rows = this._createGroupRows(groupTree)
 
-        } else if (groupColumn.isVisible) {
-            groupColumn.api.hide()
+        } else {
             this._removeRowGroups()
             this.Grid.RowController.resetGridRowIndexes()
             this.Grid.api.refreshGrid(true, true);
             return
-        } else {
-            return;
         }
 
         this.Grid.SelectionController.clearRangeSelection()

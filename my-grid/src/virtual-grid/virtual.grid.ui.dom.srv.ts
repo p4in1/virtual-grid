@@ -673,6 +673,8 @@ export class VirtualGridUIDomController {
 
         this.dom.virtualGrid.removeChild(outer);
 
-        return (w1 - w2);
+        let scrollbarWidth = (w1 - w2) || 8
+
+        return scrollbarWidth;
     }
 }

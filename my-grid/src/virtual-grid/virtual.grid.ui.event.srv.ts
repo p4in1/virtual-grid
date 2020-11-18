@@ -197,8 +197,7 @@ export class VirtualGridUIEventController {
         let nextColumn = this.Grid.columns[start + 1]
 
         let isLeftPinResizing = start != void 0 && startColumn.pinned === "left"
-        let isRightPinResizing = start != void 0 && nextColumn.pinned === "right"
-
+        let isRightPinResizing = start != void 0 && nextColumn && nextColumn.pinned === "right"
 
         let centerColumns = this.Grid.columns.filter(x => x.pinned == "center")
 
