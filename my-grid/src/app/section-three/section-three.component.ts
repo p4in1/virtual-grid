@@ -109,7 +109,7 @@ export class SectionThreeComponent implements AfterViewInit {
                     field: "data.user.userFirstName",
                     title: "Vorname",
                     type: "text",
-                    // isRowGrouped: true
+                    isRowGrouped: true
                 },
                 {
                     field: "lastName",
@@ -200,7 +200,7 @@ export class SectionThreeComponent implements AfterViewInit {
             ],
             element: this.grid.nativeElement,
             showHeader: true,
-            showGroupPanel: true,
+            showGroupPanel: false,
             showColumnFilter: true,
             showColumnAggregation: true,
             useMultiselect: true,

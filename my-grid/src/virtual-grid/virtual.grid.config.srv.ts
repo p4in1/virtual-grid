@@ -111,17 +111,15 @@ export class VirtualGridConfigController {
 
     getColDefs(config) {
 
-        if (this.showGroupPanel) {
-            config.columns.unshift({
-                suppressDragging: true,
-                suppressMoving: true,
-                isSystemColumn: true,
-                isHierarchyColumn: true,
-                isVisible: false,
-                field: "value",
-                title: "Groups"
-            })
-        }
+        config.columns.unshift({
+            suppressDragging: true,
+            suppressMoving: true,
+            isSystemColumn: true,
+            isHierarchyColumn: true,
+            isVisible: false,
+            field: "value",
+            title: "Groups"
+        })
 
         for (let col of config.columns) {
 
