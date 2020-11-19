@@ -73,6 +73,11 @@ export class VirtualGridUIEventController {
     };
 
     private _toggleHoverState(row: IVirtualGridRow, isHover: boolean) {
+
+        if(row.renderedRow == void 0){
+            return
+        }
+
         [row.renderedRow.left, row.renderedRow.center, row.renderedRow.right].forEach((rowPartial) => {
             this.Grid.Utils.toggleClass("hover", rowPartial.element, isHover)
         })

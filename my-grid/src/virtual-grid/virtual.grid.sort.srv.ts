@@ -65,21 +65,23 @@ export class VirtualGridSortController {
     public applySorting(suppressRefresh = false): void {
         // let s = +new Date()
 
-        let hierarchyColumn = this.Grid.columns.find(x => x.isHierarchyColumn)
-        if (hierarchyColumn && hierarchyColumn.isVisible) {
-            let roots: IVirtualGridRow[] = [];
+        if (this.sortedColumns.length > 0) {
+            let hierarchyColumn = this.Grid.columns.find(x => x.isHierarchyColumn)
+            if (hierarchyColumn && hierarchyColumn.isVisible) {
+                let roots: IVirtualGridRow[] = [];
 
-            for (let row of this.Grid.rows) {
-                if (row.level == 0) {
-                    roots.push(row)
+                for (let row of this.Grid.rows) {
+                    if (row.level == 0) {
+                        roots.push(row)
+                    }
                 }
+
+                this.sortAsTree(roots);
+
+                this.Grid.rows = this.Grid.Utils.flatten(roots);
+            } else {
+                this.multiSort(this.Grid.rows)
             }
-
-            this.sortAsTree(roots);
-
-            this.Grid.rows = this.Grid.Utils.flatten(roots);
-        } else {
-            this.multiSort(this.Grid.rows)
         }
 
         // console.log("sorting took -->", +new Date() - s)
