@@ -139,16 +139,8 @@ export class VirtualGridSelectionController {
             return
         }
 
-        if (event.buttons != 1) {
-            let currentCol = cell.colModel.currentIndex
-            let currentRow = cell.rowModel.index
-
-            for (let range of this.rangeSelection) {
-                let minMax = this._getMinMax(range)
-                if (currentCol >= minMax.minCol && currentCol <= minMax.maxCol && currentRow >= minMax.minRow && currentRow <= minMax.maxRow) {
-                    return;
-                }
-            }
+        if (event.buttons != 1 && this.isCellInRangeSelection(cell)) {
+            return
         }
 
         if (!event.ctrlKey) {
@@ -290,6 +282,21 @@ export class VirtualGridSelectionController {
             minRow: Math.min(rowFirst, rowLast),
             maxRow: Math.max(rowFirst, rowLast)
         }
+    }
+
+    isCellInRangeSelection(cell): boolean {
+
+        let currentCol = cell.colModel.currentIndex
+        let currentRow = cell.rowModel.index
+
+        for (let range of this.rangeSelection) {
+            let minMax = this._getMinMax(range)
+            if (currentCol >= minMax.minCol && currentCol <= minMax.maxCol && currentRow >= minMax.minRow && currentRow <= minMax.maxRow) {
+                return true;
+            }
+        }
+
+        return false
     }
 
     onCellMouseLeave = (event: any, cell: IRenderedCell): void => {

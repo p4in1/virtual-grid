@@ -49,7 +49,7 @@ export class VirtualGridUIDomController {
 
         this.dom = {
 
-            virtualGrid: this.Utils.el("div", ['virtual-grid']),
+            virtualGrid: this.Utils.el("div", ['virtual-grid', "hidden"]),
 
             headerWrapper: this.Utils.el("div", ['header-wrapper']),
             headerCenterScrollPort: this.Utils.el("div", ['header-wrapper-scroll-port']),
@@ -391,8 +391,10 @@ export class VirtualGridUIDomController {
         dom.cellText = this.Utils.el("span", ["header-cell-text"]);
         dom.cellText.textContent = column.title;
 
+        dom.cellSortArrowContainer = this.Utils.el("div", ["header-sort-arrow-container"]);
         dom.cellSortArrow = this.Utils.el("i", ["header-sort-arrow", "virtual-material-icons", "small"]);
         dom.cellSortArrow.innerHTML = "trending_flat"
+        dom.cellSortArrowNumber = this.Utils.el("span", ["header-sort-arrow-number"]);
 
         dom.cellResizer = this.Utils.el("div", ["header-cell-resizer"]);
         dom.cellFilter = this.Utils.el("input", ["header-filter-input"]) as HTMLInputElement
@@ -410,7 +412,9 @@ export class VirtualGridUIDomController {
 
         dom.cellAggregationContainer.append(dom.cellAggregationTitle, dom.cellAggregationValue)
 
-        dom.cellTextContainer.append(dom.cellText, dom.cellSortArrow);
+        dom.cellSortArrowContainer.append(dom.cellSortArrow, dom.cellSortArrowNumber)
+
+        dom.cellTextContainer.append(dom.cellText, dom.cellSortArrowContainer);
 
         let trueFilterIcon = this.Utils.el("i", ["filter-button", "virtual-material-icons"])
         let falseFilterIcon = this.Utils.el("i", ["filter-button", "virtual-material-icons"])

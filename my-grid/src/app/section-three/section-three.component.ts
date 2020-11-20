@@ -126,7 +126,8 @@ export class SectionThreeComponent implements AfterViewInit {
                 {
                     type: "boolean",
                     field: "boolean",
-                    title: "Auszahlung gefordert"
+                    title: "Auszahlung gefordert",
+                    isRowGrouped: true
                 },
                 {
                     type: "date",

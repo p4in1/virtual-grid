@@ -118,7 +118,7 @@ export class VirtualGrid implements IVirtualGrid {
                 this.GroupController.setColGroups()
             });
 
-            this.api.setGridContent();
+            this.RowController.createGridContent();
 
             log.push(`setting the content --> ${+new Date() - s}`)
             s = +new Date()

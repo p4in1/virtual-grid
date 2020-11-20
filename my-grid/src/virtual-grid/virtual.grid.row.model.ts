@@ -88,7 +88,8 @@ export class VirtualGridRow implements IVirtualGridRow {
             colModel: this.Grid.originalColumns[col.index]
         };
 
-        options.stringify = options.stringify == void 0 ? options.stringify = true : options.stringify
+        options.stringify = options.stringify == void 0 ? true : options.stringify
+        options.format = options.format == void 0 ? true : options.format
 
         if (typeof cell.colModel.cellRenderer === "function") {
             cellValue = cell.colModel.cellRenderer(cell)

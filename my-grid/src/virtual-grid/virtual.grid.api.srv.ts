@@ -60,6 +60,10 @@ export class VirtualGridApi {
 
         this.Grid.RowController.toggleRenderedRowVisibility();
 
+        if (this.Grid.ConfigController.showColumnAggregation) {
+            this.Grid.ColumnController.aggregate()
+        }
+
         this.Grid.RowController.renderRows();
         this.Grid.ColumnController.refreshColumns();
 
@@ -67,10 +71,6 @@ export class VirtualGridApi {
             this.Grid.domController.recalculateRowOrder(this.scrollPosTopBackup)
             this.Grid.domController.dom.bodyWrapper.scrollTop = this.scrollPosTopBackup
             this.scrollPosTopBackup = 0;
-        }
-
-        if (this.Grid.ConfigController.showColumnAggregation) {
-            this.Grid.ColumnController.aggregate()
         }
 
         console.log("refreshing grid took -->", +new Date() - s, "ms")
@@ -348,13 +348,6 @@ export class VirtualGridApi {
     public destroy = (): void => {
         this.Grid.rows = [];
     };
-
-    public setGridContent() {
-        this.Grid.domController.resetRenderedRows();
-        this.Grid.RowController.buildRows();
-
-        this.refreshGrid(true);
-    }
 
     /**
      * select one or multiple rows according to ctrl and shift key

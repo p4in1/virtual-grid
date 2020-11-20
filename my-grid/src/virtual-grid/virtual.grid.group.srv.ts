@@ -60,8 +60,11 @@ export class VirtualGridGroupController {
 
         // console.log("setting grouping / sorting status took -->", +new Date() - s)
 
-
         this.Grid.rows = this.Grid.Utils.flatten(rows)
+
+        this.Grid.rows.forEach((row, index) => {
+            row.index = index
+        })
 
         if (this.Grid.SortController.sortedColumns.length && !suppressSorting) {
             this.Grid.SortController.applySorting(true)
@@ -193,9 +196,7 @@ export class VirtualGridGroupController {
 
         let rows = []
 
-        let keys = Object.keys(treePart).sort((a, b) => {
-            return a.localeCompare(b)
-        })
+        let keys = Object.keys(treePart)
 
         for (let key of keys) {
             let rowNode: any = {isRowGroup: true}

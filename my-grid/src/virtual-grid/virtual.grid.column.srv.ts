@@ -122,7 +122,22 @@ export class VirtualGridColumnController {
 
         for (let col of this.Grid.columns) {
             if (col.aggFunc) {
-                col.dom.cellAggregationValue.textContent = this.getAggValue(col, this.Grid.rows)
+
+                if (this.Grid.GroupController.groups.length > 0) {
+                    let rows = this.Grid.rows.filter(x => x.level === 0)
+                    let aggValue = this.getAggValue(col, rows)
+
+                    // we will use the valueFormatter, if there is one, because the aggregated number should be
+                    // formatted like the cell values in each row (i would consider this common practice)
+                    // if there is no formatter we only format numbers to not show dozens of floating point numbers
+                    if (typeof col.cellValueFormatter == "function") {
+                        aggValue = col.cellValueFormatter({colModel: col, rowModel: null, isAggregate: true}, aggValue)
+                    } else if (col.colType === "number" && !this.Grid.Utils.isInteger(aggValue)) {
+                        aggValue = Number(aggValue).toFixed(2)
+                    }
+
+                    col.dom.cellAggregationValue.textContent = aggValue
+                }
             }
         }
 
@@ -133,11 +148,22 @@ export class VirtualGridColumnController {
         let values = []
         let aggValue = ""
         let isCustomAgg = typeof col.aggFunc === "function"
+
         for (let row of rows) {
             if (!row.isRowGroup) {
                 let value = row.getCellValue(col, {stringify: false, format: false});
                 value = typeof value === "number" || isCustomAgg ? value : +value
                 values.push(value)
+            } else {
+                let _aggValue = this.getAggValue(col, row[this.config.childNodesKey])
+                let pathObj = row.rowData
+
+                values.push(_aggValue)
+
+                col.fieldPath.forEach((part, index) => {
+                    pathObj[part] = index === col.fieldPath.length - 1 ? _aggValue : {}
+                    pathObj = pathObj[part]
+                })
             }
         }
 
@@ -149,15 +175,6 @@ export class VirtualGridColumnController {
             // NaN and Infinity (not quite sure about infinity, but for now this is like it is)
             // the NaN check for numbers is because typeof NaN === 'number' equals true
             aggValue = isCustomAgg ? func(values) : func(values.filter(x => !Number.isNaN(x) && Number.isFinite(x)))
-
-            // we will use the valueFormatter, if there is one, because the aggregated number should be
-            // formatted like the cell values in each row (i would consider this common practice)
-            // if there is no formatter we only format numbers to not show dozens of floating point numbers
-            if (typeof col.cellValueFormatter == "function") {
-                aggValue = col.cellValueFormatter({colModel: col, rowModel: null, isAggregate: true}, aggValue)
-            } else if (col.colType === "number" && !this.Grid.Utils.isInteger(aggValue)) {
-                aggValue = Number(aggValue).toFixed(2)
-            }
         }
 
         return aggValue

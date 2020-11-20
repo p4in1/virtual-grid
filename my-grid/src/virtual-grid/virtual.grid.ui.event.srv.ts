@@ -58,23 +58,9 @@ export class VirtualGridUIEventController {
         this.config.onRowDoubleClick({row, event, api: this.Grid.api});
     };
 
-    /**
-     * onRightClick callback
-     * @param event - the click event
-     */
-    private onRightClick = (event: any): void => {
-        const row: IVirtualGridRow = this.getRowByEvent(event);
-
-        if (!row.isSelected && row.isSelectable) {
-            this.Grid.SelectionController.select(row);
-        }
-
-        this.config.onRowRightClick({row, event, api: this.Grid.api});
-    };
-
     private _toggleHoverState(row: IVirtualGridRow, isHover: boolean) {
 
-        if(row.renderedRow == void 0){
+        if (row.renderedRow == void 0) {
             return
         }
 
@@ -104,11 +90,20 @@ export class VirtualGridUIEventController {
     };
 
     private onCellRightClick = (event: any, cell: IRenderedCell): void => {
+        if (!this.config.isRangeSelect || !this.Grid.SelectionController.isCellInRangeSelection(cell)) {
+            const row: IVirtualGridRow = cell.rowModel
+
+            if (!row.isSelected && row.isSelectable) {
+                this.Grid.SelectionController.select(row);
+            }
+
+            this.config.onRowRightClick({row, event, api: this.Grid.api});
+        }
+
         if (!this.config.suppressContextmenu) {
             this.Grid.ContextmenuController.showMenu(cell.rowModel, cell.colModel, event)
         }
-
-        this.onRightClick(event)
+        // this.onRightClick(event)
     }
 
     /**
@@ -385,7 +380,7 @@ export class VirtualGridUIEventController {
 
                 partial.element.addEventListener("click", this.onClick);
                 partial.element.addEventListener("dblclick", this.onDoubleClick);
-                partial.element.addEventListener("contextmenu", this.onRightClick);
+                // partial.element.addEventListener("contextmenu", this.onRightClick);
                 partial.element.addEventListener("mouseenter", this.onMouseEnter);
                 partial.element.addEventListener("mouseleave", this.onMouseLeave);
 

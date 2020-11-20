@@ -63,9 +63,9 @@ export class VirtualGridSortController {
      * apply the current sorting to each row set
      */
     public applySorting(suppressRefresh = false): void {
-        // let s = +new Date()
+        let s = +new Date()
 
-        if(this.sortedColumns.length > 0){
+        if (this.sortedColumns.length > 0) {
             let hierarchyColumn = this.Grid.columns.find(x => x.isHierarchyColumn)
             if (hierarchyColumn && hierarchyColumn.isVisible) {
                 let roots: IVirtualGridRow[] = [];
@@ -84,7 +84,13 @@ export class VirtualGridSortController {
             }
         }
 
-        // console.log("sorting took -->", +new Date() - s)
+        if (this.sortedColumns.length > 1) {
+            this.sortedColumns.forEach((sortCol, index) => {
+                sortCol.col.dom.cellSortArrowNumber.textContent = `${index + 1}`
+            })
+        }
+
+        console.log("sorting took -->", +new Date() - s)
 
         this.Grid.rows.forEach((row, index) => {
             row.index = index
@@ -145,6 +151,7 @@ export class VirtualGridSortController {
     _sortRows(rows: IVirtualGridRow[], sortCol: IVirtualSortColumn) {
         let values = []
         let dir = sortCol.col.sortDirection == "asc" ? 1 : sortCol.col.sortDirection == "desc" ? -1 : 0
+
         for (let row of rows) {
             row.value = row.getCellValue(sortCol.col, {stringify: false, format: false})
             values.push({value: row.value, row})

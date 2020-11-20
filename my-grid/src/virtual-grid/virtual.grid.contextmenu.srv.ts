@@ -109,21 +109,22 @@ export class VirtualGridContextmenuController {
         for (let row of selectedRows) {
             exportData.push(row.renderedRow.cells)
         }
+        let lines = ""
 
-        let lines = this._getLines(exportData)
+        if (exportData.length) {
+            lines = this._getLines(exportData)
+        }
 
         if (this.config.isRangeSelect) {
             for (let range of selectedRanges) {
-
                 lines += this._getLines(range.rows)
-
             }
         }
 
         this.Grid.Utils.copyToClipboard(lines)
     }
 
-    _getLines(data) {
+    _getLines(data): string {
 
         let lines = ""
         for (let row of this._getPreformattedRows(data)) {

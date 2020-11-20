@@ -516,23 +516,36 @@
                             font-size: $font-medium;
                         }
 
-                        .header-sort-arrow {
+                        .header-sort-arrow-container {
 
-                            height: 16px;
-                            width: 16px;
+                            position: relative;
 
-                            display: none;
+                            .header-sort-arrow {
 
-                            &.icon-asc {
-                                transform: rotate(-90deg);
-                                display: block;
+                                height: 16px;
+                                width: 16px;
+
+                                display: none;
+
+                                &.icon-asc {
+                                    transform: rotate(-90deg);
+                                    display: block;
+                                }
+
+                                &.icon-desc {
+                                    display: block;
+                                    transform: rotate(90deg)
+                                }
                             }
 
-                            &.icon-desc {
-                                display: block;
-                                transform: rotate(90deg)
+                            .header-sort-arrow-number {
+                                position: absolute;
+                                bottom: 0;
+                                right: 0;
+                                font-size: 10px
                             }
                         }
+
                     }
 
                     .header-cell-aggregation-container {

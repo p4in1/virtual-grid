@@ -17,6 +17,13 @@ export class VirtualGridRowController {
     constructor(protected Grid: IVirtualGrid, private config: VirtualGridConfigController, private domController: VirtualGridUIDomController) {
     }
 
+    createGridContent = () => {
+        this.Grid.domController.resetRenderedRows();
+        this.Grid.RowController.buildRows();
+
+        this.Grid.api.refreshGrid();
+    }
+
     /**
      * processes the grid data and creates the grid rows from scratch
      */
@@ -397,7 +404,6 @@ export class VirtualGridRowController {
             cell.colModel = this.Grid.columns[cell.colIndex];
 
             this._renderContent(cell)
-            this._renderRowGroupContent(cell)
             this._renderCheckbox(cell)
             this._renderAvatar(cell)
             this._renderCustomStyles(cell)
@@ -418,9 +424,12 @@ export class VirtualGridRowController {
         }
 
         let cellValue: any = cell.rowModel.getCellValue(cell.colModel, {
-            stringify: false,
-            format: !cell.rowModel.isRowGroup
+            stringify: false
         })
+
+        if (!cell.colModel.aggregateRowGroups && cell.rowModel.isRowGroup && cell.colModel.aggFunc) {
+            cellValue = ""
+        }
 
         if (colType == "boolean") {
             let cellNode = this.Grid.Utils.el("i", ["action-icon", "virtual-material-icons"])
@@ -439,15 +448,6 @@ export class VirtualGridRowController {
             for (let i = 0; i < cell.textNodes.length; i++) {
                 cell.textNodes[i].innerHTML = cellValue[i] == void 0 ? "" : cellValue[i].toString()
             }
-        }
-    }
-
-    private _renderRowGroupContent(cell: IRenderedCell) {
-        let row = cell.rowModel
-        let col = cell.colModel
-        if (row.isRowGroup && col.aggregateRowGroups && col.aggFunc) {
-            let children = this.Grid.Utils.flatten(row[this.config.childNodesKey])
-            cell.textNodes[0].textContent = this.Grid.ColumnController.getAggValue(col, children)
         }
     }
 
