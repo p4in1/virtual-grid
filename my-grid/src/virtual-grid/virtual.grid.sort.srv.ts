@@ -84,6 +84,10 @@ export class VirtualGridSortController {
             }
         }
 
+        for (let col of this.Grid.columns) {
+            col.dom.cellSortArrowNumber.textContent = ""
+        }
+
         if (this.sortedColumns.length > 1) {
             this.sortedColumns.forEach((sortCol, index) => {
                 sortCol.col.dom.cellSortArrowNumber.textContent = `${index + 1}`
