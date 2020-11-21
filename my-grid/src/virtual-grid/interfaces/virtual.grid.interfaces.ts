@@ -132,10 +132,16 @@ export interface IVirtualGridConfig {
      * @default false
      */
     suppressContextmenu?: boolean
+
     /**
      * this overrides the default and does not add the export and copy to clipboard actions
      */
     suppressContextmenuDefault?: boolean
+
+    /**
+     * suppresses the flash effect that occurs when cells contents get changed
+     */
+    suppressFlashingCells?: boolean
 
     /**
      * callback before a node is expanded
@@ -495,6 +501,7 @@ export interface IVirtualGridColumn {
     aggFunc: string | Function
     aggFuncTitle: string
     aggregateRowGroups: boolean
+    aggValue: number
 
     rowGroup: IVirtualColumnRowGroup
 }
@@ -587,7 +594,7 @@ export interface IVirtualCellDom {
     cellTrueFilter: HTMLDivElement
     cellFalseFilter: HTMLDivElement
 
-    cellSortArrowContainer:HTMLElement
+    cellSortArrowContainer: HTMLElement
     cellSortArrow: HTMLElement
     cellSortArrowNumber: HTMLElement
 

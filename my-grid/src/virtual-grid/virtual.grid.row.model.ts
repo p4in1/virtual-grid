@@ -45,12 +45,7 @@ export class VirtualGridRow implements IVirtualGridRow {
             this.isSelectable = Grid.ConfigController.selectLeavesOnly;
         }
 
-        // TODO observe changes on the rowData
-        // TODO 1. Define Getter and Setter in a generic way with Object.defineProperty https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
-        // TODO 2. Use Proxies and intercept changes made to the object
-        // if (typeof node == "object") {
-        //     this.addProxy(node);
-        // }
+        this.addProxy(node);
 
         this.rowData = node
     }
@@ -108,37 +103,31 @@ export class VirtualGridRow implements IVirtualGridRow {
         return !options.stringify ? cellValue : col.colType == "multiLine" && Array.isArray(cellValue) ? cellData.join(" ") : cellValue.toString()
     }
 
-    // private renderRow() {
-    //     // TODO - when reordering rows the grid should attach the rendered row to the row model
-    //     // TODO - Attach the rendered Row to the row model and remove the row model once the row leaves the viewport and
-    //     // TODO - would be reused for another row model .. this avoids the use of a for..loop
-    //     // let renderedRows: RenderedRow[] = this.Grid.UI.domController.renderedRows;
-    //     //
-    //     // for (let renderedRow of renderedRows) {
-    //     //     const number: number = Number(renderedRow.element.getAttribute("number"));
-    //     //     if (number == this.index) {
-    //     //         this.Grid.RowController.renderRow(renderedRow);
-    //     //         break;
-    //     //     }
-    //     // }
-    // };
+    private addProxy(node: any): void {
 
-    // private addProxy(node: any): void {
-    //
-    //     let debounce: any = null;
-    //     let _this = this;
-    //     this.rowData = new Proxy(node, {
-    //         set: function (target, prop, value) {
-    //             console.log({type: 'set', target, prop, value});
-    //
-    //             clearTimeout(debounce);
-    //
-    //             debounce = setTimeout(() => {
-    //                 _this.renderRow()
-    //             }, 0);
-    //
-    //             return Reflect.set(target, prop, value);
-    //         }
-    //     });
-    // }
+        let valMap = {}
+        let props = []
+        for (let col of this.Grid.columns) {
+            if (col.fieldPath.length === 1) {
+                props.push({field: col.field, col, obj: node})
+                valMap[col.field] = node[col.field]
+            }
+        }
+
+        for (let prop of props) {
+            Object.defineProperty(prop.obj, prop.field, {
+                // Create a new setter for the property
+                get: () => {
+                    return valMap[prop.field];
+                },
+                set: (newValue) => {
+                    valMap[prop.field] = newValue
+
+                    if (this.renderedRow && this.renderedRow.index == this.index) {
+                        this.Grid.RowController.renderCell(this, prop.col, true)
+                    }
+                }
+            })
+        }
+    }
 }

@@ -1,9 +1,4 @@
-import {
-    IValueFormatterParams,
-    IVirtualGrid,
-    IVirtualGridColumn,
-    IVirtualGridRow
-} from "./interfaces/virtual.grid.interfaces";
+import {IVirtualGrid, IVirtualGridColumn} from "./interfaces/virtual.grid.interfaces";
 
 import {VirtualGridColumn} from "./virtual.grid.column.model";
 import {VirtualGridConfigController} from "./virtual.grid.config.srv";
@@ -123,30 +118,34 @@ export class VirtualGridColumnController {
         for (let col of this.Grid.columns) {
             if (col.aggFunc) {
                 let groupCount = this.Grid.GroupController.groups.length
-                // if (this.Grid.GroupController.groups.length > 0) {
                 let rows = groupCount === 0 ? this.Grid.rows : this.Grid.rows.filter(x => x.level === 0)
-                let aggValue = this.getAggValue(col, rows)
 
-                // we will use the valueFormatter, if there is one, because the aggregated number should be
-                // formatted like the cell values in each row (i would consider this common practice)
-                // if there is no formatter we only format numbers to not show dozens of floating point numbers
-                if (typeof col.cellValueFormatter == "function") {
-                    aggValue = col.cellValueFormatter({colModel: col, rowModel: null, isAggregate: true}, aggValue)
-                } else if (col.colType === "number" && !this.Grid.Utils.isInteger(aggValue)) {
-                    aggValue = Number(aggValue).toFixed(2)
-                }
-
-                col.dom.cellAggregationValue.textContent = aggValue
-                // }
+                col.aggValue = this.getAggValue(col, rows)
+                col.dom.cellAggregationValue.textContent = this.formatAggValue(col)
             }
         }
 
         console.log("aggregating values took -->", +new Date() - s)
     }
 
+    formatAggValue(col: IVirtualGridColumn) {
+        let value: any = col.aggValue
+
+        // we will use the valueFormatter, if there is one, because the aggregated number should be
+        // formatted like the cell values in each row (i would consider this common practice)
+        // if there is no formatter we only format numbers to not show dozens of floating point numbers
+        if (typeof col.cellValueFormatter == "function") {
+            value = col.cellValueFormatter({colModel: col, rowModel: null, isAggregate: true}, value)
+        } else if (col.colType === "number" && !this.Grid.Utils.isInteger(value)) {
+            value = Number(value).toFixed(2)
+        }
+
+        return value
+    }
+
     getAggValue(col, rows) {
         let values = []
-        let aggValue = ""
+        let aggValue: any = 0
         let isCustomAgg = typeof col.aggFunc === "function"
 
         for (let row of rows) {
@@ -180,7 +179,7 @@ export class VirtualGridColumnController {
         return aggValue
     }
 
-    getAggFunction(col) {
+     getAggFunction(col) {
         if (typeof col.aggFunc === "function") {
             return col.aggFunc
         }

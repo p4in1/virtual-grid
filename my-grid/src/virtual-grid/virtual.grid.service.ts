@@ -78,7 +78,7 @@ export class VirtualGrid implements IVirtualGrid {
         log.push(`row + column controller --> ${+new Date() - s}`)
         s = +new Date()
 
-        this.rows = this.RowController.createRowModels(config.rows);
+
 
         this.originalColumns = this.ColumnController.createColumnModels();
 
@@ -88,7 +88,7 @@ export class VirtualGrid implements IVirtualGrid {
 
         this.columns = [...left, ...center, ...right]
         this.ColumnController.setCurrentColumnIndex()
-
+        this.rows = this.RowController.createRowModels(config.rows);
         log.push(`rows + columns enriched in --> ${+new Date() - s}`)
         s = +new Date()
 

@@ -21,6 +21,8 @@ export class VirtualGridConfigController {
     suppressContextmenu: boolean = false;
     suppressContextmenuDefault: boolean = false;
 
+    suppressFlashingCells: boolean = false
+
     showHeader: boolean = false
     showGroupPanel: boolean = false
     showColumnFilter: boolean = false;
@@ -62,6 +64,8 @@ export class VirtualGridConfigController {
         this.suppressPinning = config.suppressPinning
         this.suppressContextmenu = config.suppressContextmenu
         this.suppressContextmenuDefault = config.suppressContextmenuDefault
+
+        this.suppressFlashingCells = config.suppressFlashingCells
 
         this.showHeader = config.showHeader == void 0 ? true : config.showHeader
         this.showColumnFilter = config.showColumnFilter

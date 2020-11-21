@@ -68,18 +68,41 @@ export class SectionThreeComponent implements AfterViewInit {
                 test.lastName = this.getRandomLastName()
                 test.float = this.getRandomFloat()
                 test.boolean = this.getRandomBoolean()
-                test.integer = this.getRandomInteger()
+                test.integer0 = this.getRandomInteger()
                 test.integer1 = this.getRandomInteger()
                 test.integer2 = this.getRandomInteger()
                 test.integer3 = this.getRandomInteger()
                 test.integer4 = this.getRandomInteger()
                 test.integer5 = this.getRandomInteger()
-                test.integer6 = this.getRandomInteger()
-                test.integer7 = this.getRandomInteger()
-                test.integer8 = this.getRandomInteger()
                 items.push(test)
             })
         }
+
+        let numbers = [0, 1, 2, 3, 4, 5]
+        let counter = 0;
+
+
+        setTimeout(() => {
+            setInterval(() => {
+                let s = +new Date()
+                for (let row of items) {
+                    let field = `integer${numbers[Math.floor(Math.random() * numbers.length)]}`
+                    row[field] = this.getRandomInteger()
+                }
+
+                console.log("updating 100k cells took -->", +new Date() - s)
+
+                this.gridInstance.api.updateAggregates()
+            }, 500)
+
+            // setInterval(() => {
+            //     for (let row of items) {
+            //         let field = `integer${numbers[Math.floor(Math.random() * numbers.length)]}`
+            //         row[field] = this.getRandomInteger()
+            //     }
+            // }, 700)
+        }, 2000)
+
 
         const thousandSeparatorFormatter = (params: IValueFormatterParams, value: any) => {
 
@@ -109,7 +132,7 @@ export class SectionThreeComponent implements AfterViewInit {
                     field: "data.user.userFirstName",
                     title: "Vorname",
                     type: "text",
-                    isRowGrouped: true
+                    // isRowGrouped: true
                 },
                 {
                     field: "lastName",
@@ -127,7 +150,7 @@ export class SectionThreeComponent implements AfterViewInit {
                     type: "boolean",
                     field: "boolean",
                     title: "Auszahlung gefordert",
-                    isRowGrouped: true
+                    // isRowGrouped: true
                 },
                 {
                     type: "date",
@@ -145,6 +168,11 @@ export class SectionThreeComponent implements AfterViewInit {
                     cellValueFormatter(cell: IValueFormatterParams, value: any): any {
                         return value != void 0 && value != "" ? `${value} €` : ""
                     }
+                },
+                {
+                    field: "integer0",
+                    title: "Integer",
+                    type: "number"
                 },
                 {
                     field: "integer1",
@@ -208,6 +236,7 @@ export class SectionThreeComponent implements AfterViewInit {
             useRangeSelect: true,
             suppressContextmenu: false,
             suppressContextmenuDefault: false,
+            suppressFlashingCells: true,
             getContextMenuEntries(): IVirtualGridContextmenuEntry[] {
                 let entries: IVirtualGridContextmenuEntry[] = []
 

@@ -126,8 +126,12 @@ export class VirtualGridUIDomController {
         this.dom.groupPanelPlaceholder.textContent = "Drag and drop columns here to group"
     }
 
+    setClass(e, className, isAdd) {
+        this.styleCommands.push({type: "class", isAdd, e, className})
+    }
+
     setStyles(element, styles) {
-        let command = {e: element, styles: []}
+        let command = {type: "style", e: element, styles: []}
 
         for (let key in styles) {
             let item = {}
@@ -144,11 +148,22 @@ export class VirtualGridUIDomController {
             if (this.styleCommands.length > 0) {
 
                 for (let command of this.styleCommands) {
-
-                    for (let s of command.styles) {
-                        let key = Object.keys(s)[0]
-                        command.e.style[key] = s[key]
+                    switch (command.type) {
+                        case "class":
+                            if (command.isAdd) {
+                                command.e.classList.add(command.className)
+                            } else {
+                                command.e.classList.remove(command.className)
+                            }
+                            break;
+                        case "style":
+                            for (let s of command.styles) {
+                                let key = Object.keys(s)[0]
+                                command.e.style[key] = s[key]
+                            }
+                            break;
                     }
+
                 }
 
                 this.styleCommands = []

@@ -114,6 +114,10 @@
             background-color: $color-background-panel;
         }
 
+        .cell.flash {
+            animation: flash 500ms linear;
+        }
+
         .cell.selected {
             &.stack-1 {
                 background-color: rgba($color-accent-light, .08);
@@ -637,5 +641,14 @@
     /* Handle on hover */
     ::-webkit-scrollbar-thumb:hover {
         background: rgba(0, 0, 0, .5);
+    }
+
+    @keyframes flash {
+        from {
+            background-color: $color-accent-medium-light;
+        }
+        to {
+            background-color: transparent;
+        }
     }
 }

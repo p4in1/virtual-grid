@@ -1,7 +1,7 @@
 import {
     IRenderedCell,
     IRenderedRow,
-    IVirtualGrid,
+    IVirtualGrid, IVirtualGridColumn,
     IVirtualGridRow
 } from "./interfaces/virtual.grid.interfaces";
 import {VirtualGridRow} from "./virtual.grid.row.model";
@@ -396,18 +396,23 @@ export class VirtualGridRowController {
         this.toggleSelectionClasses(this.Grid.rows[row.index]);
 
         for (const j in row.cells) {
-            const cell: IRenderedCell = row.cells[j];
+            this.renderCell(this.Grid.rows[row.index], this.Grid.columns[j])
+        }
+    }
 
-            cell.rowIndex = row.index;
-            cell.colIndex = j
-            cell.rowModel = this.Grid.rows[row.index];
-            cell.colModel = this.Grid.columns[cell.colIndex];
+    public renderCell(row: IVirtualGridRow, col: IVirtualGridColumn, flashEffect?: boolean) {
+        const cell: IRenderedCell = row.renderedRow.cells[col.currentIndex];
+        cell.rowModel = row;
+        cell.colModel = col;
 
-            this._renderContent(cell)
-            this._renderCheckbox(cell)
-            this._renderAvatar(cell)
-            this._renderCustomStyles(cell)
-            this._renderTreeNode(cell)
+        this._renderContent(cell)
+        this._renderCheckbox(cell)
+        this._renderAvatar(cell)
+        this._renderCustomStyles(cell)
+        this._renderTreeNode(cell)
+
+        if (flashEffect) {
+            this._addFlashEffect(cell)
         }
     }
 
@@ -520,6 +525,18 @@ export class VirtualGridRowController {
             if (typeof (styles) == "object") {
                 this.domController.setStyles(cell.cellNode, styles);
             }
+        }
+    }
+
+    private _addFlashEffect(cell: IRenderedCell) {
+
+        if (!this.config.suppressFlashingCells) {
+
+            setTimeout(() => {
+                this.domController.setClass(cell.cellNode, "flash", false)
+            }, 500)
+
+            this.domController.setClass(cell.cellNode, "flash", true)
         }
     }
 

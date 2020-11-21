@@ -70,7 +70,8 @@ export class VirtualGridColumn implements IVirtualGridColumn {
     aggFunc: string | Function
     aggFuncTitle: string
     aggregateRowGroups: boolean
-
+    aggValue: any
+    
     colType: string
     colDef: any;
 
@@ -125,6 +126,7 @@ export class VirtualGridColumn implements IVirtualGridColumn {
         this.aggFunc = configColDef.aggFunc
         this.aggFuncTitle = configColDef.aggFuncTitle
         this.aggregateRowGroups = configColDef.aggregateRowGroups
+        this.aggValue = ""
 
         this.width = configColDef.width;
         this.minWidth = configColDef.minWidth == void 0 ? 80 : configColDef.minWidth;

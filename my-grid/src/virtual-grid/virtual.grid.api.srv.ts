@@ -382,4 +382,8 @@ export class VirtualGridApi {
     public selectRow(row: IVirtualGridRow): void {
         this.Grid.SelectionController.selectRow(row)
     }
+
+    public updateAggregates(){
+        this.Grid.ColumnController.aggregate()
+    }
 }
