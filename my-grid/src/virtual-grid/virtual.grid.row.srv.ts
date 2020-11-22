@@ -100,14 +100,14 @@ export class VirtualGridRowController {
     /**
      * Fill the grid with with rows for every visible entry.
      */
-    public renderRows = (): void => {
+    public renderRows = (flashCells?: boolean): void => {
 
         for (const row of this.domController.renderedRows) {
             if (row.index > this.Grid.rows.length - 1 || row.index < 0) {
                 break;
             }
 
-            this.renderRow(row);
+            this.renderRow(row, flashCells);
         }
     };
     /**
@@ -332,7 +332,7 @@ export class VirtualGridRowController {
         event.stopPropagation();
         event.stopImmediatePropagation();
 
-        action.callback(row.rowData)
+        action.callback(row)
     }
 
     /**
@@ -381,8 +381,9 @@ export class VirtualGridRowController {
      * render a single row and update classes
      *
      * @param row
+     * @param flashCells
      */
-    public renderRow(row: IRenderedRow): void {
+    public renderRow(row: IRenderedRow, flashCells?: boolean): void {
 
         [row.right, row.center, row.left].forEach((rowPartial) => {
 
@@ -396,7 +397,7 @@ export class VirtualGridRowController {
         this.toggleSelectionClasses(this.Grid.rows[row.index]);
 
         for (const j in row.cells) {
-            this.renderCell(this.Grid.rows[row.index], this.Grid.columns[j])
+            this.renderCell(this.Grid.rows[row.index], this.Grid.columns[j], flashCells)
         }
     }
 
@@ -405,13 +406,15 @@ export class VirtualGridRowController {
         cell.rowModel = row;
         cell.colModel = col;
 
+        let currentValue = cell.cellNode.textContent
+
         this._renderContent(cell)
         this._renderCheckbox(cell)
         this._renderAvatar(cell)
         this._renderCustomStyles(cell)
         this._renderTreeNode(cell)
 
-        if (flashEffect) {
+        if (cell.cellNode.textContent != currentValue && flashEffect) {
             this._addFlashEffect(cell)
         }
     }
@@ -669,5 +672,10 @@ export class VirtualGridRowController {
         } else if (this.Grid.SortController.sortedColumns.length !== 0) {
             this.Grid.SortController.applySorting()
         }
+    }
+
+    removeRow = (row: IVirtualGridRow) => {
+        this.Grid.rows = this.Grid.rows.filter(x => x.index != row.index)
+        this.Grid.api.refreshGrid()
     }
 }

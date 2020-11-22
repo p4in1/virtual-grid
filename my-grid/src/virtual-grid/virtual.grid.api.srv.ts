@@ -60,10 +60,6 @@ export class VirtualGridApi {
 
         this.Grid.RowController.toggleRenderedRowVisibility();
 
-        if (this.Grid.ConfigController.showColumnAggregation) {
-            this.Grid.ColumnController.aggregate()
-        }
-
         this.Grid.RowController.renderRows();
         this.Grid.ColumnController.refreshColumns();
 
@@ -383,7 +379,11 @@ export class VirtualGridApi {
         this.Grid.SelectionController.selectRow(row)
     }
 
-    public updateAggregates(){
+    public updateAggregates() {
         this.Grid.ColumnController.aggregate()
+    }
+
+    public updateRows() {
+        this.Grid.RowController.renderRows(true)
     }
 }

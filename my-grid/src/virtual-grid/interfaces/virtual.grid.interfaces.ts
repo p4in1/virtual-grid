@@ -360,6 +360,10 @@ export interface IVirtualGridRow {
      */
     updateRowData(rowData: any): void
 
+    remove(): void
+
+    setData(data: any): void
+
     getCellValue(col: IVirtualGridColumn, options?: IVirtualGetCellValueOptions): any
 }
 
@@ -510,10 +514,13 @@ export interface IRenderedCell {
     textNodes: HTMLElement[]
     treeNode: HTMLElement
     treeChildCountNode: HTMLElement
+
     checkboxNode: HTMLElement
     checkboxIcon: HTMLElement
+
     cellNode: HTMLElement
     cellContentNode: HTMLElement
+
     avatarNode: HTMLElement
     avatarPlaceholder: HTMLElement
 
@@ -530,6 +537,8 @@ export interface IRenderedCell {
     cellRenderer: Function
     cellValueGetter: Function
     cellStyleGetter: Function
+
+    displayValue: any
 }
 
 export interface IRenderedRowPartial {

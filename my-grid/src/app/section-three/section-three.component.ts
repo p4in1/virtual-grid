@@ -3,7 +3,7 @@ import {
     IValueFormatterParams,
     IVirtualGrid,
     IVirtualGridConfig,
-    IVirtualGridContextmenuEntry,
+    IVirtualGridContextmenuEntry, IVirtualGridRow,
 } from "../../virtual-grid/interfaces/virtual.grid.interfaces";
 import {VirtualGrid} from "../../virtual-grid/virtual.grid.service";
 
@@ -79,29 +79,30 @@ export class SectionThreeComponent implements AfterViewInit {
         }
 
         let numbers = [0, 1, 2, 3, 4, 5]
-        let counter = 0;
-
-
-        setTimeout(() => {
-            setInterval(() => {
-                let s = +new Date()
-                for (let row of items) {
-                    let field = `integer${numbers[Math.floor(Math.random() * numbers.length)]}`
-                    row[field] = this.getRandomInteger()
-                }
-
-                console.log("updating 100k cells took -->", +new Date() - s)
-
-                this.gridInstance.api.updateAggregates()
-            }, 500)
-
-            // setInterval(() => {
-            //     for (let row of items) {
-            //         let field = `integer${numbers[Math.floor(Math.random() * numbers.length)]}`
-            //         row[field] = this.getRandomInteger()
-            //     }
-            // }, 700)
-        }, 2000)
+        // let counter = 0;
+        //
+        //
+        // setTimeout(() => {
+        // setInterval(() => {
+        //     let s = +new Date()
+        //     for (let row of items) {
+        //         let field = `integer${numbers[Math.floor(Math.random() * numbers.length)]}`
+        //         row[field] = this.getRandomInteger()
+        //     }
+        //
+        //     // console.log("updating 100k cells took -->", +new Date() - s)
+        //
+        //     this.gridInstance.api.updateRows()
+        //     this.gridInstance.api.updateAggregates()
+        // }, 475)
+        //
+        //     // setInterval(() => {
+        //     //     for (let row of items) {
+        //     //         let field = `integer${numbers[Math.floor(Math.random() * numbers.length)]}`
+        //     //         row[field] = this.getRandomInteger()
+        //     //     }
+        //     // }, 700)
+        // }, 2000)
 
 
         const thousandSeparatorFormatter = (params: IValueFormatterParams, value: any) => {
@@ -132,7 +133,7 @@ export class SectionThreeComponent implements AfterViewInit {
                     field: "data.user.userFirstName",
                     title: "Vorname",
                     type: "text",
-                    // isRowGrouped: true
+                    isRowGrouped: true
                 },
                 {
                     field: "lastName",
@@ -150,7 +151,7 @@ export class SectionThreeComponent implements AfterViewInit {
                     type: "boolean",
                     field: "boolean",
                     title: "Auszahlung gefordert",
-                    // isRowGrouped: true
+                    isRowGrouped: true
                 },
                 {
                     type: "date",
@@ -180,6 +181,9 @@ export class SectionThreeComponent implements AfterViewInit {
                     type: "number",
                     aggFunc: "min",
                     aggregateRowGroups: true,
+                    cellValueFormatter(cell: IValueFormatterParams, value: any): any {
+                        return value != void 0 && value != "" ? `${value} €` : ""
+                    }
                 },
                 {
                     field: "integer2",
@@ -187,6 +191,9 @@ export class SectionThreeComponent implements AfterViewInit {
                     type: "number",
                     aggFunc: "max",
                     aggregateRowGroups: true,
+                    cellValueFormatter(cell: IValueFormatterParams, value: any): any {
+                        return value != void 0 && value != "" ? `${value} €` : ""
+                    }
                 },
                 {
                     field: "integer3",
@@ -220,11 +227,27 @@ export class SectionThreeComponent implements AfterViewInit {
                 {
                     pinned: "right",
                     type: "action",
-                    actions: [{
-                        icon: "delete", color: "red", callback: () => {
-
+                    actions: [
+                        {
+                            icon: "delete", color: "red", callback: (row: IVirtualGridRow) => {
+                                row.remove()
+                            }
+                        },{
+                            icon: "add", color: "blue", callback: (row: IVirtualGridRow) => {
+                                row.setData({
+                                    lastName : this.getRandomLastName(),
+                                    float : this.getRandomFloat(),
+                                    boolean : this.getRandomBoolean(),
+                                    integer0 : this.getRandomInteger(),
+                                    integer1 : this.getRandomInteger(),
+                                    integer2 : this.getRandomInteger(),
+                                    integer3 : this.getRandomInteger(),
+                                    integer4 : this.getRandomInteger(),
+                                    integer5 : this.getRandomInteger()
+                                })
+                            }
                         }
-                    }]
+                    ]
                 }
             ],
             element: this.grid.nativeElement,
@@ -236,7 +259,7 @@ export class SectionThreeComponent implements AfterViewInit {
             useRangeSelect: true,
             suppressContextmenu: false,
             suppressContextmenuDefault: false,
-            suppressFlashingCells: true,
+            suppressFlashingCells: false,
             getContextMenuEntries(): IVirtualGridContextmenuEntry[] {
                 let entries: IVirtualGridContextmenuEntry[] = []
 

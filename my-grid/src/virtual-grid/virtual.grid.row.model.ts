@@ -45,7 +45,7 @@ export class VirtualGridRow implements IVirtualGridRow {
             this.isSelectable = Grid.ConfigController.selectLeavesOnly;
         }
 
-        this.addProxy(node);
+        // this.addProxy(node);
 
         this.rowData = node
     }
@@ -103,31 +103,14 @@ export class VirtualGridRow implements IVirtualGridRow {
         return !options.stringify ? cellValue : col.colType == "multiLine" && Array.isArray(cellValue) ? cellData.join(" ") : cellValue.toString()
     }
 
-    private addProxy(node: any): void {
+    public remove = () => {
+        this.Grid.api.removeRow(this)
+    }
 
-        let valMap = {}
-        let props = []
-        for (let col of this.Grid.columns) {
-            if (col.fieldPath.length === 1) {
-                props.push({field: col.field, col, obj: node})
-                valMap[col.field] = node[col.field]
-            }
-        }
-
-        for (let prop of props) {
-            Object.defineProperty(prop.obj, prop.field, {
-                // Create a new setter for the property
-                get: () => {
-                    return valMap[prop.field];
-                },
-                set: (newValue) => {
-                    valMap[prop.field] = newValue
-
-                    if (this.renderedRow && this.renderedRow.index == this.index) {
-                        this.Grid.RowController.renderCell(this, prop.col, true)
-                    }
-                }
-            })
+    public setData = (data) => {
+        this.rowData = data
+        if (this.renderedRow && this.renderedRow.index == this.index) {
+            this.Grid.RowController.renderRow(this.renderedRow,true)
         }
     }
 }

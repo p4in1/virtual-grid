@@ -116,6 +116,10 @@ export class VirtualGrid implements IVirtualGrid {
                 this.eventController.adjustCell(this.originalColumns, 0)
                 this.eventController.bindGlobalOnResize()
                 this.GroupController.setColGroups()
+
+                if (this.ConfigController.showColumnAggregation) {
+                    this.ColumnController.aggregate()
+                }
             });
 
             this.RowController.createGridContent();
