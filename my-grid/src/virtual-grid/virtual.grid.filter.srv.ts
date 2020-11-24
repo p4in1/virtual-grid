@@ -71,11 +71,11 @@ export class VirtualGridFilterController {
         }
 
         this.applyFilter(expandParents)
-        this.Grid.api.refreshGrid(false, true);
+        this.Grid.api.refreshGrid(false, true,false);
     };
 
     applyFilter(expandParents: boolean = true) {
-        // let start = +new Date();
+        let start = +new Date();
 
         if (this._isFilterChanged()) {
             let filteredArray: IVirtualGridRow[] = this._getFilteredArray();
@@ -97,7 +97,7 @@ export class VirtualGridFilterController {
 
             this._expandParentsAfterFilter(filteredArray, expandParents)
         }
-        // console.log("applying filter took --> ", +new Date() - start);
+        console.log("applying filter took --> ", +new Date() - start);
     }
 
 

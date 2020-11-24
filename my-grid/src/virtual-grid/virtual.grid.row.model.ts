@@ -45,8 +45,6 @@ export class VirtualGridRow implements IVirtualGridRow {
             this.isSelectable = Grid.ConfigController.selectLeavesOnly;
         }
 
-        // this.addProxy(node);
-
         this.rowData = node
     }
 
@@ -76,15 +74,21 @@ export class VirtualGridRow implements IVirtualGridRow {
      * @param options
      */
     public getCellValue = (col: IVirtualGridColumn, options: IVirtualGetCellValueOptions = {}): string => {
-        let cellData: any = this.Grid.RowController.getCellData(this.rowData, col.fieldPath);
         let cellValue: string;
+        let cellData: any;
         let cell: any = {
             rowModel: this.Grid.rows[this.index],
             colModel: this.Grid.originalColumns[col.index]
         };
 
+        cellData = this.Grid.RowController.getCellData(this.rowData, col.fieldPath);
+
         options.stringify = options.stringify == void 0 ? true : options.stringify
         options.format = options.format == void 0 ? true : options.format
+
+        if (this.isRowGroup && col.aggFunc && !col.aggregateRowGroups) {
+            return ""
+        }
 
         if (typeof cell.colModel.cellRenderer === "function") {
             cellValue = cell.colModel.cellRenderer(cell)
@@ -96,11 +100,11 @@ export class VirtualGridRow implements IVirtualGridRow {
 
         if (options.format) {
             if (typeof cell.colModel.cellValueFormatter == "function") {
-                cellValue = cell.colModel.cellValueFormatter(cell, cellData)
+                cellValue = cell.colModel.cellValueFormatter(cell, cellValue)
             }
         }
 
-        return !options.stringify ? cellValue : col.colType == "multiLine" && Array.isArray(cellValue) ? cellData.join(" ") : cellValue.toString()
+        return !options.stringify ? cellValue : col.colType == "multiLine" && Array.isArray(cellValue) ? cellValue.join(" ") : cellValue.toString()
     }
 
     public remove = () => {
@@ -109,8 +113,9 @@ export class VirtualGridRow implements IVirtualGridRow {
 
     public setData = (data) => {
         this.rowData = data
+
         if (this.renderedRow && this.renderedRow.index == this.index) {
-            this.Grid.RowController.renderRow(this.renderedRow,true)
+            this.Grid.RowController.renderRow(this.renderedRow, true)
         }
     }
 }

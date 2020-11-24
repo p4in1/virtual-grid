@@ -101,6 +101,12 @@ export class VirtualGridSelectionController {
         this.Grid.RowController.toggleSelectionClasses(row, false);
     }
 
+    public selectAll = (): void => {
+        for (let row of this.Grid.rows) {
+            this.selectRow(row)
+        }
+    }
+
     /**
      * deselect all rows
      */

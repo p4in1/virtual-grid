@@ -593,9 +593,7 @@ export class VirtualGridUIDomController {
     }
 
     public recalculateRowOrder(scrollTopOverride?: number): void {
-        requestAnimationFrame(() => {
-            this.rearrangeListNodes(scrollTopOverride);
-        })
+        this.rearrangeListNodes(scrollTopOverride);
     }
 
     /**

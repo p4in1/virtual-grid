@@ -232,19 +232,21 @@ export class SectionThreeComponent implements AfterViewInit {
                             icon: "delete", color: "red", callback: (row: IVirtualGridRow) => {
                                 row.remove()
                             }
-                        },{
+                        }, {
                             icon: "add", color: "blue", callback: (row: IVirtualGridRow) => {
                                 row.setData({
-                                    lastName : this.getRandomLastName(),
-                                    float : this.getRandomFloat(),
-                                    boolean : this.getRandomBoolean(),
-                                    integer0 : this.getRandomInteger(),
-                                    integer1 : this.getRandomInteger(),
-                                    integer2 : this.getRandomInteger(),
-                                    integer3 : this.getRandomInteger(),
-                                    integer4 : this.getRandomInteger(),
-                                    integer5 : this.getRandomInteger()
+                                    lastName: this.getRandomLastName(),
+                                    float: this.getRandomFloat(),
+                                    boolean: this.getRandomBoolean(),
+                                    integer0: this.getRandomInteger(),
+                                    integer1: this.getRandomInteger(),
+                                    integer2: this.getRandomInteger(),
+                                    integer3: this.getRandomInteger(),
+                                    integer4: this.getRandomInteger(),
+                                    integer5: this.getRandomInteger()
                                 })
+                                this.gridInstance.api.updateAggregates()
+                                this.gridInstance.api.refreshGrid(true)
                             }
                         }
                     ]
@@ -252,11 +254,11 @@ export class SectionThreeComponent implements AfterViewInit {
             ],
             element: this.grid.nativeElement,
             showHeader: true,
-            showGroupPanel: false,
+            showGroupPanel: true,
             showColumnFilter: true,
             showColumnAggregation: true,
-            useMultiselect: true,
-            useRangeSelect: true,
+            isMultiselect: true,
+            isRangeSelect: true,
             suppressContextmenu: false,
             suppressContextmenuDefault: false,
             suppressFlashingCells: false,

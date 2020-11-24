@@ -20,8 +20,9 @@ export class VirtualGridApi {
      *
      * @param {boolean} immediate - refreshes the grid immediate or after a timeout
      * @param {boolean} completeRefresh - boolean to start refreshing at the top
+     * @param {boolean} flashCells - boolean to dhow indicator which cells got changed
      */
-    public refreshGrid = (immediate: boolean = false, completeRefresh: boolean = false): void => {
+    public refreshGrid = (immediate: boolean = false, completeRefresh: boolean = false, flashCells: boolean = true): void => {
         if (this.Grid == void 0) {
             return;
         }
@@ -29,10 +30,10 @@ export class VirtualGridApi {
         clearTimeout(this.debounceTimeout);
 
         if (immediate) {
-            this._refresh(completeRefresh);
+            this._refresh(completeRefresh, flashCells);
         } else {
             this.debounceTimeout = setTimeout(() => {
-                this._refresh(completeRefresh)
+                this._refresh(completeRefresh, flashCells)
             }, 50);
         }
     };
@@ -40,7 +41,7 @@ export class VirtualGridApi {
     /**
      * refreshes the grid and redraws rows
      */
-    private _refresh(completeRefresh: boolean): void {
+    private _refresh(completeRefresh: boolean, flashCells?: boolean): void {
         if (this.Grid === void 0) {
             return;
         }
@@ -60,7 +61,7 @@ export class VirtualGridApi {
 
         this.Grid.RowController.toggleRenderedRowVisibility();
 
-        this.Grid.RowController.renderRows();
+        this.Grid.RowController.renderRows(flashCells);
         this.Grid.ColumnController.refreshColumns();
 
         if (this.scrollPosTopBackup > 0) {
@@ -78,7 +79,7 @@ export class VirtualGridApi {
      * @param {Array} rows
      * @param {boolean} resetRowConfig
      */
-    public updateGridRows = (rows: any[], resetRowConfig?: boolean): void => {
+    public setRows = (rows: any[], resetRowConfig?: boolean): void => {
         this.scrollPosTopBackup = this.Grid.domController.dom.bodyWrapper.scrollTop
 
         if (resetRowConfig) {
@@ -119,7 +120,7 @@ export class VirtualGridApi {
 
             for (let col of config.groups) {
                 let column = columns.find(x => x.field == col.field)
-                this.Grid.GroupController._addGroup(column, true)
+                this.Grid.GroupController.addGroup(column, true)
             }
 
             this.Grid.GroupController.applyGrouping()
@@ -131,7 +132,7 @@ export class VirtualGridApi {
                 this.Grid.SortController.sortColumn(column, config.sort.length > 1, col.dir)
             }
         } else {
-            this.refreshGrid(true, true)
+            this.refreshGrid(true, true,false)
         }
 
         if (config.scrollTop !== 0) {
@@ -210,14 +211,6 @@ export class VirtualGridApi {
     };
 
     /**
-     * return the row count
-     * @returns {number}
-     */
-    public getRowCount = (): number => {
-        return this.Grid == void 0 ? 0 : this.Grid.rows.length;
-    };
-
-    /**
      * scroll to a specific node by index
      * the node should be visible in the center of the grid if possible
      * @param {Number} index - The Index we have to scroll to
@@ -258,23 +251,6 @@ export class VirtualGridApi {
     };
 
     /**
-     * Remove a row by the given key value pair
-     * @param key - the key to look for
-     * @param value - the value to match
-     */
-    public removeRowByKey = (key: string, value: string): void => {
-
-        for (const row of this.Grid.rows) {
-
-            if (row[key] == value) {
-                this.removeRow(row);
-                this.deselectRow(row);
-                break;
-            }
-        }
-    };
-
-    /**
      * remove multiple rows
      * @param rows - an array of rows
      */
@@ -288,38 +264,14 @@ export class VirtualGridApi {
      */
     public removeRow = (row: IVirtualGridRow): void => {
         // instead of just removing the nodes, we detach them and won't reattach them :P
-        this.Grid.RowController.detachRowByIndex(row.index);
+        this.Grid.RowController.removeRow(row);
         this.Grid.RowController.setRowIndexes();
 
         if (row.parent != void 0) {
             row.parent.childCountTotal = this.Grid.RowController.getCompleteChildCount(row.parent);
         }
 
-        this.refreshGrid();
-    };
-
-    /**
-     * convenience api function
-     * implementation see RowController.moveRow
-     *
-     * @param {number} rowIndexToMove
-     * @param {number} rowIndexToAppend
-     * @param {boolean} appendAsChild
-     */
-    public moveRow = (rowIndexToMove: number, rowIndexToAppend: number, appendAsChild: boolean): void => {
-        this.Grid.RowController.moveRow(rowIndexToMove, rowIndexToAppend, appendAsChild);
-    };
-
-    /**
-     * convenience api function
-     * implementation see RowController.insertRows
-     *
-     * @param {number} rowIndexToInsert
-     * @param {Array} rowsToInsert
-     * @param {boolean} insertAsChildren
-     */
-    public insertRows = (rowIndexToInsert: number, rowsToInsert: any[], insertAsChildren: boolean): void => {
-        this.Grid.RowController.insertRows(rowIndexToInsert, rowsToInsert, insertAsChildren);
+        this.refreshGrid(false, false, false);
     };
 
     /**
@@ -327,21 +279,21 @@ export class VirtualGridApi {
      * @param row - the row to open or close
      * @param expand - whether the row shall be expand or collapsed
      */
-    public toggleRow = (row: IVirtualGridRow, expand: boolean): void => {
+    toggleRow = (row: IVirtualGridRow, expand: boolean): void => {
         this.Grid.RowController.toggleRow(row, expand);
     };
 
     /**
      * refreshes the column headers and executes the headerValueGetter
      */
-    public refreshHeader = (): void => {
+    refreshHeader = (): void => {
         this.Grid.ColumnController.refreshColumns();
     };
 
     /**
      * destroys the whole grid and releases event listeners and removes all dom nodes
      */
-    public destroy = (): void => {
+    destroy = (): void => {
         this.Grid.rows = [];
     };
 
@@ -352,7 +304,7 @@ export class VirtualGridApi {
      * @param {boolean} useCtrl - boolean if the ctrl key is used
      * @param {boolean} useShift - boolean if the shift key is used
      */
-    public select = (row: IVirtualGridRow, useCtrl: boolean = false, useShift: boolean = false): void => {
+    select = (row: IVirtualGridRow, useCtrl: boolean = false, useShift: boolean = false): void => {
         this.Grid.SelectionController.select(row, useCtrl, useShift)
     };
 
@@ -360,7 +312,7 @@ export class VirtualGridApi {
      * deselect a single row
      * @param row
      */
-    public deselectRow(row: IVirtualGridRow): void {
+    deselectRow(row: IVirtualGridRow): void {
         this.Grid.SelectionController.deselectRow(row)
     }
 
@@ -371,19 +323,23 @@ export class VirtualGridApi {
         this.Grid.SelectionController.deselectAll()
     };
 
+    selectAll = (): void => {
+        this.Grid.SelectionController.selectAll()
+    }
+
     /**
      * select a single row
      * @param row
      */
-    public selectRow(row: IVirtualGridRow): void {
+    selectRow(row: IVirtualGridRow): void {
         this.Grid.SelectionController.selectRow(row)
     }
 
-    public updateAggregates() {
+    updateAggregates() {
         this.Grid.ColumnController.aggregate()
     }
 
-    public updateRows() {
+    updateRows() {
         this.Grid.RowController.renderRows(true)
     }
 }

@@ -79,7 +79,6 @@ export class VirtualGrid implements IVirtualGrid {
         s = +new Date()
 
 
-
         this.originalColumns = this.ColumnController.createColumnModels();
 
         let center = this.originalColumns.filter(col => col.pinned === "center")
@@ -117,7 +116,9 @@ export class VirtualGrid implements IVirtualGrid {
                 this.eventController.bindGlobalOnResize()
                 this.GroupController.setColGroups()
 
-                if (this.ConfigController.showColumnAggregation) {
+                if (this.GroupController.groups.length > 0) {
+                    this.GroupController.applyGrouping()
+                } else if (this.ConfigController.showColumnAggregation) {
                     this.ColumnController.aggregate()
                 }
             });

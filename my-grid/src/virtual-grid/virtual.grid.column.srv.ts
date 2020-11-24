@@ -113,7 +113,7 @@ export class VirtualGridColumnController {
     }
 
     aggregate() {
-        // let s = +new Date()
+        let s = +new Date()
 
         for (let col of this.Grid.columns) {
             if (col.aggFunc) {
@@ -125,7 +125,7 @@ export class VirtualGridColumnController {
             }
         }
 
-        // console.log("aggregating values took -->", +new Date() - s)
+        console.log("aggregating values took -->", +new Date() - s)
     }
 
     formatAggValue(col: IVirtualGridColumn) {
@@ -152,12 +152,12 @@ export class VirtualGridColumnController {
             if (!row.isRowGroup) {
                 let value = row.getCellValue(col, {stringify: false, format: false});
                 value = typeof value === "number" || isCustomAgg ? value : +value
-                values.push(value)
+                values[values.length] = value
             } else {
                 let _aggValue = this.getAggValue(col, row[this.config.childNodesKey])
                 let pathObj = row.rowData
 
-                values.push(_aggValue)
+                values[values.length] = _aggValue
 
                 col.fieldPath.forEach((part, index) => {
                     pathObj[part] = index === col.fieldPath.length - 1 ? _aggValue : {}

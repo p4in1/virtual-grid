@@ -50,8 +50,9 @@ export class VirtualGridUIEventController {
      */
     private onDoubleClick = (event: any): void => {
         const row: IVirtualGridRow = this.getRowByEvent(event);
+        let checkbox = this.Grid.columns.find(x => x.isCheckboxColumn)
 
-        if (!this.Grid.ConfigController.isRangeSelect && row.isSelectable) {
+        if (!this.Grid.ConfigController.isRangeSelect && row.isSelectable && !checkbox) {
             this.Grid.SelectionController.select(row);
         }
 
@@ -59,14 +60,11 @@ export class VirtualGridUIEventController {
     };
 
     private _toggleHoverState(row: IVirtualGridRow, isHover: boolean) {
-
-        if (row.renderedRow == void 0) {
-            return
+        if (row && row.renderedRow) {
+            [row.renderedRow.left, row.renderedRow.center, row.renderedRow.right].forEach((rowPartial) => {
+                this.Grid.Utils.toggleClass("hover", rowPartial.element, isHover)
+            })
         }
-
-        [row.renderedRow.left, row.renderedRow.center, row.renderedRow.right].forEach((rowPartial) => {
-            this.Grid.Utils.toggleClass("hover", rowPartial.element, isHover)
-        })
     }
 
     /**
@@ -165,15 +163,12 @@ export class VirtualGridUIEventController {
     bindGlobalOnResize() {
         if (window["ResizeObserver"]) {
             this.globalResizeObserver = new window["ResizeObserver"]((a) => {
+                this.domController.bodyWrapperWidth = Math.floor(a[0].contentRect.width)
+                this.domController.bodyWrapperHeight = Math.floor(a[0].contentRect.height)
 
-                requestAnimationFrame(() => {
-                    this.domController.bodyWrapperWidth = Math.floor(a[0].contentRect.width)
-                    this.domController.bodyWrapperHeight = Math.floor(a[0].contentRect.height)
-
-                    this.updateCellWidth()
-                    this.updateGridWidth();
-                    this.domController.calculateScrollGuard()
-                })
+                this.updateCellWidth()
+                this.updateGridWidth();
+                this.domController.calculateScrollGuard()
             });
 
             this.globalResizeObserver.observe(this.config.element);
@@ -378,7 +373,11 @@ export class VirtualGridUIEventController {
 
             [renderedRow.left, renderedRow.center, renderedRow.right].forEach((partial) => {
 
-                partial.element.addEventListener("click", this.onClick);
+                partial.element.addEventListener("click", (event) => {
+                    if (!this.Grid.columns.find(x => x.isCheckboxColumn)) {
+                        this.onClick(event)
+                    }
+                });
                 partial.element.addEventListener("dblclick", this.onDoubleClick);
                 // partial.element.addEventListener("contextmenu", this.onRightClick);
                 partial.element.addEventListener("mouseenter", this.onMouseEnter);

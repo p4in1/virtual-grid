@@ -74,9 +74,9 @@ export class VirtualGridConfigController {
 
         this.element = config.element
 
-        this.isSingleSelect = !config.useMultiselect
-        this.isMultiSelect = !!config.useMultiselect
-        this.isRangeSelect = !!config.useRangeSelect
+        this.isSingleSelect = !config.isMultiselect
+        this.isMultiSelect = !!config.isMultiselect
+        this.isRangeSelect = !!config.isRangeSelect
 
         this.headerValueGetter = config.headerValueGetter
         this.childNodesKey = config.childNodesKey != void 0 && config.childNodesKey !== '' ? config.childNodesKey : 'children';
@@ -187,7 +187,7 @@ export class VirtualGridConfigController {
 
             if (colDef.type == "multiLine") {
                 colDef.isMultiLine = true
-                colDef.lineCount = this.getLineCount(colDef, config.rows)
+                colDef.lineCount = col.lineCount == void 0 ? this.getLineCount(colDef, config.rows) : col.lineCount
             }
 
             this.colDefs.push(colDef)

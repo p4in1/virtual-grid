@@ -40,7 +40,7 @@ export class VirtualGridSortController {
 
         if (this.sortedColumns.length == 0) {
             this.Grid.RowController.resetGridRowIndexes();
-            this.Grid.api.refreshGrid(false, true);
+            this.Grid.api.refreshGrid(false, true,false);
             return;
         }
 
@@ -101,7 +101,7 @@ export class VirtualGridSortController {
         })
 
         if (!suppressRefresh) {
-            this.Grid.api.refreshGrid(false, true);
+            this.Grid.api.refreshGrid(false, true, false);
         }
     }
 
@@ -176,7 +176,7 @@ export class VirtualGridSortController {
 
     sortComp(a: any, b: any, dir?: any, type?: string): number {
 
-        if (a === b) {
+        if (a == b) {
             return 0
         }
         if (a == void 0 || a === "") {

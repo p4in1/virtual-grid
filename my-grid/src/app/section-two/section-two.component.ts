@@ -109,7 +109,7 @@ export class SectionTwoComponent implements AfterViewInit {
             showHeader: true,
             showColumnFilter: true,
             deselectWhenCollapse: true,
-            useMultiselect: true
+            isMultiselect: true
         }
 
         this.gridInstance = new VirtualGrid(config)

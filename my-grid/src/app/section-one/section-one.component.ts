@@ -25,7 +25,7 @@ export class SectionOneComponent implements AfterViewInit {
             showHeader: true,
             showGroupPanel: true,
             showColumnFilter:true,
-            useRangeSelect: true
+            isRangeSelect: true
         }
 
         data.columns[0].pinned = "left"

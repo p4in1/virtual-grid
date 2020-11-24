@@ -175,13 +175,18 @@ export class VirtualGridRowController {
         }
     };
     /**
-     * detaches the row and all it's children with the given index and removes it from the grid
+     * removes the row and all it's children with the given index and removes it from the grid
      *
-     * @param {number} rowIndex - the row to detach
+     * @param {IVirtualGridRow} row - the row to remove
      * @returns {Array} - the row and it's children
      */
-    public detachRowByIndex = (rowIndex: number): any[] => {
+    public removeRow = (row: IVirtualGridRow): void => {
 
+        // let rows = this.Grid.rows.filter(x => x.index != row.index)
+        // let roots = rows.filter(x => x.level == 0)
+        // this.Grid.rows = this.Grid.Utils.flatten(roots)
+        // this.Grid.api.refreshGrid(false, false, false)
+        let rowIndex = row.index
         let rowsToRemove: number = rowIndex == this.Grid.rows.length - 1 ? 1 : this.Grid.rows.length - rowIndex;
         const rowToStart: any = this.Grid.rows[rowIndex];
         for (let i: number = Number(rowToStart.index) + 1; i < this.Grid.rows.length; i++) {
@@ -203,92 +208,9 @@ export class VirtualGridRowController {
             }
         }
 
-        return this.Grid.rows.splice(rowIndex, rowsToRemove);
+        this.Grid.rows.splice(rowIndex, rowsToRemove);
     };
-    /**
-     * Move a row with it's children (if available) to the given destination index
-     * @param rowIndexToMove - the row to move
-     * @param rowIndexToAppend - the index where to move the row (and it's children)
-     * @param appendAsChild - whether to append the moving row to the destination or insert it before
-     */
-    public moveRow = (rowIndexToMove: number, rowIndexToAppend: number, appendAsChild: boolean): void => {
-        const targetRow: IVirtualGridRow = this.Grid.api.getRowByIndex(rowIndexToAppend);
 
-        // if we attach the node as a child, we have to attach it as the last child of the target row
-        let targetRowIndex: number = appendAsChild ? targetRow.index + this.getCompleteChildCount(targetRow) + 1 : rowIndexToAppend;
-
-        const targetRowChildCountBefore: number = targetRow.childCountTotal;
-
-        const rowsToMove: any[] = this.detachRowByIndex(rowIndexToMove);
-        const rowToMove: any = rowsToMove[0];
-
-        this.setRowIndexes();
-
-        if (appendAsChild) {
-            // in case the row to attach was already at the right index, but on the wrong level, we just add another 1
-            // to add it as the child of the target row
-            targetRowIndex = rowToMove.index == targetRow.index + 1 ? rowToMove.index : targetRowIndex;
-        } else {
-            targetRowIndex = rowIndexToAppend;
-        }
-
-        const targetRowChildCountAfter: number = this.getCompleteChildCount(targetRow);
-        if (rowIndexToMove < rowIndexToAppend || targetRowChildCountAfter < targetRowChildCountBefore) {
-            // at this point we removed n rows from the array and the target row moved up by the number of rows removed
-            targetRowIndex -= rowsToMove.length;
-        }
-
-        const args: any = [targetRowIndex, 0].concat(rowsToMove);
-        Array.prototype.splice.apply(this.Grid.rows, args);
-
-        const sourceRow: IVirtualGridRow = rowToMove.parent;
-        rowToMove.parent = targetRow;
-        targetRow[this.config.childNodesKey].push(rowToMove);
-
-        this.Grid.SortController.applySorting();
-
-        const baseLevel: number =
-            appendAsChild ? targetRow.level + 1 : targetRow.parent != void 0 ? targetRow.parent.level : 0;
-        this.rebaseRowLevel(rowsToMove[0], baseLevel);
-
-        targetRow.childCountTotal = this.getCompleteChildCount(targetRow);
-        sourceRow.childCountTotal = this.getCompleteChildCount(sourceRow);
-
-        this.toggleRow(targetRow, true);
-
-        this.Grid.api.refreshGrid();
-    };
-    /**
-     * inserts rows at the given index
-     *
-     * @param {number} rowIndexToInsert
-     * @param {Array} rowsToInsert
-     * @param {boolean} insertAsChildren - whether to append the rows to the given rowindex as children or insert it before
-     */
-    public insertRows = (rowIndexToInsert: number, rowsToInsert: any[], insertAsChildren: boolean): void => {
-        let args: any;
-
-        const startRow: IVirtualGridRow = this.Grid.api.getRowByIndex(rowIndexToInsert);
-        let rows: IVirtualGridRow[] = this.createRowModels(rowsToInsert, startRow.level + 1, startRow);
-
-        rows = this.Grid.Utils.flatten(rows);
-
-        if (insertAsChildren) {
-            let argsStart: any = [startRow.index + 1, 0];
-            args = argsStart.concat(rows);
-            Array.prototype.splice.apply(this.Grid.rows, args);
-
-            startRow[this.config.childNodesKey] = startRow[this.config.childNodesKey].concat(rowsToInsert);
-        } else {
-            this.Grid.rows = this.Grid.rows.concat(rows);
-        }
-
-        this.setRowIndexes();
-        this.setTotalChildCounts(rows);
-
-        this.Grid.SortController.applySorting();
-        this.Grid.api.refreshGrid();
-    };
     /**
      * expand or collapse a row
      * @param row - the row to open or close
@@ -322,7 +244,7 @@ export class VirtualGridRowController {
             this.expandCollapse(row);
         }
 
-        this.Grid.api.refreshGrid();
+        this.Grid.api.refreshGrid(false, false, false);
     };
 
     executeAction = (event: any, action: any): void => {
@@ -616,13 +538,15 @@ export class VirtualGridRowController {
      * @param isSelected
      */
     public toggleSelectionClasses(row: IVirtualGridRow, isSelected?: boolean): void {
-        [row.renderedRow.left, row.renderedRow.center, row.renderedRow.right].forEach((rowPartial) => {
-            let isRowSelected = isSelected !== false && (row.isSelected || isSelected === true);
+        if (row && row.renderedRow) {
+            [row.renderedRow.left, row.renderedRow.center, row.renderedRow.right].forEach((rowPartial) => {
+                let isRowSelected = isSelected !== false && (row.isSelected || isSelected === true);
 
-            this.Grid.Utils.toggleClass('selected', rowPartial.element, isRowSelected)
-            this.Grid.Utils.toggleClass('selectable', rowPartial.element, row.isSelectable)
-            this.Grid.Utils.toggleClass('not-selectable', rowPartial.element, !row.isSelectable)
-        })
+                this.Grid.Utils.toggleClass('selected', rowPartial.element, isRowSelected)
+                this.Grid.Utils.toggleClass('selectable', rowPartial.element, row.isSelectable)
+                this.Grid.Utils.toggleClass('not-selectable', rowPartial.element, !row.isSelectable)
+            })
+        }
     }
 
     /**
@@ -672,10 +596,5 @@ export class VirtualGridRowController {
         } else if (this.Grid.SortController.sortedColumns.length !== 0) {
             this.Grid.SortController.applySorting()
         }
-    }
-
-    removeRow = (row: IVirtualGridRow) => {
-        this.Grid.rows = this.Grid.rows.filter(x => x.index != row.index)
-        this.Grid.api.refreshGrid()
     }
 }

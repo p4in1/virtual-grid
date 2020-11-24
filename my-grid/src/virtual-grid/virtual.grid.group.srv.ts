@@ -24,7 +24,7 @@ export class VirtualGridGroupController {
 
     applyGrouping(suppressRefresh = false, suppressSorting = false) {
 
-        // let s = +new Date()
+        let s = +new Date()
         let rows
         let groupColumn = this.Grid.columns.find(x => x.isRowGroupColumn)
         let groupTree = {}
@@ -51,14 +51,14 @@ export class VirtualGridGroupController {
         } else {
             this._removeRowGroups()
             this.Grid.RowController.resetGridRowIndexes()
-            this.Grid.api.refreshGrid(true, true);
+            this.Grid.api.refreshGrid(true, true,false);
             return
         }
 
         this.Grid.SelectionController.clearRangeSelection()
         this._generateTreeStructure(rows)
 
-        // console.log("setting grouping / sorting status took -->", +new Date() - s)
+        console.log("setting grouping / sorting status took -->", +new Date() - s)
 
         this.Grid.rows = this.Grid.Utils.flatten(rows)
 
@@ -66,12 +66,14 @@ export class VirtualGridGroupController {
             row.index = index
         })
 
+        this.groups.length > 0 && this.Grid.ColumnController.aggregate()
+
         if (this.Grid.SortController.sortedColumns.length && !suppressSorting) {
             this.Grid.SortController.applySorting(true)
         }
 
         if (!suppressRefresh) {
-            this.Grid.api.refreshGrid(true, true);
+            this.Grid.api.refreshGrid(true, true,false);
         }
     }
 
@@ -87,12 +89,12 @@ export class VirtualGridGroupController {
     setColGroups() {
         for (let col of this.Grid.columns) {
             if (col.isRowGrouped) {
-                col.api.setRowGroup()
+                this.Grid.GroupController.addGroup(col, true)
             }
         }
     }
 
-    _addGroup(col, isActive = false) {
+    addGroup(col, isActive = false) {
         let classes = isActive ? ["group"] : ["group", "inactive"]
         let element = this.Grid.Utils.el("div", classes, {"col-id": col.id})
 
@@ -131,7 +133,7 @@ export class VirtualGridGroupController {
 
     onGroupPanelMouseEnter = (): void => {
         if (this.Grid.DnDController.isColDragActive && !this.Grid.DnDController.colDragData.col.isRowGrouped) {
-            this._addGroup(this.Grid.DnDController.colDragData.col)
+            this.addGroup(this.Grid.DnDController.colDragData.col)
         }
     }
 
@@ -225,7 +227,11 @@ export class VirtualGridGroupController {
 
         for (let i = 0; i < this.groups.length; i++) {
             let currentGroup = this.groups[i]
-            let value = row.getCellValue(currentGroup.col).trim()
+            let value = row.getCellValue(currentGroup.col)
+
+            if (value.trim) {
+                value = value.trim()
+            }
 
             if (value === "") {
                 value = "[Empty]"

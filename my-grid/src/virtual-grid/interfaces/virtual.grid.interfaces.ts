@@ -13,7 +13,7 @@ import {VirtualGridSelectionController} from "../virtual.grid.selection.srv";
 import {VirtualGridSortController} from "../virtual.grid.sort.srv";
 import {VirtualGridGroupController} from "../virtual.grid.group.srv";
 
-export interface IVirtualGridConfig {
+export declare interface IVirtualGridConfig {
 
     /**
      * the dom element to attach the grid to
@@ -66,12 +66,12 @@ export interface IVirtualGridConfig {
      * @property {string} multi "multi"
      * @default {string} single "single"
      */
-    useMultiselect?: boolean
+    isMultiselect?: boolean
 
     /**
      * enables range selection
      */
-    useRangeSelect?: boolean
+    isRangeSelect?: boolean
 
     /**
      * deselects nodes when the parent has been collapsed
@@ -224,7 +224,7 @@ export interface IVirtualGridConfig {
     onGridReady?(Grid: IVirtualGrid): void
 }
 
-export interface IVirtualGridColumnConfig {
+export declare interface IVirtualGridColumnConfig {
 
     field?: string
     title?: string
@@ -259,7 +259,7 @@ export interface IVirtualGridColumnConfig {
     cellValueFormatter?(cell: IValueFormatterParams, value: any): any
 }
 
-export interface IVirtualGrid {
+export declare interface IVirtualGrid {
     api: VirtualGridApi
     Utils: VirtualGridUtils
 
@@ -282,7 +282,7 @@ export interface IVirtualGrid {
     columns: IVirtualGridColumn[]
 }
 
-export interface VirtualGridCurrentFilter {
+export declare interface VirtualGridCurrentFilter {
     text: string
     columns: {
         [key: string]: {
@@ -292,7 +292,7 @@ export interface VirtualGridCurrentFilter {
     }
 }
 
-export interface IVirtualGridRow {
+export declare interface IVirtualGridRow {
     value?: any
     /**
      * The level describes the current depth of the row
@@ -367,7 +367,7 @@ export interface IVirtualGridRow {
     getCellValue(col: IVirtualGridColumn, options?: IVirtualGetCellValueOptions): any
 }
 
-export interface IVirtualGridColumnApi {
+export declare interface IVirtualGridColumnApi {
     /**
      * pins the column to the given area
      * areas are left, right and center whereas center is the same as the unpin function
@@ -419,7 +419,7 @@ export interface IVirtualGridColumnApi {
     hide(): void
 }
 
-export interface IVirtualGridColumn {
+export declare interface IVirtualGridColumn {
     index: number
     currentIndex: number
 
@@ -510,7 +510,7 @@ export interface IVirtualGridColumn {
     rowGroup: IVirtualColumnRowGroup
 }
 
-export interface IRenderedCell {
+export declare interface IRenderedCell {
     textNodes: HTMLElement[]
     treeNode: HTMLElement
     treeChildCountNode: HTMLElement
@@ -541,12 +541,12 @@ export interface IRenderedCell {
     displayValue: any
 }
 
-export interface IRenderedRowPartial {
+export declare interface IRenderedRowPartial {
     cells: IRenderedCell[],
     element: HTMLElement
 }
 
-export interface IRenderedRow {
+export declare interface IRenderedRow {
     index: number;
     isVisible: boolean;
     top: number;
@@ -556,7 +556,7 @@ export interface IRenderedRow {
     right: IRenderedRowPartial
 }
 
-export interface IVirtualGridDom {
+export declare interface IVirtualGridDom {
     virtualGrid: HTMLElement
 
     headerWrapper: HTMLElement
@@ -595,7 +595,7 @@ export interface IVirtualGridDom {
     contextmenuBackdrop: HTMLElement
 }
 
-export interface IVirtualCellDom {
+export declare interface IVirtualCellDom {
     cell: HTMLElement
     cellText: HTMLElement
     cellResizer: HTMLElement
@@ -615,18 +615,18 @@ export interface IVirtualCellDom {
     cellAggregationValue: HTMLSpanElement
 }
 
-export interface IVirtualColumnFilter {
+export declare interface IVirtualColumnFilter {
     value: string | boolean | number
     content: string[]
 }
 
-export interface IVirtualColumnAction {
+export declare interface IVirtualColumnAction {
     color: string
     icon: string
     callback: Function
 }
 
-export interface IVirtualColumnRowGroup {
+export declare interface IVirtualColumnRowGroup {
     label: string
     element: HTMLElement
     removeButton: HTMLElement
@@ -634,7 +634,7 @@ export interface IVirtualColumnRowGroup {
     isActive: boolean
 }
 
-export interface IVirtualAvatar {
+export declare interface IVirtualAvatar {
     /**
      * the image url
      */
@@ -656,7 +656,7 @@ export interface IVirtualAvatar {
     hideEmptyPlaceholder?: boolean
 }
 
-export interface IVirtualColDefConfig {
+export declare interface IVirtualColDefConfig {
     isMultiLine: boolean
     lineCount: number
     field: string
@@ -706,7 +706,7 @@ export interface IVirtualColDefConfig {
     cellValueFormatter(): void
 }
 
-export interface IVirtualGridContextmenuEntry {
+export declare interface IVirtualGridContextmenuEntry {
     label?: string
     index?: number
     icon?: string
@@ -719,7 +719,7 @@ export interface IVirtualGridContextmenuEntry {
     action?(row, col): void
 }
 
-export interface IVirtualDragData {
+export declare interface IVirtualDragData {
     x: number,
     y: number,
     col: IVirtualGridColumn,
@@ -729,12 +729,12 @@ export interface IVirtualDragData {
     pinned: string
 }
 
-export interface IVirtualGetCellValueOptions {
+export declare interface IVirtualGetCellValueOptions {
     stringify?: boolean
     format?: boolean
 }
 
-export interface IValueFormatterParams {
+export declare interface IValueFormatterParams {
     rowModel: IVirtualGridRow
     colModel: IVirtualGridColumn
 

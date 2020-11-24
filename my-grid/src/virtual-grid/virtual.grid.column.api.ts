@@ -73,7 +73,7 @@ export class VirtualGridColumnApi implements IVirtualGridColumnApi {
     setRowGroup = () => {
         let rowGroup = this.Grid.GroupController.groups.find(x => x.col.id == this.col.id)
         if (!this.col.isRowGrouped || !rowGroup) {
-            this.Grid.GroupController._addGroup(this.col, true)
+            this.Grid.GroupController.addGroup(this.col, true)
             this.Grid.GroupController.applyGrouping()
         }
     }
