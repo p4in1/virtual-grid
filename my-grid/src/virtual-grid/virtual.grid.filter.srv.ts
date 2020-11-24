@@ -71,7 +71,7 @@ export class VirtualGridFilterController {
         }
 
         this.applyFilter(expandParents)
-        this.Grid.api.refreshGrid(false, true,false);
+        this.Grid.api.refreshGrid(false, true, false);
     };
 
     applyFilter(expandParents: boolean = true) {
@@ -96,8 +96,12 @@ export class VirtualGridFilterController {
             }
 
             this._expandParentsAfterFilter(filteredArray, expandParents)
+
+            console.log("applying filter took --> ", +new Date() - start);
+
+            this.Grid.ColumnController.aggregate()
         }
-        console.log("applying filter took --> ", +new Date() - start);
+
     }
 
 

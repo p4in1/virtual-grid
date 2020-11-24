@@ -97,7 +97,7 @@ export class SectionTwoComponent implements AfterViewInit {
                 {
                     field: "email",
                     title: "Email",
-                    showFilter: false
+                    showFilter: true
                 },
                 {
                     field: "phoneNumber",

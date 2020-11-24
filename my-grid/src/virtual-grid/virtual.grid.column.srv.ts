@@ -118,7 +118,7 @@ export class VirtualGridColumnController {
         for (let col of this.Grid.columns) {
             if (col.aggFunc) {
                 let groupCount = this.Grid.GroupController.groups.length
-                let rows = groupCount === 0 ? this.Grid.rows : this.Grid.rows.filter(x => x.level === 0)
+                let rows = groupCount === 0 ? this.Grid.rows : this.Grid.rows.filter(x => x.level === 0 && x.isVisibleAfterFilter)
 
                 col.aggValue = this.getAggValue(col, rows)
                 col.dom.cellAggregationValue.textContent = this.formatAggValue(col)
@@ -149,6 +149,11 @@ export class VirtualGridColumnController {
         let isCustomAgg = typeof col.aggFunc === "function"
 
         for (let row of rows) {
+
+            if (!row.isVisibleAfterFilter) {
+                continue
+            }
+
             if (!row.isRowGroup) {
                 let value = row.getCellValue(col, {stringify: false, format: false});
                 value = typeof value === "number" || isCustomAgg ? value : +value
@@ -179,7 +184,7 @@ export class VirtualGridColumnController {
         return aggValue
     }
 
-     getAggFunction(col) {
+    getAggFunction(col) {
         if (typeof col.aggFunc === "function") {
             return col.aggFunc
         }

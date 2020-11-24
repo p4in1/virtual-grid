@@ -177,7 +177,7 @@ export class VirtualGridGroupController {
             rows[i].level = level
 
             if (children && children.length > 0) {
-                this._generateTreeStructure(children, level + 1, row)
+                this._generateTreeStructure(children, level + 1, rows[i])
             }
         }
     }
