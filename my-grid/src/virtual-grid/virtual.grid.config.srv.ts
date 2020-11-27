@@ -74,8 +74,8 @@ export class VirtualGridConfigController {
 
         this.element = config.element
 
-        this.isSingleSelect = !config.isMultiselect
-        this.isMultiSelect = !!config.isMultiselect
+        this.isSingleSelect = !config.isMultiSelect
+        this.isMultiSelect = !!config.isMultiSelect
         this.isRangeSelect = !!config.isRangeSelect
 
         this.headerValueGetter = config.headerValueGetter

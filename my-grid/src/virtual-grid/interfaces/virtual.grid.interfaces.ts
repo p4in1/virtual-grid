@@ -66,7 +66,7 @@ export declare interface IVirtualGridConfig {
      * @property {string} multi "multi"
      * @default {string} single "single"
      */
-    isMultiselect?: boolean
+    isMultiSelect?: boolean
 
     /**
      * enables range selection

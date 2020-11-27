@@ -257,7 +257,7 @@ export class SectionThreeComponent implements AfterViewInit {
             showGroupPanel: true,
             showColumnFilter: true,
             showColumnAggregation: true,
-            isMultiselect: true,
+            isMultiSelect: true,
             isRangeSelect: true,
             suppressContextmenu: false,
             suppressContextmenuDefault: false,
