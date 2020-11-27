@@ -21,7 +21,7 @@ export class VirtualGridRowController {
         this.Grid.domController.resetRenderedRows();
         this.Grid.RowController.buildRows();
 
-        this.Grid.api.refreshGrid();
+        this.Grid.api.refreshGrid(false, false, false);
     }
 
     /**

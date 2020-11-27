@@ -107,15 +107,7 @@ export class VirtualGridConfigController {
             this.headerRowHeight += 40
         }
 
-        this.getColDefs(config)
-    }
-
-    private _noop = () => {
-    }
-
-    getColDefs(config) {
-
-        config.columns.unshift({
+        let group = [{
             suppressDragging: true,
             suppressMoving: true,
             isSystemColumn: true,
@@ -123,9 +115,18 @@ export class VirtualGridConfigController {
             isVisible: false,
             field: "value",
             title: "Groups"
-        })
+        }]
 
-        for (let col of config.columns) {
+        this.getColDefs(group)
+        this.getColDefs(config.columns, config.rows)
+    }
+
+    private _noop = () => {
+    }
+
+    getColDefs(columns, rows = []) {
+
+        for (let col of columns) {
 
             let colDef: IVirtualColDefConfig = <IVirtualColDefConfig>{
                 isMultiLine: false,
@@ -187,7 +188,7 @@ export class VirtualGridConfigController {
 
             if (colDef.type == "multiLine") {
                 colDef.isMultiLine = true
-                colDef.lineCount = col.lineCount == void 0 ? this.getLineCount(colDef, config.rows) : col.lineCount
+                colDef.lineCount = col.lineCount == void 0 ? this.getLineCount(colDef, rows) : col.lineCount
             }
 
             this.colDefs.push(colDef)
