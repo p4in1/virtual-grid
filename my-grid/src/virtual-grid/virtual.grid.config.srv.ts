@@ -169,7 +169,13 @@ export class VirtualGridConfigController {
 
                 aggFunc: col.aggFunc,
                 aggFuncTitle: col.aggFuncTitle,
-                aggregateRowGroups: col.aggregateRowGroups
+                aggregateRowGroups: col.aggregateRowGroups,
+
+                onCellClick: typeof col.onCellClick == "function" ? col.onCellClick : this._noop,
+                onCellRightClick: typeof col.onCellRightClick == "function" ? col.onCellRightClick : this._noop,
+                onCellMouseEnter: typeof col.onCellMouseEnter == "function" ? col.onCellMouseEnter : this._noop,
+                onCellMouseLeave: typeof col.onCellMouseLeave == "function" ? col.onCellMouseLeave : this._noop
+
             }
 
             colDef.isPinned = colDef.pinned == "left" || colDef.pinned == "right";

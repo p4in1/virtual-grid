@@ -75,6 +75,7 @@ export class VirtualGridUIEventController {
         const row: IVirtualGridRow = this.getRowByEvent(event);
         this._toggleHoverState(row, true)
         this.config.onRowMouseEnter({row, event, api: this.Grid.api});
+
     };
 
     /**
@@ -102,6 +103,12 @@ export class VirtualGridUIEventController {
             this.Grid.ContextmenuController.showMenu(cell.rowModel, cell.colModel, event)
         }
         // this.onRightClick(event)
+
+        cell.colModel.onCellRightClick({row: cell.rowModel, column: cell.colModel, event, api: this.Grid.api})
+    }
+
+    private onCellClick = (event: any, cell: IRenderedCell): void => {
+        cell.colModel.onCellClick({row: cell.rowModel, column: cell.colModel, event, api: this.Grid.api})
     }
 
     /**
@@ -406,6 +413,9 @@ export class VirtualGridUIEventController {
             })
             cell.cellNode.addEventListener("contextmenu", (event) => {
                 this.onCellRightClick(event, cell)
+            })
+            cell.cellNode.addEventListener("click", (event) => {
+                this.onCellClick(event, cell)
             })
         }
     }

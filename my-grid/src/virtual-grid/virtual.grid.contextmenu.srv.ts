@@ -161,7 +161,7 @@ export class VirtualGridContextmenuController {
         firstRow.forEach((cell: IRenderedCell) => {
 
             let colModel = cell.colModel
-            if (!colModel.isVisible || colModel.colType == "avatar" || colModel.colType == "action" || colModel.colType == "checkbox") {
+            if (!colModel.isVisible || colModel.isCheckboxColumn || colModel.colType == "avatar" || colModel.colType == "action") {
                 return;
             }
 
@@ -179,7 +179,7 @@ export class VirtualGridContextmenuController {
 
             row.forEach((cell: IRenderedCell) => {
                 let colModel = cell.colModel
-                if (!colModel.isVisible || colModel.colType == "avatar" || colModel.colType == "action" || colModel.colType == "checkbox") {
+                if (!colModel.isVisible || colModel.isCheckboxColumn || colModel.colType == "avatar" || colModel.colType == "action") {
                     return;
                 }
 

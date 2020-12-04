@@ -507,6 +507,11 @@ export declare interface IVirtualGridColumn {
     aggregateRowGroups: boolean
     aggValue: number
 
+    onCellClick: Function
+    onCellRightClick: Function
+    onCellMouseEnter: Function
+    onCellMouseLeave: Function
+
     rowGroup: IVirtualColumnRowGroup
 }
 
@@ -704,6 +709,14 @@ export declare interface IVirtualColDefConfig {
     cellValueGetter(): void
 
     cellValueFormatter(): void
+
+    onCellClick(cell): void
+
+    onCellRightClick(cell): void
+
+    onCellMouseEnter(cell): void
+
+    onCellMouseLeave(cell): void
 }
 
 export declare interface IVirtualGridContextmenuEntry {

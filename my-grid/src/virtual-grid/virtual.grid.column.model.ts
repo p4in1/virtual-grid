@@ -71,7 +71,7 @@ export class VirtualGridColumn implements IVirtualGridColumn {
     aggFuncTitle: string
     aggregateRowGroups: boolean
     aggValue: any
-    
+
     colType: string
     colDef: any;
 
@@ -99,6 +99,11 @@ export class VirtualGridColumn implements IVirtualGridColumn {
     actions: IVirtualColumnAction[] = []
     avatarConfig: IVirtualAvatar;
 
+    onCellClick:Function
+    onCellRightClick:Function
+    onCellMouseEnter:Function
+    onCellMouseLeave:Function
+
     constructor(private Grid: IVirtualGrid, colDef: any, index: number) {
         let configColDef = this.Grid.ConfigController.colDefs[index]
 
@@ -122,6 +127,12 @@ export class VirtualGridColumn implements IVirtualGridColumn {
         this.cellStyleGetter = typeof (configColDef.cellStyleGetter) == "function" ? configColDef.cellStyleGetter : null;
         this.cellValueGetter = typeof (configColDef.cellValueGetter) == "function" ? configColDef.cellValueGetter : null;
         this.cellValueFormatter = typeof (configColDef.cellValueFormatter) == "function" ? configColDef.cellValueFormatter : null;
+
+
+        this.onCellClick = typeof (configColDef.onCellClick) == "function" ? configColDef.onCellClick : null;
+        this.onCellRightClick = typeof (configColDef.onCellRightClick) == "function" ? configColDef.onCellRightClick : null;
+        this.onCellMouseEnter = typeof (configColDef.onCellMouseEnter) == "function" ? configColDef.onCellMouseEnter : null;
+        this.onCellMouseLeave = typeof (configColDef.onCellMouseLeave) == "function" ? configColDef.onCellMouseLeave : null;
 
         this.aggFunc = configColDef.aggFunc
         this.aggFuncTitle = configColDef.aggFuncTitle
