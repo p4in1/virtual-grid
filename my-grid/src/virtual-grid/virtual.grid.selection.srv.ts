@@ -1,7 +1,7 @@
 import {
     IRenderedCell,
-    IVirtualGrid,
-    IVirtualGridRow,
+    IVirtualGrid, IVirtualGridColumn,
+    IVirtualGridRow, IVirtualRowCell,
 } from "./interfaces/virtual.grid.interfaces";
 import {VirtualGridConfigController} from "./virtual.grid.config.srv";
 
@@ -79,6 +79,7 @@ export class VirtualGridSelectionController {
             this.selectRow(row);
         }
 
+        this.clearRangeSelection()
         this.Grid.RowController.renderRows();
     };
 
@@ -120,6 +121,7 @@ export class VirtualGridSelectionController {
             row.isSelected = false;
         }
 
+        this.clearRangeSelection()
         this.selectedRows = [];
     };
 
@@ -145,7 +147,7 @@ export class VirtualGridSelectionController {
             return
         }
 
-        if (event.buttons != 1 && this.isCellInRangeSelection(cell)) {
+        if (event.buttons != 1) {
             return
         }
 
@@ -188,14 +190,21 @@ export class VirtualGridSelectionController {
         this.rangeSelection = []
     }
 
-    private _clearRange(range) {
+    private _clearRange(range: IVirtualRangeSelection) {
         for (let selectedRow of range.rows) {
             for (let cell of selectedRow) {
-                cell.cellNode.classList.remove("selected", "range-border-top", "range-border-bottom", "range-border-right", "range-border-left")
+                let row: IVirtualGridRow = cell.row
+                let col: IVirtualGridColumn = cell.col
+                let virtualCell: IVirtualRowCell = row.cells.find(x => x.colModel.id == col.id)
 
-                for (let i = 1; i <= 10; i++) {
-                    cell.cellNode.classList.remove(`stack-${i}`);
-                }
+                row.isRangeSelected = false
+
+                virtualCell.stackCount = 0
+                virtualCell.isSelected = false
+                virtualCell.isBorderRight = false
+                virtualCell.isBorderLeft = false
+                virtualCell.isBorderBottom = false
+                virtualCell.isBorderTop = false
             }
         }
     }
@@ -210,22 +219,24 @@ export class VirtualGridSelectionController {
         currentRange.rows = []
 
         for (let i = indexes.minRow; i <= indexes.maxRow; i++) {
-            let _row: IRenderedCell[] = []
+            let rangeRow: any[] = []
 
             for (let j = indexes.minCol; j <= indexes.maxCol; j++) {
-                _row.push(this.Grid.rows[i].renderedRow.cells[j])
+                let row: IVirtualGridRow = this.Grid.rows[i]
+                let cell = row.renderedRow.cells[j]
+                rangeRow.push({col: cell.colModel, row: cell.rowModel})
             }
 
-            currentRange.rows.push(_row)
+            currentRange.rows.push(rangeRow)
         }
 
         currentRange.end.row = cell.rowModel
         currentRange.end.col = cell.colModel
 
-        this._drawRanges()
+        this._setRanges()
     }
 
-    _drawRanges() {
+    _setRanges() {
 
         let cellSelectCount = {}
 
@@ -233,33 +244,26 @@ export class VirtualGridSelectionController {
             let indexes = this._getMinMax(range)
 
             for (let i = indexes.minRow; i <= indexes.maxRow; i++) {
+                let row = this.Grid.rows[i]
+
+                row.isRangeSelected = true
 
                 for (let j = indexes.minCol; j <= indexes.maxCol; j++) {
-                    let cell = this.Grid.rows[i].renderedRow.cells[j]
 
-                    if (cellSelectCount[cell.cellId] == void 0) {
-                        cellSelectCount[cell.cellId] = {count: 0, cell}
+                    let renderedCell = row.renderedRow.cells[j]
+                    let virtualCell = row.cells.find(x => x.colModel.id == renderedCell.colModel.id)
+
+                    if (cellSelectCount[renderedCell.cellId] == void 0) {
+                        cellSelectCount[renderedCell.cellId] = {count: 0, renderedCell}
                     }
 
-                    cellSelectCount[cell.cellId].count++
+                    cellSelectCount[renderedCell.cellId].count++
 
-                    cell.cellNode.classList.add("selected")
-
-                    if (i === indexes.minRow) {
-                        cell.cellNode.classList.add("range-border-top")
-                    }
-
-                    if (i === indexes.maxRow) {
-                        cell.cellNode.classList.add("range-border-bottom")
-                    }
-
-                    if (j === indexes.minCol) {
-                        cell.cellNode.classList.add("range-border-left")
-                    }
-
-                    if (j === indexes.maxCol) {
-                        cell.cellNode.classList.add("range-border-right")
-                    }
+                    virtualCell.isSelected = true
+                    virtualCell.isBorderTop = i === indexes.minRow
+                    virtualCell.isBorderBottom = i === indexes.maxRow
+                    virtualCell.isBorderLeft = j === indexes.minCol
+                    virtualCell.isBorderRight = j === indexes.maxCol
                 }
             }
         }
@@ -270,13 +274,19 @@ export class VirtualGridSelectionController {
                 countObj.count = 10
             }
 
-            countObj.cell.cellNode.classList.add(`stack-${countObj.count}`)
+            let row = countObj.renderedCell.rowModel
+            let virtualCell: IVirtualRowCell = row.cells.find(x => x.colModel.id == countObj.renderedCell.colModel.id)
+
+            virtualCell.stackCount = countObj.count
         }
+
+
+        this.Grid.RowController.renderRows()
     }
 
     _getMinMax(range, cell?) {
         let rangeStart = range.start
-        let rangeEnd = range.end
+        let rangeEnd = range.end.row == void 0 ? range.start : range.end
         let colFirst = rangeStart.col.currentIndex
         let colLast = cell ? cell.colModel.currentIndex : rangeEnd.col.currentIndex
         let rowLast = cell ? cell.rowModel.index : rangeEnd.row.index

@@ -1,5 +1,4 @@
 import {
-    IRenderedCell,
     IVirtualGrid,
     IVirtualGridColumn,
     IVirtualGridContextmenuEntry,
@@ -67,38 +66,40 @@ export class VirtualGridContextmenuController {
     }
 
     exportAsCsv = () => {
-        // let selection = this.Grid.SelectionController.getSelection()
-        //
-        // let exportData = []
-        //
-        // if (this.config.isRangeSelect) {
-        //     exportData = selection.range
-        // } else {
-        //     for (let row of selection) {
-        //         exportData.push(row.renderedRow.cells)
-        //     }
-        // }
-        //
-        // let rows = []
-        // for (let row of this._getPreformattedRows(exportData)) {
-        //     let _row = []
-        //     row.forEach((cell) => {
-        //         _row.push(cell.value)
-        //     })
-        //
-        //     rows.push(_row)
-        // }
-        //
-        // let csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
-        // let encodedUri = encodeURI(csvContent);
-        // let link = document.createElement("a");
-        // link.setAttribute("href", encodedUri);
-        // link.setAttribute("download", "export.csv");
-        // document.body.appendChild(link); // Required for FF
-        //
-        // link.click();
-        //
-        // document.body.removeChild(link)
+        let selectedRows = this.Grid.SelectionController.getSelectedRows()
+
+        let exportData = []
+
+        for (let row of selectedRows) {
+            let rowData = []
+
+            for (let col of this.Grid.columns) {
+                rowData.push({row, col})
+            }
+
+            exportData.push(rowData)
+        }
+
+        let rows = []
+        for (let row of this._getPreformattedRows(exportData)) {
+            let _row = []
+            row.forEach((cell) => {
+                _row.push(cell.value)
+            })
+
+            rows.push(_row)
+        }
+
+        let csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
+        let encodedUri = encodeURI(csvContent);
+        let link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "export.csv");
+        document.body.appendChild(link); // Required for FF
+
+        link.click();
+
+        document.body.removeChild(link)
     }
 
     copySelectionToClipboard = () => {
@@ -106,9 +107,17 @@ export class VirtualGridContextmenuController {
         let selectedRows = this.Grid.SelectionController.getSelectedRows()
 
         let exportData = []
+
         for (let row of selectedRows) {
-            exportData.push(row.renderedRow.cells)
+            let rowData = []
+
+            for (let col of this.Grid.columns) {
+                rowData.push({row, col})
+            }
+
+            exportData.push(rowData)
         }
+
         let lines = ""
 
         if (exportData.length) {
@@ -158,9 +167,9 @@ export class VirtualGridContextmenuController {
         let firstRow = exportData[0]
         let preFormattedColHeader = []
 
-        firstRow.forEach((cell: IRenderedCell) => {
+        firstRow.forEach((obj: any) => {
 
-            let colModel = cell.colModel
+            let colModel = obj.col
             if (!colModel.isVisible || colModel.isCheckboxColumn || colModel.colType == "avatar" || colModel.colType == "action") {
                 return;
             }
@@ -177,13 +186,13 @@ export class VirtualGridContextmenuController {
         for (let row of exportData) {
             let preFormattedRow = []
 
-            row.forEach((cell: IRenderedCell) => {
-                let colModel = cell.colModel
+            row.forEach((obj: any) => {
+                let colModel = obj.col
                 if (!colModel.isVisible || colModel.isCheckboxColumn || colModel.colType == "avatar" || colModel.colType == "action") {
                     return;
                 }
 
-                let value = cell.rowModel.getCellValue(colModel)
+                let value = obj.row.getCellValue(colModel)
                 let colId = colModel.id
 
                 colLength[colId] = colLength[colId] <= value.length ? value.length + 2 : colLength[colId]
@@ -195,8 +204,8 @@ export class VirtualGridContextmenuController {
 
         for (let row of preFormatting) {
 
-            row.forEach((cell: any) => {
-                cell.idealLength = colLength[cell.colId]
+            row.forEach((obj: any) => {
+                obj.idealLength = colLength[obj.colId]
             })
         }
 

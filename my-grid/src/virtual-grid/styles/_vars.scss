@@ -107,6 +107,7 @@ $eob-pane-padding: 16px; // the main inner padding of ui components
     font-family: 'Virtual Material Icons';
     font-style: normal;
     font-weight: 400;
+    font-display: block;
     src: url(assets/icons.woff2) format('woff2')
 }
 
@@ -137,8 +138,9 @@ $eob-pane-padding: 16px; // the main inner padding of ui components
     &.small {
         font-size: $font-big;
     }
+
     &.extra-small {
         font-size: 10px;
-        color: rgba(0,0,0,0.6);
+        color: rgba(0, 0, 0, 0.6);
     }
 }

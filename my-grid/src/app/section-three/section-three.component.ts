@@ -133,7 +133,7 @@ export class SectionThreeComponent implements AfterViewInit {
                     field: "data.user.userFirstName",
                     title: "Vorname",
                     type: "text",
-                    isRowGrouped: true
+                    // isRowGrouped: true
                 },
                 {
                     field: "lastName",
@@ -151,7 +151,7 @@ export class SectionThreeComponent implements AfterViewInit {
                     type: "boolean",
                     field: "boolean",
                     title: "Auszahlung gefordert",
-                    isRowGrouped: true
+                    // isRowGrouped: true
                 },
                 {
                     type: "date",

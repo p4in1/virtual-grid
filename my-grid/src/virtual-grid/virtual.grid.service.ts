@@ -60,7 +60,7 @@ export class VirtualGrid implements IVirtualGrid {
         s = +new Date()
 
         this.api = new VirtualGridApi(this, this.ConfigController);
-        this.Utils = new VirtualGridUtils();
+        this.Utils = new VirtualGridUtils(this);
 
         log.push(`api + utils took --> ${+new Date() - s}`)
         s = +new Date()

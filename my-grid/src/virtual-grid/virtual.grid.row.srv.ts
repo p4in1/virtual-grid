@@ -97,11 +97,11 @@ export class VirtualGridRowController {
             });
         }
     };
+
     /**
      * Fill the grid with with rows for every visible entry.
      */
     public renderRows = (flashCells?: boolean): void => {
-
         for (const row of this.domController.renderedRows) {
             if (row.index > this.Grid.rows.length - 1 || row.index < 0) {
                 break;
@@ -302,24 +302,29 @@ export class VirtualGridRowController {
     /**
      * render a single row and update classes
      *
-     * @param row
+     * @param renderedRow
      * @param flashCells
      */
-    public renderRow(row: IRenderedRow, flashCells?: boolean): void {
+    public renderRow(renderedRow: IRenderedRow, flashCells?: boolean): void {
 
-        [row.right, row.center, row.left].forEach((rowPartial) => {
+        [renderedRow.right, renderedRow.center, renderedRow.left].forEach((rowPartial) => {
 
-            rowPartial.element.setAttribute("number", row.index.toString());
-            rowPartial.element.style["transform"] = `translateY(${row.top}px)`;
+            rowPartial.element.setAttribute("number", renderedRow.index.toString());
+            rowPartial.element.style["transform"] = `translateY(${renderedRow.top}px)`;
         });
 
+        let rowModel = this.Grid.rows[renderedRow.index]
 
-        this.Grid.rows[row.index].renderedRow = row
+        rowModel.renderedRow = renderedRow
 
-        this.toggleSelectionClasses(this.Grid.rows[row.index]);
+        for (let cell of rowModel.cells) {
+            cell.renderedCell = renderedRow.cells.find(x => x.colModel.id == cell.colModel.id)
+        }
 
-        for (const j in row.cells) {
-            this.renderCell(this.Grid.rows[row.index], this.Grid.columns[j], flashCells)
+        this.toggleSelectionClasses(this.Grid.rows[renderedRow.index]);
+
+        for (const j in renderedRow.cells) {
+            this.renderCell(this.Grid.rows[renderedRow.index], this.Grid.columns[j], flashCells)
         }
     }
 
@@ -546,6 +551,16 @@ export class VirtualGridRowController {
                 this.Grid.Utils.toggleClass('selectable', rowPartial.element, row.isSelectable)
                 this.Grid.Utils.toggleClass('not-selectable', rowPartial.element, !row.isSelectable)
             })
+
+            for (let cell of row.cells) {
+                this.Grid.Utils.toggleClass('selected', cell.renderedCell.cellNode, cell.isSelected)
+                this.Grid.Utils.toggleClass('range-border-top', cell.renderedCell.cellNode, cell.isBorderTop)
+                this.Grid.Utils.toggleClass('range-border-left', cell.renderedCell.cellNode, cell.isBorderLeft)
+                this.Grid.Utils.toggleClass('range-border-right', cell.renderedCell.cellNode, cell.isBorderRight)
+                this.Grid.Utils.toggleClass('range-border-bottom', cell.renderedCell.cellNode, cell.isBorderBottom)
+
+                cell.renderedCell.cellNode.classList.add(`stack-${cell.stackCount}`)
+            }
         }
     }
 

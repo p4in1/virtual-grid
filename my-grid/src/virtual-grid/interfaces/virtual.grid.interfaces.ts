@@ -310,6 +310,11 @@ export declare interface IVirtualGridRow {
      * Also selected rows are highlighted in a appealing color given by the theme
      */
     isSelected: boolean
+
+    /**
+     * shows if this row or cells of it are part of a range selection
+     */
+    isRangeSelected: boolean
     /**
      * is true when this is an aggregation row
      */
@@ -355,6 +360,12 @@ export declare interface IVirtualGridRow {
     children?: IVirtualGridRow[]
 
     /**
+     * the cell objects for each column in the grid
+     * they hold the status for the range selection and possibly the value (maybe later)
+     */
+    cells: IVirtualRowCell[]
+
+    /**
      * updates the row data of a row instance and refreshes the grid row
      * @param rowData - the new data
      */
@@ -365,6 +376,17 @@ export declare interface IVirtualGridRow {
     setData(data: any): void
 
     getCellValue(col: IVirtualGridColumn, options?: IVirtualGetCellValueOptions): any
+}
+
+export interface IVirtualRowCell {
+    isSelected: boolean
+    isBorderTop: boolean
+    isBorderRight: boolean
+    isBorderBottom: boolean
+    isBorderLeft: boolean
+    stackCount: number
+    colModel: IVirtualGridColumn
+    renderedCell: IRenderedCell
 }
 
 export declare interface IVirtualGridColumnApi {

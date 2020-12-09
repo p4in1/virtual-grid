@@ -1,4 +1,4 @@
-import {IVirtualGridColumn, IVirtualGridRow} from "./interfaces/virtual.grid.interfaces";
+import {IVirtualGrid} from "./interfaces/virtual.grid.interfaces";
 
 export class VirtualGridUtils {
     CHAR_WIDTH_MAP = {};
@@ -7,7 +7,7 @@ export class VirtualGridUtils {
     gIsTouchDevice = false;
     gIsPhone = false;
 
-    constructor() {
+    constructor(private Grid: IVirtualGrid) {
         const textWidthInspector: HTMLElement = document.createElement("span");
 
         document.body.append(textWidthInspector);

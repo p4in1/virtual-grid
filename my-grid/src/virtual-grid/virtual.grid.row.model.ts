@@ -3,7 +3,7 @@ import {
     IVirtualGetCellValueOptions,
     IVirtualGrid,
     IVirtualGridColumn,
-    IVirtualGridRow
+    IVirtualGridRow, IVirtualRowCell
 } from "./interfaces/virtual.grid.interfaces";
 
 export class VirtualGridRow implements IVirtualGridRow {
@@ -19,6 +19,7 @@ export class VirtualGridRow implements IVirtualGridRow {
     initialIndex: number;
 
     isRowGroup: boolean = false
+    isRangeSelected: boolean = false;
     isSelectable: boolean = true;
     isSelected: boolean = false;
     isVisible: boolean = true;
@@ -29,9 +30,12 @@ export class VirtualGridRow implements IVirtualGridRow {
     parent?: IVirtualGridRow;
     isExpanded?: boolean = false;
 
+    cells: IVirtualRowCell[] = []
+
     constructor(private Grid: IVirtualGrid, node: any, level: number = 0, parent?: IVirtualGridRow) {
         this.level = level;
         this.isSelectable = true;
+        this.isRangeSelected = false
         this.isSelected = !!node.isSelected;
         this.isVisible = parent == void 0 || parent != void 0 && parent.isExpanded;
         this.isRowGroup = node.isRowGroup
@@ -46,6 +50,19 @@ export class VirtualGridRow implements IVirtualGridRow {
         }
 
         this.rowData = node
+
+        for (let col of this.Grid.columns) {
+            this.cells.push({
+                isBorderBottom: false,
+                isBorderLeft: false,
+                isBorderRight: false,
+                isBorderTop: false,
+                isSelected: false,
+                colModel: col,
+                renderedCell: null,
+                stackCount: 0
+            })
+        }
     }
 
     public updateRowData(rowData: any): void {
