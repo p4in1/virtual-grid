@@ -40,7 +40,7 @@ export class VirtualGridSortController {
 
         if (this.sortedColumns.length == 0) {
             this.Grid.RowController.resetGridRowIndexes();
-            this.Grid.api.refreshGrid(false, true,false);
+            this.Grid.api.refreshGrid(false, true, false);
             return;
         }
 
@@ -187,7 +187,6 @@ export class VirtualGridSortController {
             return dir
         }
 
-        // noinspection FallThroughInSwitchStatementJS
         switch (type) {
             case "boolean":
                 a = !!a
@@ -196,13 +195,23 @@ export class VirtualGridSortController {
             case "number":
                 return dir === 1 ? a - b : b - a
             case "date":
-                a = !a ? "" : a
-                b = !b ? "" : b
+                a = typeof a == "number" ? a : Date.parse(a)
+                b = typeof b == "number" ? b : Date.parse(b)
+
+                if (isNaN(a)) {
+                    return -1 * dir
+                }
+
+                if (isNaN(b)) {
+                    return dir
+                }
                 break;
             case "multiLine":
-                a = a[0]
-                b = b[0]
             case "text":
+                if (type === "multiLine") {
+                    a = a[0]
+                    b = b[0]
+                }
 
                 a = typeof a === "string" ? a : a.toString()
                 b = typeof b === "string" ? b : b.toString()

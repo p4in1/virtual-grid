@@ -128,11 +128,16 @@ export class VirtualGridApi {
 
         if (config && config.sort && Array.isArray(config.sort)) {
             for (let col of config.sort) {
-                let column = columns.find(x => x.field == col.field)
+
+                let field = col.field;
+                let index = col.index
+
+                let column = columns.find(x => index && field ? x.field == field && x.index == index : x.field == field)
+
                 this.Grid.SortController.sortColumn(column, config.sort.length > 1, col.dir)
             }
         } else {
-            this.refreshGrid(true, true,false)
+            this.refreshGrid(true, true, false)
         }
 
         if (config.scrollTop !== 0) {
@@ -151,7 +156,8 @@ export class VirtualGridApi {
         })
 
         let sort = this.Grid.SortController.sortedColumns.map((sortCol) => {
-            return {"field": sortCol.col.field, "dir": sortCol.col.sortDirection}
+            let col = sortCol.col
+            return {"field": col.field, "index": col.index, "dir": col.sortDirection}
         })
 
         let filter = {
