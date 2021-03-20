@@ -455,6 +455,18 @@ export class VirtualGridUIDomController {
             dom.cellContent.append(dom.cellFilterContainer)
         }
 
+        if (column.isCheckboxColumn) {
+
+            dom.cellCheckboxContainer = this.Utils.el("div", ["header-cell-checkbox-container"]) as HTMLDivElement
+            dom.cellCheckbox = this.Utils.el("div", ["header-cell-checkbox"]) as HTMLDivElement
+            dom.cellCheckboxIcon = this.Utils.el("i", ["checkbox-icon", "virtual-material-icons", "small"])
+
+            dom.cellCheckboxContainer.append(dom.cellCheckbox)
+            dom.cellCheckbox.append(dom.cellCheckboxIcon)
+
+            dom.cellContent.append(dom.cellCheckboxContainer)
+        }
+
         if (this.config.showColumnAggregation && column.aggFunc) {
             let aggregationTitle = "Custom"
             switch (column.aggFunc) {
@@ -657,6 +669,8 @@ export class VirtualGridUIDomController {
             if (this.visibleRowIndices[visibleRowIndexesStart + i] == void 0) {
                 break;
             }
+
+            delete this.Grid.rows[row.index].renderedRow
 
             row.top = start + i * rowHeight
             row.index = this.visibleRowIndices[visibleRowIndexesStart + i]

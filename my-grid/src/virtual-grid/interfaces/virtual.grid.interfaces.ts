@@ -465,6 +465,10 @@ export declare interface IVirtualGridColumn {
         cellAggregationContainer: HTMLElement
         cellAggregationTitle: HTMLSpanElement
         cellAggregationValue: HTMLSpanElement
+
+        cellCheckboxContainer: HTMLDivElement
+        cellCheckbox: HTMLDivElement
+        cellCheckboxIcon: HTMLElement
     }
 
     api: IVirtualGridColumnApi
@@ -640,6 +644,10 @@ export declare interface IVirtualCellDom {
     cellAggregationContainer: HTMLElement
     cellAggregationTitle: HTMLSpanElement
     cellAggregationValue: HTMLSpanElement
+
+    cellCheckboxContainer: HTMLDivElement
+    cellCheckbox: HTMLDivElement
+    cellCheckboxIcon: HTMLElement
 }
 
 export declare interface IVirtualColumnFilter {

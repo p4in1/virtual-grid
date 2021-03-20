@@ -333,7 +333,7 @@ export class VirtualGridUIEventController {
     private _adjustCellLeft() {
 
         let left
-        let side
+        let side = null
 
         for (let i = 0; i < this.Grid.columns.length; i++) {
             let currentColumn = this.Grid.columns[i]
@@ -453,6 +453,23 @@ export class VirtualGridUIEventController {
                         this.Grid.FilterController.setTextFilter(column, filterField.value)
                     })
                 }
+            }
+
+            if (column.isCheckboxColumn) {
+                column.dom.cellCheckboxContainer.addEventListener("click", () => {
+
+                    let checkboxState = column.dom.cellCheckboxContainer.getAttribute("checkbox-state")
+
+                    if (checkboxState == "true") {
+                        this.Grid.api.deselectAll()
+                        column.dom.cellCheckboxContainer.setAttribute("checkbox-state", "false")
+                        column.dom.cellCheckboxIcon.innerText = ""
+                    } else {
+                        this.Grid.api.selectAll()
+                        column.dom.cellCheckboxContainer.setAttribute("checkbox-state", "true")
+                        column.dom.cellCheckboxIcon.innerText = "done"
+                    }
+                })
             }
 
             if (!column.isSuppressResize && Number(column.index) < this.Grid.originalColumns.length - 1) {

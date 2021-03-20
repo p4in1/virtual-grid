@@ -84,7 +84,7 @@ export class VirtualGridApi {
 
         if (resetRowConfig) {
             this.Grid.domController.resetRenderedRows();
-        } 
+        }
 
         // reset the selection
         // #BUGFIX there was a bug where the rows where initialized with a selection but the following

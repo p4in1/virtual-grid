@@ -602,6 +602,29 @@
                             }
                         }
                     }
+
+                    .header-cell-checkbox-container {
+
+                        height: 100%;
+                        width: 100%;
+                        display: flex;
+                        align-items: flex-end;
+                        justify-content: center;
+
+                        .header-cell-checkbox {
+                            margin-bottom: 14px;
+                            min-width: 20px;
+                            min-height: 20px;
+                            width: 20px;
+                            height: 20px;
+                            border: 1px solid rgba(0, 0, 0, 0.2);
+                            background-color: white;
+                            cursor: pointer;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        }
+                    }
                 }
 
                 .header-cell-resizer {

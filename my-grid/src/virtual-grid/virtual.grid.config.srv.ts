@@ -103,6 +103,7 @@ export class VirtualGridConfigController {
         if (this.showColumnAggregation) {
             this.headerRowHeight += 32
         }
+
         if (this.showColumnFilter) {
             this.headerRowHeight += 40
         }
@@ -191,6 +192,11 @@ export class VirtualGridConfigController {
                 this.setMinimumProperties(colDef)
             }
 
+            if (colDef.isCheckboxColumn && colDef.field == void 0) {
+                colDef.type = "checkbox"
+                colDef.width = 32
+                this.setMinimumProperties(colDef)
+            }
 
             if (colDef.type == "multiLine") {
                 colDef.isMultiLine = true

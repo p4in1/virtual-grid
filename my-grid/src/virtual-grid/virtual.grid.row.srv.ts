@@ -542,7 +542,9 @@ export class VirtualGridRowController {
      * @param isSelected
      */
     public toggleSelectionClasses(row: IVirtualGridRow, isSelected?: boolean): void {
+
         if (row && row.renderedRow) {
+
             [row.renderedRow.left, row.renderedRow.center, row.renderedRow.right].forEach((rowPartial) => {
                 let isRowSelected = isSelected !== false && (row.isSelected || isSelected === true);
 
@@ -551,14 +553,20 @@ export class VirtualGridRowController {
                 this.Grid.Utils.toggleClass('not-selectable', rowPartial.element, !row.isSelectable)
             })
 
-            for (let cell of row.cells) {
-                this.Grid.Utils.toggleClass('selected', cell.renderedCell.cellNode, cell.isSelected)
-                this.Grid.Utils.toggleClass('range-border-top', cell.renderedCell.cellNode, cell.isBorderTop)
-                this.Grid.Utils.toggleClass('range-border-left', cell.renderedCell.cellNode, cell.isBorderLeft)
-                this.Grid.Utils.toggleClass('range-border-right', cell.renderedCell.cellNode, cell.isBorderRight)
-                this.Grid.Utils.toggleClass('range-border-bottom', cell.renderedCell.cellNode, cell.isBorderBottom)
+            if (this.config.isRangeSelect) {
+                for (let cell of row.cells) {
+                    this.Grid.Utils.toggleClass('selected', cell.renderedCell.cellNode, cell.isSelected)
+                    this.Grid.Utils.toggleClass('range-border-top', cell.renderedCell.cellNode, cell.isBorderTop)
+                    this.Grid.Utils.toggleClass('range-border-left', cell.renderedCell.cellNode, cell.isBorderLeft)
+                    this.Grid.Utils.toggleClass('range-border-right', cell.renderedCell.cellNode, cell.isBorderRight)
+                    this.Grid.Utils.toggleClass('range-border-bottom', cell.renderedCell.cellNode, cell.isBorderBottom)
 
-                cell.renderedCell.cellNode.classList.add(`stack-${cell.stackCount}`)
+                    cell.renderedCell.cellNode.classList.add(`stack-${cell.stackCount}`)
+
+                    if (cell.colModel.isCheckboxColumn) {
+                        cell.renderedCell.checkboxIcon.innerHTML = cell.renderedCell.rowModel && cell.renderedCell.rowModel.isSelected ? "done" : ""
+                    }
+                }
             }
         }
     }

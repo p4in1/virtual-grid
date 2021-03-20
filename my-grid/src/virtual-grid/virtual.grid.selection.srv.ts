@@ -112,13 +112,12 @@ export class VirtualGridSelectionController {
      * deselect all rows
      */
     public deselectAll = (): void => {
+        for (const row of this.Grid.rows) {
+            row.isSelected = false;
+        }
 
         for (let row of this.selectedRows) {
             this.Grid.RowController.toggleSelectionClasses(row, false);
-        }
-
-        for (const row of this.Grid.rows) {
-            row.isSelected = false;
         }
 
         this.clearRangeSelection()

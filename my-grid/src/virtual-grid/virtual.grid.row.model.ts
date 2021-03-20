@@ -46,7 +46,7 @@ export class VirtualGridRow implements IVirtualGridRow {
 
         if (node[Grid.ConfigController.childNodesKey]) {
             this.isExpanded = Grid.ConfigController.expandNodesByDefault || node.expanded;
-            this.isSelectable = Grid.ConfigController.selectLeavesOnly;
+            this.isSelectable = !!Grid.ConfigController.selectLeavesOnly;
         }
 
         this.rowData = node

@@ -90,7 +90,10 @@ export class VirtualGridColumn implements IVirtualGridColumn {
         cellFilterContainer: null,
         cellAggregationContainer: null,
         cellAggregationTitle: null,
-        cellAggregationValue: null
+        cellAggregationValue: null,
+        cellCheckboxContainer: null,
+        cellCheckbox: null,
+        cellCheckboxIcon: null
     };
 
     filter: IVirtualColumnFilter
@@ -99,10 +102,10 @@ export class VirtualGridColumn implements IVirtualGridColumn {
     actions: IVirtualColumnAction[] = []
     avatarConfig: IVirtualAvatar;
 
-    onCellClick:Function
-    onCellRightClick:Function
-    onCellMouseEnter:Function
-    onCellMouseLeave:Function
+    onCellClick: Function
+    onCellRightClick: Function
+    onCellMouseEnter: Function
+    onCellMouseLeave: Function
 
     constructor(private Grid: IVirtualGrid, colDef: any, index: number) {
         let configColDef = this.Grid.ConfigController.colDefs[index]

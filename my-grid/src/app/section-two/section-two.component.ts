@@ -87,23 +87,27 @@ export class SectionTwoComponent implements AfterViewInit {
                     },
                 },
                 {
+                    checkbox: true,
+                    type: "checkbox"
+                },
+                {
                     field: "title",
                     title: "Gruppenstruktur",
                     isHierarchyColumn: true,
                     type: "multiLine",
-                    checkbox: true,
+
                     minWidth: 200
                 },
-                {
-                    field: "email",
-                    title: "Email",
-                    showFilter: true
-                },
-                {
-                    field: "phoneNumber",
-                    title: "Telefonnummer",
-                    showFilter: false
-                }
+                // {
+                //     field: "email",
+                //     title: "Email",
+                //     showFilter: true
+                // },
+                // {
+                //     field: "phoneNumber",
+                //     title: "Telefonnummer",
+                //     showFilter: false
+                // }
             ],
             element: this.grid.nativeElement,
             showHeader: true,
