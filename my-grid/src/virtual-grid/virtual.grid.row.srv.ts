@@ -28,7 +28,6 @@ export class VirtualGridRowController {
      * processes the grid data and creates the grid rows from scratch
      */
     public buildRows = (): void => {
-        this.Grid.SelectionController.selectedRows = [];
         // flatten the recursive structure
         this.Grid.rows = this.Grid.Utils.flatten(this.Grid.rows);
         this.setRowIndexes();

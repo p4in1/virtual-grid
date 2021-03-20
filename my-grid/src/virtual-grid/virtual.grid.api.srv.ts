@@ -84,7 +84,17 @@ export class VirtualGridApi {
 
         if (resetRowConfig) {
             this.Grid.domController.resetRenderedRows();
-        }
+        } 
+
+        // reset the selection
+        // #BUGFIX there was a bug where the rows where initialized with a selection but the following
+        // #BUGFIX line reset the selection after initial selection to an empty array
+        // #BUGFIX this line resided in the "buildRows" function and reset the whole selection at start
+        // #BUGFIX this line was uses on 2 occasions
+        // --> 1. the grid was created (createGridContent in the service.ts)
+        // --> 2. once the grid was updated
+        // we do not need to reset the selection on startup, but rather on update in this function
+        this.Grid.SelectionController.selectedRows = [];
 
         this.Grid.rows = this.Grid.RowController.createRowModels(rows);
         // processing row data and convert into a more suitable structure
