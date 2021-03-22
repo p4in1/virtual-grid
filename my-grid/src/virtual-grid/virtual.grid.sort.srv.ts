@@ -66,8 +66,8 @@ export class VirtualGridSortController {
         let s = +new Date()
 
         if (this.sortedColumns.length > 0) {
-            let hierarchyColumn = this.Grid.columns.find(x => x.isHierarchyColumn)
-            if (hierarchyColumn && hierarchyColumn.isVisible) {
+            let hierarchyColumn = this.Grid.columns.find(x => x.isHierarchyColumn && x.isVisible)
+            if (hierarchyColumn) {
                 let roots: IVirtualGridRow[] = [];
 
                 for (let row of this.Grid.rows) {

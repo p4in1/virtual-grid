@@ -101,6 +101,13 @@ export class VirtualGridRowController {
      * Fill the grid with with rows for every visible entry.
      */
     public renderRows = (flashCells?: boolean): void => {
+
+        for (let row of this.Grid.rows) {
+            if (row.renderedRow != void 0) {
+                delete row.renderedRow
+            }
+        }
+
         for (const row of this.domController.renderedRows) {
             if (row.index > this.Grid.rows.length - 1 || row.index < 0) {
                 break;
@@ -108,6 +115,7 @@ export class VirtualGridRowController {
 
             this.renderRow(row, flashCells);
         }
+
     };
     /**
      * Recalculate the position of the rendered rows when they are removed or the visibility changes
@@ -553,8 +561,11 @@ export class VirtualGridRowController {
                 this.Grid.Utils.toggleClass('not-selectable', rowPartial.element, !row.isSelectable)
             })
 
-            if (this.config.isRangeSelect) {
-                for (let cell of row.cells) {
+
+            for (let cell of row.cells) {
+
+                if (this.config.isRangeSelect) {
+
                     this.Grid.Utils.toggleClass('selected', cell.renderedCell.cellNode, cell.isSelected)
                     this.Grid.Utils.toggleClass('range-border-top', cell.renderedCell.cellNode, cell.isBorderTop)
                     this.Grid.Utils.toggleClass('range-border-left', cell.renderedCell.cellNode, cell.isBorderLeft)
@@ -563,9 +574,10 @@ export class VirtualGridRowController {
 
                     cell.renderedCell.cellNode.classList.add(`stack-${cell.stackCount}`)
 
-                    if (cell.colModel.isCheckboxColumn) {
-                        cell.renderedCell.checkboxIcon.innerHTML = cell.renderedCell.rowModel && cell.renderedCell.rowModel.isSelected ? "done" : ""
-                    }
+                }
+
+                if (cell.colModel.isCheckboxColumn) {
+                    cell.renderedCell.checkboxIcon.innerHTML = cell.renderedCell.rowModel && cell.renderedCell.rowModel.isSelected ? "done" : ""
                 }
             }
         }
