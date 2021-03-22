@@ -32,6 +32,8 @@ export class VirtualGridConfigController {
     isMultiSelect: boolean = false;
     isRangeSelect: boolean = false;
 
+    isParentChildSelection: boolean = false;
+
     element: HTMLElement;
     childNodesKey: string
 
@@ -62,6 +64,7 @@ export class VirtualGridConfigController {
         this.suppressAutoSize = config.suppressAutoSize
         this.suppressDragging = config.suppressDragging
         this.suppressPinning = config.suppressPinning
+
         this.suppressContextmenu = config.suppressContextmenu
         this.suppressContextmenuDefault = config.suppressContextmenuDefault
 
@@ -77,6 +80,8 @@ export class VirtualGridConfigController {
         this.isSingleSelect = !config.isMultiSelect
         this.isMultiSelect = !!config.isMultiSelect
         this.isRangeSelect = !!config.isRangeSelect
+
+        this.isParentChildSelection = !!config.isParentChildSelection
 
         this.headerValueGetter = config.headerValueGetter
         this.childNodesKey = config.childNodesKey != void 0 && config.childNodesKey !== '' ? config.childNodesKey : 'children';
@@ -95,6 +100,12 @@ export class VirtualGridConfigController {
         this.expandNodesByDefault = config.expandNodesByDefault == void 0 ? true : config.expandNodesByDefault;
         this.selectLeavesOnly = config.selectLeavesOnly;
         this.deselectWhenCollapse = config.deselectWhenCollapse;
+
+        if (this.selectLeavesOnly && this.isParentChildSelection) {
+            console.warn("The properties 'selectLeavesOnly' and 'isParentChildSelection' are mutually exclusive. Setting 'isParentChildSelection' to 'false'")
+            this.isParentChildSelection = false
+        }
+
 
         this.externalFilter = config.externalFilter
 

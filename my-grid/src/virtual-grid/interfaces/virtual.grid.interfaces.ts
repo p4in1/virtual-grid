@@ -62,9 +62,6 @@ export declare interface IVirtualGridConfig {
     /**
      * enables multi selection holding the shift key for a range or ctrl for single items
      * enables multiple ranges to be selected
-     * @property {string} single "single"
-     * @property {string} multi "multi"
-     * @default {string} single "single"
      */
     isMultiSelect?: boolean
 
@@ -72,6 +69,16 @@ export declare interface IVirtualGridConfig {
      * enables range selection
      */
     isRangeSelect?: boolean
+
+    /**
+     * precondition: multiselect has to be enabled
+     * this is used when there is a checkbox setting on one of the columns
+     * and when the list is actually a tree
+     *
+     * using this flag enables the checkbox on intermediate nodes and by checking the checkbox all children
+     * will be selected or not. in addition this enables the indeterminate state of a checkbox on the parents level
+     */
+    isParentChildSelection?: boolean
 
     /**
      * deselects nodes when the parent has been collapsed

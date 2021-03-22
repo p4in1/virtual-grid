@@ -100,6 +100,7 @@ export class VirtualGridSelectionController {
         }
 
         this.Grid.RowController.toggleSelectionClasses(row, false);
+        this.checkParentChildSelection(row)
     }
 
     public selectAll = (): void => {
@@ -138,6 +139,21 @@ export class VirtualGridSelectionController {
 
         this.selectedRows.push(row);
         this.Grid.RowController.toggleSelectionClasses(row);
+        this.checkParentChildSelection(row)
+    }
+
+    private checkParentChildSelection(row) {
+        if (this.config.isParentChildSelection) {
+            if (row.children.length) {
+                for (let child of row.children) {
+                    if (row.isSelected) {
+                        this.selectRow(child)
+                    } else {
+                        this.deselectRow(child)
+                    }
+                }
+            }
+        }
     }
 
     onCellMouseDown = (event: any, cell: IRenderedCell): void => {
