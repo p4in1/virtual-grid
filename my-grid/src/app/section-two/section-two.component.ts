@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, ElementRef, Input, ViewChild} from '@angular/core';
 import {VirtualGrid} from "../../virtual-grid/virtual.grid.service";
-import {IVirtualGridConfig} from "../../virtual-grid/interfaces/virtual.grid.interfaces";
+import {IVirtualGrid, IVirtualGridConfig} from "../../virtual-grid/interfaces/virtual.grid.interfaces";
 
 @Component({
     selector: 'app-section-two',
@@ -111,10 +111,12 @@ export class SectionTwoComponent implements AfterViewInit {
             ],
             element: this.grid.nativeElement,
             showHeader: true,
-            showColumnFilter: true,
+            filter:{
+                showColumnFilter:true
+            },
             deselectWhenCollapse: true,
             isMultiSelect: true,
-            isParentChildSelection: true
+            isParentChildSelection: true,
         }
 
         this.gridInstance = new VirtualGrid(config)

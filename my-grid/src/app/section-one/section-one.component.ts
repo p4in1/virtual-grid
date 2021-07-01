@@ -24,8 +24,10 @@ export class SectionOneComponent implements AfterViewInit {
             element: this.grid.nativeElement,
             showHeader: true,
             showGroupPanel: true,
-            showColumnFilter:true,
-            isRangeSelect: true
+            isRangeSelect: true,
+            filter:{
+                showColumnFilter:true
+            }
         }
 
         data.columns[0].pinned = "left"

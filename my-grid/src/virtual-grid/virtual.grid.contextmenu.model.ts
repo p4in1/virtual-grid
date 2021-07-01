@@ -160,7 +160,7 @@ export class VirtualGridContextMenu {
 
             if (entry.action) {
                 entry.element.addEventListener("click", () => {
-                    entry.action(row, col)
+                    entry.action({Grid: this.Grid, row, col})
                 })
             }
 

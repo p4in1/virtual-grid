@@ -57,6 +57,7 @@
             padding-right: $eob-pane-padding / 2;
             width: 16px;
             max-width: 16px;
+            box-sizing: content-box;
         }
 
         &:hover {
@@ -351,6 +352,7 @@
                             width: 16px;
                             height: 16px;
                             border: 1px solid rgba(0, 0, 0, .2);
+                            box-sizing: content-box;
                         }
 
                         &.text-node {

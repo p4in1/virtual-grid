@@ -16,7 +16,7 @@ export class SectionFourComponent implements AfterViewInit {
     }
 
     ngAfterViewInit(): void {
-        var columns = [{title: 'Fruit', field: 'fruit',checkbox:true}, {title: 'Amount', field: 'amount'}]
+        var columns = [{title: 'Fruit', field: 'fruit', checkbox: true}, {title: 'Amount', field: 'amount'}]
         var rows = [{fruit: 'Apple', amount: 10}, {fruit: 'Banana', amount: 5}, {fruit: 'Pineapple', amount: 3}]
         var element = this.grid.nativeElement
 
@@ -24,7 +24,9 @@ export class SectionFourComponent implements AfterViewInit {
             columns: columns,
             rows: rows,
             element: element,
-            showHeader:true
+            showHeader: true,
+            rowHeight: 40,
+
         }
 
         new VirtualGrid(gridConfig)

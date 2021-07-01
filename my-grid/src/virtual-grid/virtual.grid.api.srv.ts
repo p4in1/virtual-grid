@@ -236,6 +236,8 @@ export class VirtualGridApi {
         let dom = this.Grid.domController.dom
         let visibleItemsBefore: number = 0;
 
+        this.Grid.RowController.expandParents(this.getRowByIndex(index))
+
         for (const row of this.Grid.rows) {
 
             if (row.index == index) {
@@ -357,5 +359,33 @@ export class VirtualGridApi {
 
     updateRows() {
         this.Grid.RowController.renderRows(true)
+    }
+
+    addRow(row: IVirtualGridRow, node): IVirtualGridRow {
+
+        row.childCountTotal = this.Grid.RowController.getCompleteChildCount(row)
+
+        let gridRow = new VirtualGridRow(this.Grid, node, row.level + 1, row)
+        let index = row.index + row.childCountTotal + 1
+
+        this.Grid.rows.splice(index, 0, gridRow)
+
+        row[this.config.childNodesKey].push(gridRow)
+
+        gridRow.index = index
+        gridRow.initialIndex = index
+
+        for (let i = index + 1; i < this.Grid.rows.length; i++) {
+            this.Grid.rows[i].index++
+            this.Grid.rows[i].initialIndex++
+        }
+
+        if (row.parent != void 0) {
+            row.parent.childCountTotal = this.Grid.RowController.getCompleteChildCount(row.parent);
+        }
+
+        this.refreshGrid(true, true, false);
+
+        return gridRow
     }
 }

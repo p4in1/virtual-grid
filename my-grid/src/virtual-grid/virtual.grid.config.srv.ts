@@ -25,7 +25,6 @@ export class VirtualGridConfigController {
 
     showHeader: boolean = false
     showGroupPanel: boolean = false
-    showColumnFilter: boolean = false;
     showColumnAggregation: boolean = false;
 
     isSingleSelect: boolean = true;
@@ -41,6 +40,7 @@ export class VirtualGridConfigController {
 
     onGridReady: Function
     onRowClick: Function
+    onRowSelect: Function
     onRowMouseEnter: Function
     onRowMouseLeave: Function
     onRowDoubleClick: Function
@@ -57,6 +57,11 @@ export class VirtualGridConfigController {
 
     originalRows: any[] = []
 
+    filter = {
+        showChildrenAfterFilter: false,
+        showColumnFilter: false
+    }
+
     constructor(private Grid: IVirtualGrid, config: IVirtualGridConfig) {
 
         this.suppressSorting = config.suppressSorting
@@ -71,11 +76,12 @@ export class VirtualGridConfigController {
         this.suppressFlashingCells = config.suppressFlashingCells
 
         this.showHeader = config.showHeader == void 0 ? true : config.showHeader
-        this.showColumnFilter = config.showColumnFilter
         this.showColumnAggregation = config.showColumnAggregation
         this.showGroupPanel = config.showHeader && config.showGroupPanel
 
         this.element = config.element
+
+        this.rowHeight = config.rowHeight == void 0 ? this.rowHeight : config.rowHeight
 
         this.isSingleSelect = !config.isMultiSelect
         this.isMultiSelect = !!config.isMultiSelect
@@ -88,6 +94,7 @@ export class VirtualGridConfigController {
 
         this.onGridReady = typeof config.onGridReady == "function" ? config.onGridReady : this._noop
         this.onRowClick = typeof config.onRowClick == "function" ? config.onRowClick : this._noop
+        this.onRowSelect = typeof config.onRowSelect == "function" ? config.onRowSelect : this._noop
         this.onRowMouseEnter = typeof config.onRowMouseEnter == "function" ? config.onRowMouseEnter : this._noop
         this.onRowMouseLeave = typeof config.onRowMouseLeave == "function" ? config.onRowMouseLeave : this._noop
         this.onRowDoubleClick = typeof config.onRowDoubleClick == "function" ? config.onRowDoubleClick : this._noop
@@ -101,11 +108,15 @@ export class VirtualGridConfigController {
         this.selectLeavesOnly = config.selectLeavesOnly;
         this.deselectWhenCollapse = config.deselectWhenCollapse;
 
+        if (config.filter) {
+            this.filter.showColumnFilter = config.filter.showColumnFilter == void 0 ? false : config.filter.showColumnFilter
+            this.filter.showChildrenAfterFilter = config.filter.showChildrenAfterFilter == void 0 ? false : config.filter.showChildrenAfterFilter
+        }
+
         if (this.selectLeavesOnly && this.isParentChildSelection) {
             console.warn("The properties 'selectLeavesOnly' and 'isParentChildSelection' are mutually exclusive. Setting 'isParentChildSelection' to 'false'")
             this.isParentChildSelection = false
         }
-
 
         this.externalFilter = config.externalFilter
 
@@ -115,7 +126,7 @@ export class VirtualGridConfigController {
             this.headerRowHeight += 32
         }
 
-        if (this.showColumnFilter) {
+        if (this.filter.showColumnFilter) {
             this.headerRowHeight += 40
         }
 
@@ -131,6 +142,21 @@ export class VirtualGridConfigController {
 
         this.getColDefs(group)
         this.getColDefs(config.columns, config.rows)
+
+        // in the case there is no rowHeight set we calculate this ourselves
+        if (!config.rowHeight) {
+            for (let col of this.colDefs) {
+                let rowHeight = 40
+                for (let j = 1; j < col.lineCount; j++) {
+                    rowHeight += 16
+                }
+
+                this.rowHeight = rowHeight > this.rowHeight ? rowHeight : this.rowHeight
+            }
+
+            this.rowHeight += 12 // this works like a padding
+        }
+
     }
 
     private _noop = () => {
@@ -149,7 +175,7 @@ export class VirtualGridConfigController {
 
                 type: col.type == void 0 ? "text" : col.type,
 
-                isShowFilter: col.showFilter != void 0 ? col.showFilter : this.showColumnFilter,
+                isShowFilter: col.showFilter != void 0 ? col.showFilter : this.filter.showColumnFilter,
 
                 isActionColumn: col.type == "action",
                 isIconColumn: col.type == "icon",
@@ -216,17 +242,6 @@ export class VirtualGridConfigController {
 
             this.colDefs.push(colDef)
         }
-
-        for (let col of this.colDefs) {
-            let rowHeight = 40
-            for (let j = 1; j < col.lineCount; j++) {
-                rowHeight += 16
-            }
-
-            this.rowHeight = rowHeight > this.rowHeight ? rowHeight : this.rowHeight
-        }
-
-        this.rowHeight += 12 // this works like a padding
     }
 
     getValue(col, row) {

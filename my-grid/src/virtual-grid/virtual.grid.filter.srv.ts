@@ -5,6 +5,7 @@ import {
     VirtualGridCurrentFilter
 } from "./interfaces/virtual.grid.interfaces";
 import {VirtualGridConfigController} from "./virtual.grid.config.srv";
+import {filter} from "rxjs/operators";
 
 /**
  * instance of column controller
@@ -80,7 +81,7 @@ export class VirtualGridFilterController {
         if (this._isFilterChanged()) {
             let filteredArray: IVirtualGridRow[] = this._getFilteredArray();
 
-            // console.log("filter took --> ", +new Date() - start, "filtered count --> ", filteredArray.length);
+            console.log("filter took --> ", +new Date() - start, "filtered count --> ", filteredArray.length);
 
             this.currentFilter.text = this.filterValue
 
@@ -96,6 +97,7 @@ export class VirtualGridFilterController {
             }
 
             this._expandParentsAfterFilter(filteredArray, expandParents)
+            this._expandChildrenAfterFilter(filteredArray)
 
             console.log("applying filter took --> ", +new Date() - start);
 
@@ -274,25 +276,34 @@ export class VirtualGridFilterController {
     private _expandParentsAfterFilter = (filteredArray: IVirtualGridRow[], expandParents: boolean): void => {
         for (const item of filteredArray) {
             let currentItem: IVirtualGridRow = item;
-            let hasParent: boolean = currentItem.parent != void 0;
-            let addedParentCount: number = 0;
+
             currentItem.isVisible = true;
             currentItem.isVisibleAfterFilter = true;
             // adding parents to the visible rows and expanding them
-            while (hasParent) {
-                currentItem = currentItem.parent;
-                if (expandParents) {
-
-                    currentItem.isExpanded = true;
-                    currentItem.isVisible = true;
-                    currentItem.isVisibleAfterFilter = true
-                }
-
-                addedParentCount++;
-                if (currentItem.parent == void 0) {
-                    hasParent = false;
-                }
+            if (expandParents) {
+                this.Grid.RowController.expandParents(currentItem)
             }
+
+        }
+    }
+
+    private _expandChildrenAfterFilter = (filteredArray: IVirtualGridRow[]): void => {
+        for (let item of filteredArray) {
+            this._expandChildren(item.children)
+        }
+    }
+
+    private _expandChildren(children) {
+        if (children == void 0) {
+            return
+        }
+
+        for (let child of children) {
+            child.isExpanded = true;
+            child.isVisible = true;
+            child.isVisibleAfterFilter = true
+
+            this._expandChildren(child.children)
         }
     }
 }

@@ -102,7 +102,6 @@ export class VirtualGridUIEventController {
         if (!this.config.suppressContextmenu) {
             this.Grid.ContextmenuController.showMenu(cell.rowModel, cell.colModel, event)
         }
-        // this.onRightClick(event)
 
         cell.colModel.onCellRightClick({row: cell.rowModel, column: cell.colModel, event, api: this.Grid.api})
     }

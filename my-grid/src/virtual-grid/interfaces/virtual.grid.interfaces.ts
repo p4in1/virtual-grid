@@ -16,6 +16,10 @@ import {VirtualGridGroupController} from "../virtual.grid.group.srv";
 export declare interface IVirtualGridConfig {
 
     /**
+     * (optional) Fixed row height
+     */
+    rowHeight?: number
+    /**
      * the dom element to attach the grid to
      */
     element: HTMLElement
@@ -40,12 +44,6 @@ export declare interface IVirtualGridConfig {
      * @default false
      */
     showGroupPanel?: boolean
-
-    /**
-     * whether to show the column filter or not
-     * @default false
-     */
-    showColumnFilter?: boolean
 
     /**
      * this enables the column aggregation
@@ -151,6 +149,24 @@ export declare interface IVirtualGridConfig {
     suppressFlashingCells?: boolean
 
     /**
+     * the filter object
+     */
+    filter?: {
+
+        /**
+         * if true, the children of hierarchical nodes will not be filtered
+         * when the parent node matches
+         */
+        showChildrenAfterFilter?: boolean
+
+        /**
+         * whether to show the column filter or not
+         * @default false
+         */
+        showColumnFilter?:boolean
+    }
+
+    /**
      * callback before a node is expanded
      * this gives you the opportunity to load the children async and attach them to the grid using the api
      * @param row - the row to expand
@@ -215,6 +231,14 @@ export declare interface IVirtualGridConfig {
      * @param api - grid api
      */
     onRowClick?(row: IVirtualGridRow, event: any, api: VirtualGridApi): void
+
+    /**
+     * row select callback
+     * @param row - the VirtualGridRow the event was executed on
+     * @param event - the original event
+     * @param api - grid api
+     */
+    onRowSelect?(row: IVirtualGridRow, event: any, api: VirtualGridApi): void
 
     /**
      * a callback where the user can set the contextmenu entries for specific rows and columns
@@ -766,7 +790,7 @@ export declare interface IVirtualGridContextmenuEntry {
 
     subMenuInstance?: VirtualGridContextMenu
 
-    action?(row, col): void
+    action?({Grid: VirtualGrid, row: IVirtualGridRow, col: IVirtualGridColumn}): void
 }
 
 export declare interface IVirtualDragData {

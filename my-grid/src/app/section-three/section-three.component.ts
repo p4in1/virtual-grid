@@ -255,7 +255,9 @@ export class SectionThreeComponent implements AfterViewInit {
             element: this.grid.nativeElement,
             showHeader: true,
             showGroupPanel: true,
-            showColumnFilter: true,
+            filter:{
+                showColumnFilter:true
+            },
             showColumnAggregation: true,
             isMultiSelect: true,
             isRangeSelect: true,

@@ -45,8 +45,8 @@ export class VirtualGridRow implements IVirtualGridRow {
         }
 
         if (node[Grid.ConfigController.childNodesKey]) {
-            this.isExpanded = Grid.ConfigController.expandNodesByDefault || node.expanded;
-            this.isSelectable = !!Grid.ConfigController.selectLeavesOnly || Grid.ConfigController.isParentChildSelection;
+            this.isExpanded = node.isExpanded == void 0 ? Grid.ConfigController.expandNodesByDefault : node.isExpanded;
+            this.isSelectable = !Grid.ConfigController.selectLeavesOnly || Grid.ConfigController.isParentChildSelection;
         }
 
         this.rowData = node
@@ -124,15 +124,26 @@ export class VirtualGridRow implements IVirtualGridRow {
         return !options.stringify ? cellValue : col.colType == "multiLine" && Array.isArray(cellValue) ? cellValue.join(" ") : cellValue.toString()
     }
 
+    /**
+     * remove this row from the grid
+     */
     public remove = () => {
         this.Grid.api.removeRow(this)
     }
 
+    /**
+     * overwrite the current rowData object
+     * @param data - new rowData object
+     */
     public setData = (data) => {
         this.rowData = data
 
         if (this.renderedRow && this.renderedRow.index == this.index) {
             this.Grid.RowController.renderRow(this.renderedRow, true)
         }
+    }
+
+    public addNode = (rowNode): IVirtualGridRow => {
+        return this.Grid.api.addRow(this, rowNode)
     }
 }

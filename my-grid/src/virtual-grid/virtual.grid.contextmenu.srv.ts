@@ -16,7 +16,7 @@ export class VirtualGridContextmenuController {
     }
 
     hideMenu = (): void => {
-        this.contextmenu.hide(true)
+        this.contextmenu && this.contextmenu.hide(true)
     }
 
     showMenu(row: IVirtualGridRow, col: IVirtualGridColumn, event) {
@@ -25,6 +25,12 @@ export class VirtualGridContextmenuController {
         event.stopImmediatePropagation()
 
         let entries = this.getEntries(row, col)
+
+        if (entries == void 0 || entries.length === 0) {
+            this.hideMenu()
+            return
+        }
+
         this.Grid.domController.dom.contextmenu.innerHTML = ""
         this.contextmenu = new VirtualGridContextMenu(this.Grid, this.Grid.domController.dom.contextmenu, entries, row, col, event)
 
@@ -57,7 +63,7 @@ export class VirtualGridContextmenuController {
             }]
         }
 
-        let userEntries = this.config.getContextMenuEntries(row, col)
+        let userEntries = this.config.getContextMenuEntries({Grid: this.Grid, row, col})
         if (userEntries && Array.isArray(userEntries)) {
             entries = entries.concat(userEntries)
         }

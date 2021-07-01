@@ -40,6 +40,7 @@ export class VirtualGridRowController {
     public setRowIndexes = (): void => {
         for (let i = 0; i < this.Grid.rows.length; i++) {
             this.Grid.rows[i].index = i;
+
             if (this.Grid.rows[i].initialIndex == void 0) {
                 this.Grid.rows[i].initialIndex = this.Grid.rows[i].index
             }
@@ -630,5 +631,24 @@ export class VirtualGridRowController {
         } else if (this.Grid.SortController.sortedColumns.length !== 0) {
             this.Grid.SortController.applySorting()
         }
+    }
+
+    expandParents(row: IVirtualGridRow) {
+        let hasParent: boolean = row.parent != void 0;
+        while (hasParent) {
+            row = row.parent;
+
+            if (!row.isExpanded) {
+                row.isExpanded = true
+
+                this.Grid.RowController.expandCollapse(row)
+            }
+
+            if (row.parent == void 0) {
+                hasParent = false;
+            }
+        }
+
+        this.Grid.api.refreshGrid(false, false, false);
     }
 }

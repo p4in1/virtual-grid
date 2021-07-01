@@ -140,6 +140,10 @@ export class VirtualGridSelectionController {
         this.selectedRows.push(row);
         this.Grid.RowController.toggleSelectionClasses(row);
         this.checkParentChildSelection(row)
+
+        if (this.config.onRowSelect) {
+            this.config.onRowSelect({grid: this.Grid, row})
+        }
     }
 
     private checkParentChildSelection(row) {
