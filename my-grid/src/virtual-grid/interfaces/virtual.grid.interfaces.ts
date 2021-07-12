@@ -163,7 +163,7 @@ export declare interface IVirtualGridConfig {
          * whether to show the column filter or not
          * @default false
          */
-        showColumnFilter?:boolean
+        showColumnFilter?: boolean
     }
 
     /**
@@ -517,6 +517,8 @@ export declare interface IVirtualGridColumn {
     cellValueGetter?: Function
     cellValueFormatter?: Function
 
+    headerCellValueGetter?: Function
+
     isVisible?: boolean
     isFilterPresent: boolean
     isShowFilter?: boolean
@@ -770,6 +772,8 @@ export declare interface IVirtualColDefConfig {
     cellValueGetter(): void
 
     cellValueFormatter(): void
+
+    headerCellValueGetter(): void
 
     onCellClick(cell): void
 

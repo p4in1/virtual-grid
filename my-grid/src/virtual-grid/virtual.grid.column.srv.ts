@@ -31,7 +31,13 @@ export class VirtualGridColumnController {
 
             let headerValue: string = "";
 
-            if (typeof (this.config.headerValueGetter) == "function") {
+            // first we check if the column has a header value getter
+            // second we check if the grid itself has a headerValueGetter
+            // otherwise we simply use the title as it is
+
+            if (typeof (column.headerCellValueGetter) === "function") {
+                headerValue = column.headerCellValueGetter({column, api: this.Grid.api});
+            } else if (typeof (this.config.headerValueGetter) == "function") {
                 headerValue = this.config.headerValueGetter({column, api: this.Grid.api});
             } else {
                 headerValue = column.title;

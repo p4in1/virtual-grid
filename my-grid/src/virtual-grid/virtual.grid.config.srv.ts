@@ -89,7 +89,7 @@ export class VirtualGridConfigController {
 
         this.isParentChildSelection = !!config.isParentChildSelection
 
-        this.headerValueGetter = config.headerValueGetter
+        this.headerValueGetter = typeof config.headerValueGetter == "function" ? config.headerValueGetter : null;
         this.childNodesKey = config.childNodesKey != void 0 && config.childNodesKey !== '' ? config.childNodesKey : 'children';
 
         this.onGridReady = typeof config.onGridReady == "function" ? config.onGridReady : this._noop
@@ -196,6 +196,8 @@ export class VirtualGridConfigController {
                 cellRenderer: col.cellRenderer,
                 cellValueFormatter: col.cellValueFormatter,
                 cellValueGetter: col.cellValueGetter,
+
+                headerCellValueGetter: col.headerCellValueGetter,
 
                 pinned: col.pinned && ["left", "right"].includes(col.pinned) ? col.pinned : "center",
 

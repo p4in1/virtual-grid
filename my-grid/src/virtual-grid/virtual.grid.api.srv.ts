@@ -309,6 +309,13 @@ export class VirtualGridApi {
     };
 
     /**
+     * refreshes only the rows and flashes the cells that are updated
+     */
+    refreshRows = (): void =>  {
+        this.Grid.RowController.renderRows(true)
+    }
+
+    /**
      * destroys the whole grid and releases event listeners and removes all dom nodes
      */
     destroy = (): void => {
@@ -355,10 +362,6 @@ export class VirtualGridApi {
 
     updateAggregates() {
         this.Grid.ColumnController.aggregate()
-    }
-
-    updateRows() {
-        this.Grid.RowController.renderRows(true)
     }
 
     addRow(row: IVirtualGridRow, node): IVirtualGridRow {

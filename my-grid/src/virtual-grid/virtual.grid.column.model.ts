@@ -67,6 +67,8 @@ export class VirtualGridColumn implements IVirtualGridColumn {
     cellValueGetter: Function;
     cellValueFormatter: Function
 
+    headerCellValueGetter: Function;
+
     aggFunc: string | Function
     aggFuncTitle: string
     aggregateRowGroups: boolean
@@ -131,6 +133,7 @@ export class VirtualGridColumn implements IVirtualGridColumn {
         this.cellValueGetter = typeof (configColDef.cellValueGetter) == "function" ? configColDef.cellValueGetter : null;
         this.cellValueFormatter = typeof (configColDef.cellValueFormatter) == "function" ? configColDef.cellValueFormatter : null;
 
+        this.headerCellValueGetter = typeof (configColDef.headerCellValueGetter) == "function" ? configColDef.headerCellValueGetter : null;
 
         this.onCellClick = typeof (configColDef.onCellClick) == "function" ? configColDef.onCellClick : null;
         this.onCellRightClick = typeof (configColDef.onCellRightClick) == "function" ? configColDef.onCellRightClick : null;
